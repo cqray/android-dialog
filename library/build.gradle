@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 30
+        versionCode 46
+        versionName createVersionName(versionCode)
+
+        consumerProguardFiles "consumer-rules.pro"
+
+//        compileOptions {
+//            sourceCompatibility JavaVersion.VERSION_1_8
+//            targetCompatibility JavaVersion.VERSION_1_8
+//        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    api fileTree(dir: "libs", include: ["*.jar"])
+    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'com.github.cqray:android-animator:0.5.7'
+}
+
+/**
+ * 生成版本名
+ */
+static String createVersionName(int code) {
+    int num1 = code / 100
+    int num2 = (code - num1 * 100) / 10
+    int num3 = code - num1 * 100 - num2 * 10
+    return num1 + "." + num2 + "." + num3
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#454718</color>
+    <color name="text">#333333</color>
+    <color name="tint">#777777</color>
+    <color name="divider">#DEDEDE</color>
+    <color name="pressed">#EEEEEE</color>
+    <color name="foreground">#FFFFFF</color>
+</resources>

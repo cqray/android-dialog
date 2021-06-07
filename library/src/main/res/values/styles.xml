@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--自定义对话框样式-->
+    <style name="DialogFragmentNoAnimation" parent="android:Theme.Dialog">
+        <!--透明主题-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <!--进入时的动画-->
+        <item name="android:windowEnterAnimation">@anim/__no_animation</item>
+        <!--退出时的动画-->
+        <item name="android:windowExitAnimation">@anim/__no_animation</item>
+    </style>
+</resources>
