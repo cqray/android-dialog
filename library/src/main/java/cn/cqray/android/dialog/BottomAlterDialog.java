@@ -139,14 +139,14 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
             @Override
             public void onChanged(Integer integer) {
                 mStartView.setVisibility(integer);
-                //mTitleModule.setPadding(getDefaultPadding(), 0, getDefaultPadding(), 0);
+                setTitlePadding();
             }
         });
         mEndModule.observeGravity(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mEndView.setVisibility(integer);
-                //mTitleModule.setPadding(getDefaultPadding(), 0, getDefaultPadding(), 0);
+                setTitlePadding();
             }
         });
         mTitlePadding.observe(this, new Observer<float[]>() {
