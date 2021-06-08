@@ -132,7 +132,6 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
             @Override
             public void onChanged(Integer integer) {
                 setTitleCenter(integer);
-                setTitlePadding();
             }
         });
         mStartModule.observeGravity(this, new Observer<Integer>() {
@@ -356,7 +355,9 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         setTitleMargin();
     }
 
-
+    /**
+     * 设置标题控件外部间隔
+     */
     private void setTitleMargin() {
         mTitleView.post(new Runnable() {
             @Override
@@ -402,6 +403,7 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
                 params.addRule(RelativeLayout.END_OF, 0);
                 params.addRule(RelativeLayout.START_OF, 0);
             }
+            setTitlePadding();
         }
     }
 

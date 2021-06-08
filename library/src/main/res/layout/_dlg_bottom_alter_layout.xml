@@ -63,8 +63,6 @@
             android:gravity="center_vertical"
             android:ellipsize="end"
             android:maxLines="1"
-            android:layout_marginLeft="@dimen/small"
-            android:layout_marginRight="@dimen/small"
             android:background="@color/colorPrimary"
             android:textColor="@color/text"
             android:textSize="@dimen/h3">

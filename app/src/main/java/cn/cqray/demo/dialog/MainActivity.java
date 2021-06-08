@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                             .titleCenter()
                             //.startVisible(false)
                             //.endVisible(false)
-                            .startBackgroundResource(R.color.colorAccent)
+                            //.startBackgroundResource(R.color.colorAccent)
                             //.endBackgroundResource(R.color.colorAccent)
                             //.content("是噶好尬gsa")
                             //.contentTextSize(16)
