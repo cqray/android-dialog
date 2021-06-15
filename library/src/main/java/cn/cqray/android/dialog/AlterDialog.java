@@ -37,7 +37,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 是否是默认背景 **/
     private boolean mDefaultButtonBackground = true;
     /** 按钮监听事件 **/
-    private OnBtnClickListener[] mButtonListeners;
+    private OnButtonClickListener[] mButtonListeners;
     /** 内容间隔 **/
     private final MutableLiveData<Float> mContentPadding = new MutableLiveData<>();
     /** 按钮文本 **/
@@ -203,7 +203,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
         return (T) this;
     }
 
-    public T buttonClick(OnBtnClickListener... listeners) {
+    public T buttonClick(OnButtonClickListener... listeners) {
         mButtonListeners = listeners;
         return (T) this;
     }
@@ -299,7 +299,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
                 // 控件索引
                 int index = mBottomView.indexOfChild(v);
                 // 获取对应的监听事件
-                OnBtnClickListener listener1 = mButtonListeners == null ||
+                OnButtonClickListener listener1 = mButtonListeners == null ||
                         mButtonListeners.length <= index ?
                         null : mButtonListeners[index];
                 // 回调

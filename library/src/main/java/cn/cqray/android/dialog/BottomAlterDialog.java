@@ -44,8 +44,8 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     private boolean mTitleCenter;
     private boolean mDefaultStartBackground = true;
     private boolean mDefaultEndBackground = true;
-    private List<OnBtnClickListener> mLeftListeners = new ArrayList<>();
-    private List<OnBtnClickListener> mRightListeners = new ArrayList<>();
+    private List<OnButtonClickListener> mLeftListeners = new ArrayList<>();
+    private List<OnButtonClickListener> mRightListeners = new ArrayList<>();
 
     /** 标题间隔 **/
     private final MutableLiveData<float[]> mTitlePadding = new MutableLiveData<>();
@@ -90,7 +90,7 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mStartView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (OnBtnClickListener listener : mLeftListeners) {
+                for (OnButtonClickListener listener : mLeftListeners) {
                     listener.onClick();
                 }
             }
@@ -98,7 +98,7 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mEndView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (OnBtnClickListener listener : mRightListeners) {
+                for (OnButtonClickListener listener : mRightListeners) {
                     listener.onClick();
                 }
             }
@@ -134,14 +134,14 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
                 setTitleCenter(integer);
             }
         });
-        mStartModule.observeGravity(this, new Observer<Integer>() {
+        mStartModule.observeVisibility(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mStartView.setVisibility(integer);
                 setTitlePadding();
             }
         });
-        mEndModule.observeGravity(this, new Observer<Integer>() {
+        mEndModule.observeVisibility(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
                 mEndView.setVisibility(integer);
@@ -318,12 +318,12 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         return (T) this;
     }
 
-    public T addStartClickListener(OnBtnClickListener listener) {
+    public T addStartClickListener(OnButtonClickListener listener) {
         mLeftListeners.add(listener);
         return (T) this;
     }
 
-    public T addEndClickListener(OnBtnClickListener listener) {
+    public T addEndClickListener(OnButtonClickListener listener) {
         mRightListeners.add(listener);
         return (T) this;
     }

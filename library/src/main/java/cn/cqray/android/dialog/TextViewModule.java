@@ -3,6 +3,7 @@ package cn.cqray.android.dialog;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 
