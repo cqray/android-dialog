@@ -1,6 +1,7 @@
 package cn.cqray.android.dialog;
 
 import android.animation.ValueAnimator;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -146,6 +147,9 @@ public class DialogModule extends ViewModule<View> {
 
     public void setCustomAmountCount(float amount) {
         mCustomAmountCount = amount;
+        if (mWindow != null && Looper.myLooper() == Looper.getMainLooper()) {
+            mWindow.setDimAmount(amount);
+        }
     }
 
     public void setNativeAmountCount(float amount) {
