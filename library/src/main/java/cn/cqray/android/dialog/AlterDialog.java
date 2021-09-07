@@ -18,8 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -37,7 +37,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 是否是默认背景 **/
     private boolean mDefaultButtonBackground = true;
     /** 按钮监听事件 **/
-    private OnButtonClickListener[] mButtonListeners;
+    private View.OnClickListener[] mButtonListeners;
     /** 内容间隔 **/
     private final MutableLiveData<Float> mContentPadding = new MutableLiveData<>();
     /** 按钮文本 **/
@@ -57,17 +57,10 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 分割线程序块 **/
     protected final ViewModule<View> mDividerModule;
 
-    public AlterDialog(FragmentActivity act) {
-        super(act);
-        mTitleModule = new TextViewModule(act);
-        mDividerModule = new ViewModule<>(act);
-        gravityCenter();
-    }
-
-    public AlterDialog(Fragment fragment) {
-        super(fragment);
-        mTitleModule = new TextViewModule(fragment);
-        mDividerModule = new ViewModule<>(fragment);
+    public AlterDialog(LifecycleOwner owner) {
+        super(owner);
+        mTitleModule = new TextViewModule(owner);
+        mDividerModule = new ViewModule<>(owner);
         gravityCenter();
     }
 
@@ -203,7 +196,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
         return (T) this;
     }
 
-    public T buttonClick(OnButtonClickListener... listeners) {
+    public T buttonClick(View.OnClickListener... listeners) {
         mButtonListeners = listeners;
         return (T) this;
     }
@@ -299,12 +292,12 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
                 // 控件索引
                 int index = mBottomView.indexOfChild(v);
                 // 获取对应的监听事件
-                OnButtonClickListener listener1 = mButtonListeners == null ||
+                View.OnClickListener listener1 = mButtonListeners == null ||
                         mButtonListeners.length <= index ?
                         null : mButtonListeners[index];
                 // 回调
                 if (listener1 != null) {
-                    listener1.onClick();
+                    listener1.onClick(v);
                 }
             }
         };

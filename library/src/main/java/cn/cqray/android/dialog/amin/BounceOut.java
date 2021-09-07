@@ -9,6 +9,7 @@ import cn.cqray.android.anim.AnimatorBuilder;
  * @author Cqray
  */
 public class BounceOut extends DialogAnimator {
+
     @Override
     public void onHandle(@NonNull AnimatorBuilder builder) {
         builder.bounceOut();

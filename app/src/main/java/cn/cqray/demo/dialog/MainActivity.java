@@ -1,6 +1,7 @@
 package cn.cqray.demo.dialog;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -13,12 +14,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 import cn.cqray.android.dialog.AlterDialog;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
+import cn.cqray.android.dialog.DialogState;
 import cn.cqray.android.dialog.MessageDialog;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 //                        .backgroundColor(Color.WHITE)
 //                        .show(MainActivity.this);
                 if (dialog == null) {
+
                     dialog = new BottomAlterDialog<>(MainActivity.this)
                             .width(300)
                             .height(200)
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 //                            .titlePadding(16)
 //                            .titleCenter()
                             .startVisible(false)
+
                             //.endVisible(false)
                             //.startBackgroundResource(R.color.colorAccent)
                             //.endBackgroundResource(R.color.colorAccent)
@@ -69,6 +74,24 @@ public class MainActivity extends AppCompatActivity {
                             //.contentTextColor(Color.RED)
                             //.buttonTextSize(16)
                             //.buttonBackgroundResource(R.color.colorAccent)
+//                            .observeShow(MainActivity.this, new Observer<BaseDialog<?>>() {
+//                                @Override
+//                                public void onChanged(BaseDialog<?> t) {
+//
+//                                }
+//                            })
+                            .addEndClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .observeDismiss(MainActivity.this, new Observer<DialogState>() {
+                                @Override
+                                public void onChanged(DialogState dialogState) {
+                                    Toast.makeText(MainActivity.this, "哈哈", Toast.LENGTH_SHORT).show();
+                                }
+                            })
                             .nativeDimAmount(0.15f)
                             .customDimAmount(0f);
                 }

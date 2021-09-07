@@ -6,8 +6,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -27,15 +25,8 @@ public class PanelModule extends ViewModule<ViewGroup> {
     /** 面板宽、高 **/
     private final MutableLiveData<int[]> mSize = new MutableLiveData<>();
 
-    public PanelModule(FragmentActivity act) {
-        super(act);
-        setWidth(0);
-        setBackgroundColor(Color.WHITE);
-        setGravity(Gravity.CENTER);
-    }
-
-    public PanelModule(Fragment fragment) {
-        super(fragment);
+    public PanelModule(LifecycleOwner owner) {
+        super(owner);
         setWidth(0);
         setBackgroundColor(Color.WHITE);
         setGravity(Gravity.CENTER);

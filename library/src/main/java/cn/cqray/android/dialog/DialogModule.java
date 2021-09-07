@@ -7,22 +7,17 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-
-import java.util.List;
-import java.util.Vector;
 
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
 import cn.cqray.android.dialog.amin.DialogAnimator;
 
 /**
- * @author Admin
- * @date 2021/6/7 11:13
+ * 对话框模块
+ * @author Cqray
  */
 public class DialogModule extends ViewModule<View> {
 
@@ -44,19 +39,17 @@ public class DialogModule extends ViewModule<View> {
     private MutableLiveData<Integer> mWindowSize = new MutableLiveData<>();
     /** 自定义遮罩四周间隔 **/
     private MutableLiveData<float []> mCustomDimMargin = new MutableLiveData<>();
-    /** 取消监听 **/
-    private List<OnCancelListener> mOnCancelListeners = new Vector<>();
-    /** 关闭监听 **/
-    private List<OnDismissListener> mOnDismissListeners = new Vector<>();
     /** 显示监听 **/
-    private List<OnShowListener> mOnShowListeners = new Vector<>();
+    private MutableLiveData<DialogState> mShow = new MutableLiveData<>();
+    /** 取消监听 **/
+    private MutableLiveData<DialogState> mCancel = new MutableLiveData<>();
+    /** 关闭监听 **/
+    private MutableLiveData<DialogState> mDismiss = new MutableLiveData<>();
 
-    public DialogModule(FragmentActivity act) {
-        super(act);
-    }
+    private MutableLiveData<DialogState> mState = new MutableLiveData<>();
 
-    public DialogModule(Fragment fragment) {
-        super(fragment);
+    public DialogModule(LifecycleOwner owner) {
+        super(owner);
     }
 
     @Override
@@ -97,6 +90,39 @@ public class DialogModule extends ViewModule<View> {
         });
     }
 
+    public void observeState(LifecycleOwner owner, final Observer<DialogState> observer) {
+        mState.removeObservers(owner);
+        mState.observe(owner, observer);
+    }
+
+    public void observeShow(LifecycleOwner owner, final Observer<DialogState> observer) {
+        mShow.removeObservers(owner);
+        mShow.observe(owner, observer);
+    }
+
+    public void observeCancel(LifecycleOwner owner, final Observer<DialogState> observer) {
+        mCancel.removeObservers(owner);
+        mCancel.observe(owner, observer);
+    }
+
+    public void observeDismiss(LifecycleOwner owner, final Observer<DialogState> observer) {
+        mDismiss.removeObservers(owner);
+        mDismiss.observe(owner, observer);
+    }
+
+    public void setState(DialogState state) {
+        if (state == DialogState.SHOW) {
+            mShow.setValue(DialogState.SHOW);
+            mState.setValue(DialogState.SHOW);
+        } else if (state == DialogState.CANCEL) {
+            mCancel.setValue(DialogState.CANCEL);
+            mState.setValue(DialogState.CANCEL);
+        } else if (state == DialogState.DISMISS) {
+            mDismiss.setValue(DialogState.DISMISS);
+            mState.setValue(DialogState.DISMISS);
+        }
+    }
+
     public void setWindow(Window window) {
         mWindow = window;
         mWindowSize.postValue(0);
@@ -124,18 +150,6 @@ public class DialogModule extends ViewModule<View> {
 
     public void setNativeAmountCount(float amount) {
         mNativeAmountCount = amount;
-    }
-
-    public void addOnCancelListener(OnCancelListener listener) {
-        mOnCancelListeners.add(listener);
-    }
-
-    public void addOnDismissListener(OnDismissListener listener) {
-        mOnDismissListeners.add(listener);
-    }
-
-    public void addOnShowListener(OnShowListener listener) {
-        mOnShowListeners.add(listener);
     }
 
     public boolean isCancelableOutsize() {
@@ -175,17 +189,5 @@ public class DialogModule extends ViewModule<View> {
         int end = show ? (int) (255 * mCustomAmountCount) : 0;
         mDimAnimator = ValueAnimator.ofInt(start, end);
         return mDimAnimator;
-    }
-
-    public List<OnCancelListener> getOnCancelListeners() {
-        return mOnCancelListeners;
-    }
-
-    public List<OnDismissListener> getOnDismissListeners() {
-        return mOnDismissListeners;
-    }
-
-    public List<OnShowListener> getOnShowListeners() {
-        return mOnShowListeners;
     }
 }

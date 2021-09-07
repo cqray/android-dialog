@@ -3,20 +3,17 @@ package cn.cqray.android.dialog;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 
 import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 /**
+ * 文本按钮模块
  * @author Cqray
- * @date 2021/6/6 22:35
  */
 public class TextViewModule extends ViewModule<TextView> {
 
@@ -31,12 +28,8 @@ public class TextViewModule extends ViewModule<TextView> {
     /** 文本位置 **/
     private final MutableLiveData<Integer> mGravity = new MutableLiveData<>();
 
-    public TextViewModule(FragmentActivity act) {
-        super(act);
-    }
-
-    public TextViewModule(Fragment fragment) {
-        super(fragment);
+    public TextViewModule(LifecycleOwner owner) {
+        super(owner);
     }
 
     @Override

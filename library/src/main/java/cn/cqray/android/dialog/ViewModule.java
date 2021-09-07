@@ -1,5 +1,6 @@
 package cn.cqray.android.dialog;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -9,7 +10,6 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,8 +26,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 /**
+ * View控件模块
  * @author Cqray
- * @date 2021/6/6 22:41
  */
 public class ViewModule<T extends View> {
     /** 圆角数量 **/
@@ -51,12 +51,12 @@ public class ViewModule<T extends View> {
     /** 背景资源 **/
     private final MutableLiveData<Integer> mBackgroundResource = new MutableLiveData<>();
 
-    public ViewModule(FragmentActivity act) {
-        mLifecycleOwner = act;
-    }
-
-    public ViewModule(Fragment fragment) {
-        mLifecycleOwner = fragment;
+    public ViewModule(LifecycleOwner owner) {
+        if (owner instanceof Activity || owner instanceof Fragment) {
+            mLifecycleOwner = owner;
+            return;
+        }
+        throw new IllegalArgumentException("LifecycleOwner must implements on FragmentActivity or Fragment.");
     }
 
     public void observe(LifecycleOwner owner, final T view) {

@@ -15,8 +15,8 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -44,8 +44,8 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     private boolean mTitleCenter;
     private boolean mDefaultStartBackground = true;
     private boolean mDefaultEndBackground = true;
-    private List<OnButtonClickListener> mLeftListeners = new ArrayList<>();
-    private List<OnButtonClickListener> mRightListeners = new ArrayList<>();
+    private List<View.OnClickListener> mLeftListeners = new ArrayList<>();
+    private List<View.OnClickListener> mRightListeners = new ArrayList<>();
 
     /** 标题间隔 **/
     private final MutableLiveData<float[]> mTitlePadding = new MutableLiveData<>();
@@ -60,21 +60,12 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     /** 分割线代码块 **/
     protected final ViewModule<View> mDividerModule;
 
-    public BottomAlterDialog(FragmentActivity act) {
-        super(act);
-        mTitleModule = new TextViewModule(act);
-        mStartModule = new TextViewModule(act);
-        mEndModule = new TextViewModule(act);
-        mDividerModule = new ViewModule<>(act);
-        gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
-    }
-
-    public BottomAlterDialog(Fragment fragment) {
-        super(fragment);
-        mTitleModule = new TextViewModule(fragment);
-        mStartModule = new TextViewModule(fragment);
-        mEndModule = new TextViewModule(fragment);
-        mDividerModule = new ViewModule<>(fragment);
+    public BottomAlterDialog(LifecycleOwner owner) {
+        super(owner);
+        mTitleModule = new TextViewModule(owner);
+        mStartModule = new TextViewModule(owner);
+        mEndModule = new TextViewModule(owner);
+        mDividerModule = new ViewModule<>(owner);
         gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
     }
 
@@ -90,16 +81,16 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mStartView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (OnButtonClickListener listener : mLeftListeners) {
-                    listener.onClick();
+                for (View.OnClickListener listener : mLeftListeners) {
+                    listener.onClick(v);
                 }
             }
         });
         mEndView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for (OnButtonClickListener listener : mRightListeners) {
-                    listener.onClick();
+                for (View.OnClickListener listener : mRightListeners) {
+                    listener.onClick(v);
                 }
             }
         });
@@ -318,12 +309,12 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         return (T) this;
     }
 
-    public T addStartClickListener(OnButtonClickListener listener) {
+    public T addStartClickListener(View.OnClickListener listener) {
         mLeftListeners.add(listener);
         return (T) this;
     }
 
-    public T addEndClickListener(OnButtonClickListener listener) {
+    public T addEndClickListener(View.OnClickListener listener) {
         mRightListeners.add(listener);
         return (T) this;
     }
@@ -407,6 +398,9 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         }
     }
 
+    /**
+     * 获取默认的标题间隔
+     */
     private int getDefaultPadding() {
         float[] padding = mTitlePadding.getValue();
         if (padding == null) {
