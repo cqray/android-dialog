@@ -18,7 +18,7 @@ allprojects {
 #### 第二步
 添加依赖
 ```
-implementation 'com.github.cqray:android-dialog:0.4.6'
+implementation 'com.github.cqray:android-dialog:0.4.7'
 ```
 
 ### 如何使用
