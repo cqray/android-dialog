@@ -18,11 +18,11 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-import cn.cqray.android.dialog.AlterDialog;
+
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
-import cn.cqray.android.dialog.DialogState;
-import cn.cqray.android.dialog.MessageDialog;
+import cn.cqray.android.dialog.OnCancelListener;
+import cn.cqray.android.dialog.OnDismissListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -86,10 +86,16 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             })
-                            .observeDismiss(MainActivity.this, new Observer<DialogState>() {
+                            .addOnDismissListener(new OnDismissListener() {
                                 @Override
-                                public void onChanged(DialogState dialogState) {
+                                public void onDismiss() {
                                     Toast.makeText(MainActivity.this, "哈哈", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnCancelListener(new OnCancelListener() {
+                                @Override
+                                public void onCancel() {
+                                    Toast.makeText(MainActivity.this, "哈哈2", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .nativeDimAmount(0.15f)

@@ -7,10 +7,16 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
@@ -21,6 +27,14 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
  * @author Cqray
  */
 public class DialogModule extends ViewModule<View> {
+
+    public static final int CANCEL = 0;
+    public static final int DISMISS = 1;
+    public static final int SHOW = 2;
+
+    @IntDef({CANCEL, DISMISS, SHOW})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface DialogState {}
 
     /** 点击外部取消 */
     private boolean mCancelableOutsize = true;
@@ -40,14 +54,12 @@ public class DialogModule extends ViewModule<View> {
     private MutableLiveData<Integer> mWindowSize = new MutableLiveData<>();
     /** 自定义遮罩四周间隔 **/
     private MutableLiveData<float []> mCustomDimMargin = new MutableLiveData<>();
-    /** 显示监听 **/
-    private MutableLiveData<DialogState> mShow = new MutableLiveData<>();
     /** 取消监听 **/
-    private MutableLiveData<DialogState> mCancel = new MutableLiveData<>();
+    private List<OnCancelListener> mCancelListeners = new ArrayList<>();
     /** 关闭监听 **/
-    private MutableLiveData<DialogState> mDismiss = new MutableLiveData<>();
-
-    private MutableLiveData<DialogState> mState = new MutableLiveData<>();
+    private List<OnDismissListener> mDismissListeners = new ArrayList<>();
+    /** 显示监听 **/
+    private List<OnShowListener> mShowListeners = new ArrayList<>();
 
     public DialogModule(LifecycleOwner owner) {
         super(owner);
@@ -91,37 +103,32 @@ public class DialogModule extends ViewModule<View> {
         });
     }
 
-    public void observeState(LifecycleOwner owner, final Observer<DialogState> observer) {
-        mState.removeObservers(owner);
-        mState.observe(owner, observer);
-    }
-
-    public void observeShow(LifecycleOwner owner, final Observer<DialogState> observer) {
-        mShow.removeObservers(owner);
-        mShow.observe(owner, observer);
-    }
-
-    public void observeCancel(LifecycleOwner owner, final Observer<DialogState> observer) {
-        mCancel.removeObservers(owner);
-        mCancel.observe(owner, observer);
-    }
-
-    public void observeDismiss(LifecycleOwner owner, final Observer<DialogState> observer) {
-        mDismiss.removeObservers(owner);
-        mDismiss.observe(owner, observer);
-    }
-
-    public void setState(DialogState state) {
-        if (state == DialogState.SHOW) {
-            mShow.setValue(DialogState.SHOW);
-            mState.setValue(DialogState.SHOW);
-        } else if (state == DialogState.CANCEL) {
-            mCancel.setValue(DialogState.CANCEL);
-            mState.setValue(DialogState.CANCEL);
-        } else if (state == DialogState.DISMISS) {
-            mDismiss.setValue(DialogState.DISMISS);
-            mState.setValue(DialogState.DISMISS);
+    public void setState(@DialogState int state) {
+        if (state == SHOW) {
+            for (OnShowListener listener : mShowListeners) {
+                listener.onShow();
+            }
+        } else if (state == CANCEL) {
+            for (OnCancelListener listener : mCancelListeners) {
+                listener.onCancel();
+            }
+        } else if (state == DISMISS) {
+            for (OnDismissListener listener : mDismissListeners) {
+                listener.onDismiss();
+            }
         }
+    }
+
+    public void addOnCancelListener(OnCancelListener listener) {
+        mCancelListeners.add(listener);
+    }
+
+    public void addOnDismissListener(OnDismissListener listener) {
+        mDismissListeners.add(listener);
+    }
+
+    public void addOnShowListener(OnShowListener listener) {
+        mShowListeners.add(listener);
     }
 
     public void setWindow(Window window) {

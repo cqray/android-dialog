@@ -28,7 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import cn.cqray.android.dialog.amin.DialogAnimator;
 
@@ -151,10 +150,10 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
         super.onDismiss(dialog);
         if (mCancel) {
             onCancel();
-            mDialogModule.setState(DialogState.CANCEL);
+            mDialogModule.setState(DialogModule.CANCEL);
         }
         onDismiss();
-        mDialogModule.setState(DialogState.DISMISS);
+        mDialogModule.setState(DialogModule.DISMISS);
     }
 
     public void show() {
@@ -204,26 +203,6 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
         mPanelView.removeAllViews();
         mPanelView.addView(view);
         mUnBinder = ButterKnifeUtils.bind(this, mRootView);
-    }
-
-    public T observeState(LifecycleOwner owner, Observer<DialogState> observer) {
-        mDialogModule.observeState(owner, observer);
-        return (T) this;
-    }
-
-    public T observeShow(LifecycleOwner owner, Observer<DialogState> observer) {
-        mDialogModule.observeShow(owner, observer);
-        return (T) this;
-    }
-
-    public T observeCancel(LifecycleOwner owner, Observer<DialogState> observer) {
-        mDialogModule.observeCancel(owner, observer);
-        return (T) this;
-    }
-
-    public T observeDismiss(LifecycleOwner owner, Observer<DialogState> observer) {
-        mDialogModule.observeDismiss(owner, observer);
-        return (T) this;
     }
 
     public T cancelable(boolean cancelable) {
@@ -359,6 +338,21 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
         return (T) this;
     }
 
+    public T addOnCancelListener(OnCancelListener listener) {
+        mDialogModule.addOnCancelListener(listener);
+        return (T) this;
+    }
+
+    public T addOnDismissListener(OnDismissListener listener) {
+        mDialogModule.addOnDismissListener(listener);
+        return (T) this;
+    }
+
+    public T addOnShowListener(OnShowListener listener) {
+        mDialogModule.addOnShowListener(listener);
+        return (T) this;
+    }
+
     public <V extends View> V findViewById(@IdRes int resId) {
         if (mRootView != null) {
             return mRootView.findViewById(resId);
@@ -398,7 +392,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
                         quickDismiss();
                     } else {
                         onShow();
-                        mDialogModule.setState(DialogState.SHOW);
+                        mDialogModule.setState(DialogModule.SHOW);
                     }
                 }
 
