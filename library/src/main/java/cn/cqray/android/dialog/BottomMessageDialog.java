@@ -18,9 +18,9 @@ public class BottomMessageDialog extends BottomAlterDialog<BottomMessageDialog> 
 
     private final TextViewModule mContentModule;
 
-    public BottomMessageDialog(FragmentActivity act) {
-        super(act);
-        mContentModule = new TextViewModule(act);
+    public BottomMessageDialog(FragmentActivity activity) {
+        super(activity);
+        mContentModule = new TextViewModule(activity);
         startVisible(false).endVisible(false);
     }
 

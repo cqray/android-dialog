@@ -19,7 +19,8 @@ import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
-import androidx.lifecycle.LifecycleOwner;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -57,10 +58,17 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 分割线程序块 **/
     protected final ViewModule<View> mDividerModule;
 
-    public AlterDialog(LifecycleOwner owner) {
-        super(owner);
-        mTitleModule = new TextViewModule(owner);
-        mDividerModule = new ViewModule<>(owner);
+    public AlterDialog(FragmentActivity activity) {
+        super(activity);
+        mTitleModule = new TextViewModule(activity);
+        mDividerModule = new ViewModule<>(activity);
+        gravityCenter();
+    }
+
+    public AlterDialog(Fragment fragment) {
+        super(fragment);
+        mTitleModule = new TextViewModule(fragment);
+        mDividerModule = new ViewModule<>(fragment);
         gravityCenter();
     }
 

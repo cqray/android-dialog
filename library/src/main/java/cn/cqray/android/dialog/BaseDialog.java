@@ -49,7 +49,15 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
     protected final DialogModule mDialogModule;
     protected final PanelModule mPanelModule;
 
-    public BaseDialog(LifecycleOwner owner) {
+    public BaseDialog(FragmentActivity activity) {
+        this((LifecycleOwner) activity);
+    }
+
+    public BaseDialog(Fragment fragment) {
+        this((LifecycleOwner) fragment);
+    }
+
+    private BaseDialog(LifecycleOwner owner) {
         if (owner instanceof FragmentActivity || owner instanceof Fragment) {
             mLifecycleOwner = owner;
             mDialogModule = new DialogModule(owner);

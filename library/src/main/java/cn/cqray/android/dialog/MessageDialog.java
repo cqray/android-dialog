@@ -18,9 +18,9 @@ public class MessageDialog extends AlterDialog<MessageDialog> {
 
     private final TextViewModule mContentModule;
 
-    public MessageDialog(FragmentActivity act) {
-        super(act);
-        mContentModule = new TextViewModule(act);
+    public MessageDialog(FragmentActivity activity) {
+        super(activity);
+        mContentModule = new TextViewModule(activity);
     }
 
     public MessageDialog(Fragment fragment) {

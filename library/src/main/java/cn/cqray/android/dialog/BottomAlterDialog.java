@@ -16,7 +16,8 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
-import androidx.lifecycle.LifecycleOwner;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -60,12 +61,21 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     /** 分割线代码块 **/
     protected final ViewModule<View> mDividerModule;
 
-    public BottomAlterDialog(LifecycleOwner owner) {
-        super(owner);
-        mTitleModule = new TextViewModule(owner);
-        mStartModule = new TextViewModule(owner);
-        mEndModule = new TextViewModule(owner);
-        mDividerModule = new ViewModule<>(owner);
+    public BottomAlterDialog(FragmentActivity activity) {
+        super(activity);
+        mTitleModule = new TextViewModule(activity);
+        mStartModule = new TextViewModule(activity);
+        mEndModule = new TextViewModule(activity);
+        mDividerModule = new ViewModule<>(activity);
+        gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
+    }
+
+    public BottomAlterDialog(Fragment fragment) {
+        super(fragment);
+        mTitleModule = new TextViewModule(fragment);
+        mStartModule = new TextViewModule(fragment);
+        mEndModule = new TextViewModule(fragment);
+        mDividerModule = new ViewModule<>(fragment);
         gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
     }
 
