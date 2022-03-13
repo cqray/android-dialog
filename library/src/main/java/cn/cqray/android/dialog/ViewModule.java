@@ -153,7 +153,10 @@ public class ViewModule<T extends View> {
         if (radii == null || radii.length < RADII_LENGTH) {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
-        mBackgroundRadii = radii;
+        mBackgroundRadii = new float[RADII_LENGTH];
+        for (int i = 0; i < RADII_LENGTH; i++) {
+            mBackgroundRadii[i] = toPix(radii[i]);
+        }
         requestBackground();
     }
 
