@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -217,11 +218,11 @@ class DialogInner extends Fragment {
         }
         mViewDestroyed = true;
         if (mBackStackId >= 0) {
-            requireFragmentManager().popBackStack(mBackStackId,
+            getParentFragmentManager().popBackStack(mBackStackId,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
             mBackStackId = -1;
         } else {
-            FragmentTransaction ft = requireFragmentManager().beginTransaction();
+            FragmentTransaction ft = getParentFragmentManager().beginTransaction();
             ft.remove(this);
             if (allowStateLoss) {
                 ft.commitAllowingStateLoss();

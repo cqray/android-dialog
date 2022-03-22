@@ -1,6 +1,7 @@
 package cn.cqray.android.dialog;
 
 import android.animation.ValueAnimator;
+
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+
+import com.smarx.notchlib.INotchScreen;
+import com.smarx.notchlib.NotchScreenManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -74,16 +78,26 @@ public class DialogModule extends ViewModule<View> {
                 if (mWindow == null) {
                     return;
                 }
-                int barHeight = DialogUtils.isFull(requireActivity()) ? 0 : DialogUtils.getStatusBarHeight();
-                int screenWidth = DialogUtils.getWidth();
-                int screenHeight = DialogUtils.getHeight() - barHeight;
-                WindowManager.LayoutParams lp = mWindow.getAttributes();
-                lp.width = screenWidth;
-                lp.height = screenHeight;
-                view.getLayoutParams().width = screenWidth;
-                view.getLayoutParams().height = screenHeight;
-                mWindow.setAttributes(lp);
-                view.requestLayout();
+
+                NotchScreenManager.getInstance().getNotchInfo(requireActivity(), new INotchScreen.NotchScreenCallback() {
+                    @Override
+                    public void onResult(INotchScreen.NotchScreenInfo notchScreenInfo) {
+                        int barHeight = DialogUtils.isFull(requireActivity()) ? 0 : DialogUtils.getStatusBarHeight();
+                        if (notchScreenInfo.hasNotch) {
+                            barHeight = 0;
+                        }
+                        int screenWidth = DialogUtils.getWidth();
+                        int screenHeight = DialogUtils.getHeight() - barHeight;
+
+                        WindowManager.LayoutParams lp = mWindow.getAttributes();
+                        lp.width = screenWidth;
+                        lp.height = screenHeight;
+                        view.getLayoutParams().width = screenWidth;
+                        view.getLayoutParams().height = screenHeight;
+                        mWindow.setAttributes(lp);
+                        view.requestLayout();
+                    }
+                });
             }
         });
         mCustomDimMargin.observe(owner, new Observer<float[]>() {

@@ -98,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "哈哈2", Toast.LENGTH_SHORT).show();
                                 }
                             })
-                            .nativeDimAmount(0.15f)
-                            .customDimAmount(0f);
+                            //.nativeDimAmount(0.15f)
+                            .customDimAmount(0.15f);
                 }
                         dialog.show();
             }
