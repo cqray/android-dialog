@@ -11,4 +11,12 @@
         <!--退出时的动画-->
         <item name="android:windowExitAnimation">@anim/__no_animation</item>
     </style>
+
+    <style name="DialogFullTheme" parent="Animation.AppCompat.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+    </style>
 </resources>

@@ -36,7 +36,7 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
  * @author Cqray
  */
 @SuppressWarnings("unchecked")
-public class BaseDialog<T extends BaseDialog<T>> extends DialogInner {
+public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
 
     private View mRootView;
     private View mDimView;
