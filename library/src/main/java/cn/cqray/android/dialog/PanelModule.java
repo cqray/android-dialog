@@ -1,7 +1,7 @@
 package cn.cqray.android.dialog;
 
 import android.graphics.Color;
-import android.util.Log;
+
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
