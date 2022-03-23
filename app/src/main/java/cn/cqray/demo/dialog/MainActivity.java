@@ -17,6 +17,7 @@ import java.util.Locale;
 
 
 import cn.cqray.android.dialog.BaseDialog;
+import cn.cqray.android.dialog.BaseDialog2;
 import cn.cqray.android.dialog.BottomAlterDialog;
 import cn.cqray.android.dialog.OnCancelListener;
 import cn.cqray.android.dialog.OnDismissListener;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +100,15 @@ public class MainActivity extends AppCompatActivity {
                             //.nativeDimAmount(0.15f)
                             .customDimAmount(0.15f);
                 }
-                        dialog.show();
+                       // dialog.show();
+
+                new BaseDialog2(MainActivity.this) {
+                    @Override
+                    public void onCreating(Bundle savedInstanceState) {
+                        super.onCreating(savedInstanceState);
+                        setContentView(R.layout.activity_content);
+                    }
+                }.show();
             }
         });
     }

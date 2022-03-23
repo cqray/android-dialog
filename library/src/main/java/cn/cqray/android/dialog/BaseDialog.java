@@ -110,7 +110,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
     @NonNull
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dlg = new Dialog(requireActivity()) {
+        Dialog dlg = new Dialog(requireActivity(), R.style.DialogFullTheme) {
             @Override
             public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
                 if (BaseDialog.this.dispatchTouchEvent(ev) || mDialogModule.isDialogAnimRunning()) {
