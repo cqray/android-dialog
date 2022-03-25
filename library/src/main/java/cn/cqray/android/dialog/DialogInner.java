@@ -189,7 +189,7 @@ class DialogInner extends Fragment {
         mShownByMe = true;
         FragmentTransaction ft = manager.beginTransaction();
         ft.add(this, tag);
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
 
     private void dismissInternal(boolean allowStateLoss, boolean fromOnDismiss) {
