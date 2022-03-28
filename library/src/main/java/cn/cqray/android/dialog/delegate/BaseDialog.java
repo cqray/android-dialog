@@ -2,6 +2,7 @@ package cn.cqray.android.dialog.delegate;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -19,7 +20,8 @@ import cn.cqray.android.dialog.listener.OnShowListener;
  * 基础对话框实现
  * @author Cqray
  */
-public class BaseDialog {
+@SuppressWarnings("unchecked")
+public class BaseDialog<T extends BaseDialog<T>> {
 
     private final Fragment mFragment;
     private final FragmentActivity mActivity;
@@ -48,11 +50,18 @@ public class BaseDialog {
         return false;
     }
 
-    public void onCancel() {}
+    public void onCancel() {
+        Log.e("数据", "onCancel");
+    }
 
-    public void onShow() {}
+    public void onShow() {
 
-    public void onDismiss() {}
+        Log.e("数据", "onShow");
+    }
+
+    public void onDismiss() {
+        Log.e("数据", "onDismiss");
+    }
 
     public void onCreating(Bundle savedInstanceState) {}
 
@@ -75,9 +84,25 @@ public class BaseDialog {
         return mLifecycleOwner;
     }
 
+    public T blackStatusBar(boolean black) {
+        mDialogDelegate.setBlackStatusBar(black);
+        return (T) this;
+    }
+
+    public T cancelable(boolean cancelable) {
+        mDialogDelegate.setCancelable(cancelable);
+        return (T) this;
+    }
+
+    public T cancelableOutsize(boolean cancelable) {
+        mDialogDelegate.setCancelableOutsize(cancelable);
+        return (T) this;
+    }
+
     public void show() {
         mDialogDelegate.show();
     }
+
 
     public void addOnCancelListener(OnCancelListener listener) {
         mDialogDelegate.addOnCancelListener(listener);
@@ -90,4 +115,5 @@ public class BaseDialog {
     public void addOnShowListener(OnShowListener listener) {
         mDialogDelegate.addOnShowListener(listener);
     }
+
 }

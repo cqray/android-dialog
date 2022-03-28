@@ -121,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
                         super.onCreating(savedInstanceState);
                         setContentView(R.layout.activity_content);
                     }
-                }.show();
+                }
+//                .blackStatusBar(true)
+                .show();
             }
         });
     }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.cqray.android.code.lifecycle.SimpleLiveData;
+import cn.cqray.android.code.util.Utils;
 import cn.cqray.android.dialog.BaseDelegate;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
@@ -51,7 +52,7 @@ public class DialogDelegate extends BaseDelegate {
     /** 是否因为消动作而消除对话框 **/
     protected boolean mDismissByCanceled;
     protected boolean mDismissing;
-    protected BaseDialog mDialog;
+    protected BaseDialog<?> mDialog;
     protected final PanelDelegate mPanelDelegate;
     /** 对话框显示、消失动画，提示显示、消失动画 **/
     protected DialogAnimator[] mAnimators = new DialogAnimator[4];
@@ -69,18 +70,24 @@ public class DialogDelegate extends BaseDelegate {
     /** 显示监听 **/
     private List<OnShowListener> mShowListeners = new ArrayList<>();
 
-    public DialogDelegate(Fragment fragment, BaseDialog dialog) {
+    public DialogDelegate(Fragment fragment, BaseDialog<?> dialog) {
         super(fragment);
         mDialog = dialog;
         mPanelDelegate = new PanelDelegate(fragment);
+        initialize();
         initPanelDelegate();
     }
 
-    public DialogDelegate(FragmentActivity activity, BaseDialog dialog) {
+    public DialogDelegate(FragmentActivity activity, BaseDialog<?> dialog) {
         super(activity);
         mDialog = dialog;
         mPanelDelegate = new PanelDelegate(activity);
+        initialize();
         initPanelDelegate();
+    }
+
+    private void initialize() {
+        mBlackStatusBar.setValue(false);
     }
 
     protected void initPanelDelegate() {
@@ -102,7 +109,6 @@ public class DialogDelegate extends BaseDelegate {
                 setContentView(R.layout.__dialog_layout);
                 initDialogView();
                 initLiveData();
-                mBlackStatusBar.setValue(false);
                 mDialog.onCreating(savedInstanceState);
                 showOrDismiss(true);
             }
@@ -279,6 +285,7 @@ public class DialogDelegate extends BaseDelegate {
         return animTipsShowing || animDismissing;
     }
 
+
     public void addOnCancelListener(OnCancelListener listener) {
         mCancelListeners.add(listener);
     }
@@ -290,5 +297,4 @@ public class DialogDelegate extends BaseDelegate {
     public void addOnShowListener(OnShowListener listener) {
         mShowListeners.add(listener);
     }
-
 }
