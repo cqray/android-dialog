@@ -19,11 +19,10 @@ import java.util.Locale;
 
 
 import cn.cqray.android.code.util.SizeUnit;
-import cn.cqray.android.dialog.BaseDialog;
-import cn.cqray.android.dialog.BaseDialog2;
+import cn.cqray.android.dialog.delegate.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
-import cn.cqray.android.dialog.OnCancelListener;
-import cn.cqray.android.dialog.OnDismissListener;
+import cn.cqray.android.dialog.listener.OnCancelListener;
+import cn.cqray.android.dialog.listener.OnDismissListener;
 import cn.cqray.android.dialog.delegate.PanelDelegate;
 
 public class MainActivity extends AppCompatActivity {
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                        // dialog.show();
 
-                new BaseDialog2(MainActivity.this) {
+                new BaseDialog(MainActivity.this) {
                     @Override
                     public void onCreating(Bundle savedInstanceState) {
                         super.onCreating(savedInstanceState);
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    BaseDialog<?> dialog ;
+    cn.cqray.android.dialog.BaseDialog dialog ;
 
     static boolean isFull(Activity act) {
         if (act == null || act.getWindow() == null) {

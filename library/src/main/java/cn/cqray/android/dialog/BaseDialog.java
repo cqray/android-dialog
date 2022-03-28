@@ -30,6 +30,9 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
 import cn.cqray.android.dialog.amin.DialogAnimator;
+import cn.cqray.android.dialog.listener.OnCancelListener;
+import cn.cqray.android.dialog.listener.OnDismissListener;
+import cn.cqray.android.dialog.listener.OnShowListener;
 
 /**
  * 内部实现Dialog

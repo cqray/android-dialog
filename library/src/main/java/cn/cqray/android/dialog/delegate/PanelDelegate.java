@@ -18,12 +18,13 @@ import cn.cqray.android.code.util.SizeUnit;
 import cn.cqray.android.code.util.SizeUtils;
 
 import cn.cqray.android.dialog.DialogUtils;
-import cn.cqray.android.dialog.amin.DialogAnimator;
 
+/**
+ * 对话框面板委托
+ * @author Cqray
+ */
 public class PanelDelegate extends ViewDelegate<ViewGroup> {
 
-    /** 对话框显示、消失动画，提示显示、消失动画 **/
-    protected DialogAnimator[] mAnimators = new DialogAnimator[4];
     /** 面板相关尺寸, 依次为宽度dp值、宽度比例、宽度最小值, 宽度最大值、高度dp值、高度比例值、高度最小值，高度最大值。 **/
     protected Float[] mSizeArray = new Float[8];
     /** 对话框位置 **/

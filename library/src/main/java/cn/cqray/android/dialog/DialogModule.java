@@ -25,6 +25,9 @@ import java.util.List;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
 import cn.cqray.android.dialog.amin.DialogAnimator;
+import cn.cqray.android.dialog.listener.OnCancelListener;
+import cn.cqray.android.dialog.listener.OnDismissListener;
+import cn.cqray.android.dialog.listener.OnShowListener;
 
 /**
  * 对话框模块
