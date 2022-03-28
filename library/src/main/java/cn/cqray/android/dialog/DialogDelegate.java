@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,11 +15,15 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 
 import cn.cqray.android.code.lifecycle.SimpleLiveData;
+import cn.cqray.android.code.util.SizeUnit;
+import cn.cqray.android.code.util.SizeUtils;
+import cn.cqray.android.dialog.delegate.PanelDelegate;
 
 public class DialogDelegate extends BaseDelegate {
 
@@ -26,23 +31,35 @@ public class DialogDelegate extends BaseDelegate {
     private Dialog mDialog;
     private OnCreatingCallback mCallback;
 
-    private PanelModule panelModule;
+    protected final PanelDelegate mPanelDelegate;
 
-    private final SimpleLiveData<Integer> mContentResId = new SimpleLiveData<>();
     private final MutableLiveData<View> mContentView = new SimpleLiveData<>();
 
-    private final SimpleLiveData<Boolean> mCancelable = new SimpleLiveData<>();
-    private final SimpleLiveData<Boolean> mCancelableOutsize = new SimpleLiveData<>();
-    private final SimpleLiveData<Boolean> mBlackStatusBar = new SimpleLiveData<>();
+    protected final SimpleLiveData<Integer> mContentResId = new SimpleLiveData<>();
+    protected final SimpleLiveData<Boolean> mCancelable = new SimpleLiveData<>();
+    protected final SimpleLiveData<Boolean> mCancelableOutsize = new SimpleLiveData<>();
+    protected final SimpleLiveData<Boolean> mBlackStatusBar = new SimpleLiveData<>();
 
     public DialogDelegate(Fragment fragment, OnCreatingCallback callback) {
         super(fragment);
         mCallback = callback;
+        mPanelDelegate = new PanelDelegate(fragment);
+        initPanelDelegate();
     }
 
     public DialogDelegate(FragmentActivity activity, OnCreatingCallback callback) {
         super(activity);
         mCallback = callback;
+        mPanelDelegate = new PanelDelegate(activity);
+        initPanelDelegate();
+    }
+
+    protected void initPanelDelegate() {
+        mPanelDelegate.setBackgroundColor(Color.WHITE);
+        mPanelDelegate.setRadius(4);
+        mPanelDelegate.setWidthScale(0.5f);
+        mPanelDelegate.setHeightScale(0.5f);
+        mPanelDelegate.setGravity(Gravity.CENTER);
     }
 
     protected void initDialog() {
@@ -59,7 +76,7 @@ public class DialogDelegate extends BaseDelegate {
                 mPanelLayout.setVisibility(View.GONE);
                 mPanelLayout.postDelayed(() -> mPanelLayout.setVisibility(View.VISIBLE), 50);
                 initLiveData();
-                initModule();
+                mPanelDelegate.setView(mPanelLayout);
                 mBlackStatusBar.setValue(false);
                 if (mCallback != null) {
                     mCallback.onCreating(savedInstanceState);
@@ -140,13 +157,15 @@ public class DialogDelegate extends BaseDelegate {
         });
     }
 
-    protected void initModule() {
-        panelModule = new PanelModule(getLifecycleOwner());
-        panelModule.observe(getLifecycleOwner(), mPanelLayout);
-        panelModule.setWidthScale(0.5f);
-        panelModule.setHeightScale(0.5f);
-        panelModule.setBackgroundColor(Color.WHITE);
-    }
+
+
+//    protected void initModule() {
+//        panelModule = new PanelModule(getLifecycleOwner());
+//        panelModule.observe(getLifecycleOwner(), mPanelLayout);
+//        panelModule.setWidthScale(0.5f);
+//        panelModule.setHeightScale(0.5f);
+//        panelModule.setBackgroundColor(Color.WHITE);
+//    }
 
     public interface OnCreatingCallback {
 

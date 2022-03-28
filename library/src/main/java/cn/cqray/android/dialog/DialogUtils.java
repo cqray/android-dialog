@@ -27,7 +27,7 @@ import java.util.Locale;
  * 对话框工具类
  * @author Cqray
  */
-class DialogUtils {
+public class DialogUtils {
 
     private static final String FLYME_OS_4 = "Flyme_OS_4";
     private static final String VERSION_4_4_4 = "4.4.4";
@@ -52,15 +52,15 @@ class DialogUtils {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
-    static int getWidth() {
+    public static int getWidth() {
         return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
-    static int getHeight() {
+    public static int getHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
-    static int getStatusBarHeight() {
+    public static int getStatusBarHeight() {
         int statusBarHeight = 0;
         int resourceId = Resources.getSystem().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -81,7 +81,7 @@ class DialogUtils {
         return navigationBarHeight;
     }
 
-    static boolean isFull(Activity act) {
+    public static boolean isFull(Activity act) {
         if (act == null || act.getWindow() == null) {
             return false;
         }

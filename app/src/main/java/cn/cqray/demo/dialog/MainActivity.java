@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,24 +12,37 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.util.Locale;
 
 
+import cn.cqray.android.code.util.SizeUnit;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BaseDialog2;
 import cn.cqray.android.dialog.BottomAlterDialog;
 import cn.cqray.android.dialog.OnCancelListener;
 import cn.cqray.android.dialog.OnDismissListener;
+import cn.cqray.android.dialog.delegate.PanelDelegate;
 
 public class MainActivity extends AppCompatActivity {
-
+    PanelDelegate delegate = new PanelDelegate(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        FrameLayout panel = findViewById(R.id.panel);
+        delegate.setView(panel);
+
+        delegate.setBackgroundColor(Color.CYAN);
+        delegate.setWidth(200);
+        delegate.setHeight(200);
+        delegate.setWidthScale(0.8f);
+        delegate.setWidth(250, SizeUnit.DP);
+        delegate.setOffset(50, 50);
 
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
