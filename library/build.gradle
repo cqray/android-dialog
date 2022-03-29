@@ -30,7 +30,7 @@ dependencies {
     api fileTree(dir: "libs", include: ["*.jar"])
     api 'androidx.appcompat:appcompat:1.3.1'
     api 'com.github.cqray:android-animator:0.5.7'
-    api 'com.github.cqray:android-code:0.0.2'
+    api 'com.github.cqray:android-code:0.0.6'
     api 'com.github.smarxpan:NotchScreenTool:0.0.1'
 
     api 'androidx.lifecycle:lifecycle-common-java8:2.3.1'

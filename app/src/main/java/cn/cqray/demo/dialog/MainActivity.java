@@ -19,7 +19,7 @@ import java.util.Locale;
 
 
 import cn.cqray.android.code.util.SizeUnit;
-import cn.cqray.android.dialog.delegate.BaseDialog;
+import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 //                            .titlePadding(16)
 //                            .titleCenter()
                             .startVisible(false)
+//                            .offset(0, -50)
 
                             //.endVisible(false)
                             //.startBackgroundResource(R.color.colorAccent)
@@ -98,13 +99,13 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             })
-                            .addOnDismissListener(new OnDismissListener() {
+                            .addDismissListener(new OnDismissListener() {
                                 @Override
                                 public void onDismiss() {
                                     Toast.makeText(MainActivity.this, "哈哈", Toast.LENGTH_SHORT).show();
                                 }
                             })
-                            .addOnCancelListener(new OnCancelListener() {
+                            .addCancelListener(new OnCancelListener() {
                                 @Override
                                 public void onCancel() {
                                     Toast.makeText(MainActivity.this, "哈哈2", Toast.LENGTH_SHORT).show();
@@ -113,21 +114,22 @@ public class MainActivity extends AppCompatActivity {
                             //.nativeDimAmount(0.15f)
                             .customDimAmount(0.15f);
                 }
-                       // dialog.show();
+                dialog.show();
 
-                new BaseDialog(MainActivity.this) {
-                    @Override
-                    public void onCreating(Bundle savedInstanceState) {
-                        super.onCreating(savedInstanceState);
-                        setContentView(R.layout.activity_content);
-                    }
-                }
-//                .blackStatusBar(true)
-                .show();
+//                new BaseDialog(MainActivity.this) {
+//                    @Override
+//                    public void onCreating(Bundle savedInstanceState) {
+//                        super.onCreating(savedInstanceState);
+//                        setContentView(R.layout.activity_content);
+//                    }
+//                }
+//                .offset(20, 20)
+////                .blackStatusBar(true)
+//                .show();
             }
         });
     }
-    cn.cqray.android.dialog.BaseDialog dialog ;
+    BaseDialog dialog ;
 
     static boolean isFull(Activity act) {
         if (act == null || act.getWindow() == null) {

@@ -99,10 +99,14 @@ public class BaseDialog<T extends BaseDialog<T>> {
         return (T) this;
     }
 
+    public T offset(float x, float y) {
+        mDialogDelegate.getPanelDelegate().setOffset(x, y);
+        return (T) this;
+    }
+
     public void show() {
         mDialogDelegate.show();
     }
-
 
     public void addOnCancelListener(OnCancelListener listener) {
         mDialogDelegate.addOnCancelListener(listener);

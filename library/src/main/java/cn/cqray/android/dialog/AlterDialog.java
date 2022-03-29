@@ -24,6 +24,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import cn.cqray.android.code.util.SizeUtils;
+
 /**
  * 消息对话框
  * @author Cqray
@@ -276,7 +278,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      */
     private void setContentPadding() {
         Float value = mContentPadding.getValue();
-        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : toPix(value);
+        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : SizeUtils.dp2px(value);
         int count = mBottomView.getChildCount();
         int half = mDefaultButtonBackground ? padding / 2 : padding;
         mContentView.setPadding(padding, padding, padding, count > 0 ? padding : half);
@@ -333,7 +335,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      */
     private void setButtonTextSize() {
         Float value = mButtonTextSize.getValue();
-        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : toPix(value);
+        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : SizeUtils.dp2px(value);
         int count = mBottomView.getChildCount();
         for (int i = 0; i < count; i++) {
             // 获取文本控件

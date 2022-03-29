@@ -24,6 +24,8 @@ import androidx.lifecycle.Observer;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.cqray.android.code.delegate.TextViewDelegate;
+import cn.cqray.android.code.util.SizeUtils;
 import cn.cqray.android.dialog.amin.SlideBottomIn;
 import cn.cqray.android.dialog.amin.SlideBottomOut;
 
@@ -53,28 +55,28 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     /** 内容内部间隔 **/
     private final MutableLiveData<float[]> mContentPadding = new MutableLiveData<>();
     /** 标题文本代码块 **/
-    protected final TextViewModule mTitleModule;
+    protected final TextViewDelegate mTitleModule;
     /** 标题左边边按钮代码块 **/
-    protected final TextViewModule mStartModule;
+    protected final TextViewDelegate mStartModule;
     /** 标题右边按钮代码块 **/
-    protected final TextViewModule mEndModule;
+    protected final TextViewDelegate mEndModule;
     /** 分割线代码块 **/
     protected final ViewModule<View> mDividerModule;
 
     public BottomAlterDialog(FragmentActivity activity) {
         super(activity);
-        mTitleModule = new TextViewModule(activity);
-        mStartModule = new TextViewModule(activity);
-        mEndModule = new TextViewModule(activity);
+        mTitleModule = new TextViewDelegate(activity);
+        mStartModule = new TextViewDelegate(activity);
+        mEndModule = new TextViewDelegate(activity);
         mDividerModule = new ViewModule<>(activity);
         gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
     }
 
     public BottomAlterDialog(Fragment fragment) {
         super(fragment);
-        mTitleModule = new TextViewModule(fragment);
-        mStartModule = new TextViewModule(fragment);
-        mEndModule = new TextViewModule(fragment);
+        mTitleModule = new TextViewDelegate(fragment);
+        mStartModule = new TextViewDelegate(fragment);
+        mEndModule = new TextViewDelegate(fragment);
         mDividerModule = new ViewModule<>(fragment);
         gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
     }
@@ -88,26 +90,20 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mEndView = findViewById(R.id._dlg_right);
         mDividerView = findViewById(R.id._dlg_divider);
         mContentView = findViewById(R.id._dlg_content);
-        mStartView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (View.OnClickListener listener : mLeftListeners) {
-                    listener.onClick(v);
-                }
+        mStartView.setOnClickListener(v -> {
+            for (View.OnClickListener listener : mLeftListeners) {
+                listener.onClick(v);
             }
         });
-        mEndView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (View.OnClickListener listener : mRightListeners) {
-                    listener.onClick(v);
-                }
+        mEndView.setOnClickListener(v -> {
+            for (View.OnClickListener listener : mRightListeners) {
+                listener.onClick(v);
             }
         });
         mContentPadding.observe(this, new Observer<float[]>() {
             @Override
             public void onChanged(float[] floats) {
-                mContentView.setPadding(toPix(floats[0]), toPix(floats[1]), toPix(floats[2]), toPix(floats[3]));
+                mContentView.setPadding(SizeUtils.dp2px(floats[0]), SizeUtils.dp2px(floats[1]), SizeUtils.dp2px(floats[2]), SizeUtils.dp2px(floats[3]));
             }
         });
         initTitleModule();
@@ -117,38 +113,38 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
      * 初始化标题相关代码块
      */
     private void initTitleModule() {
-        mTitleModule.observe(this, mTitleView);
-        mStartModule.observe(this, mStartView);
-        mEndModule.observe(this, mEndView);
+        mTitleModule.setView(mTitleView);
+        mStartModule.setView(mStartView);
+        mEndModule.setView(mEndView);
         mDividerModule.observe(this, mDividerView);
-        mTitleModule.observeVisibility(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                View parent = (View) mTitleView.getParent();
-                parent.setVisibility(integer);
-                mDividerView.setVisibility(integer);
-            }
-        });
-        mTitleModule.observeGravity(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                setTitleCenter(integer);
-            }
-        });
-        mStartModule.observeVisibility(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                mStartView.setVisibility(integer);
-                setTitlePadding();
-            }
-        });
-        mEndModule.observeVisibility(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                mEndView.setVisibility(integer);
-                setTitlePadding();
-            }
-        });
+//        mTitleModule.observeVisibility(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                View parent = (View) mTitleView.getParent();
+//                parent.setVisibility(integer);
+//                mDividerView.setVisibility(integer);
+//            }
+//        });
+//        mTitleModule.observeGravity(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                setTitleCenter(integer);
+//            }
+//        });
+//        mStartModule.observeVisibility(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                mStartView.setVisibility(integer);
+//                setTitlePadding();
+//            }
+//        });
+//        mEndModule.observeVisibility(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                mEndView.setVisibility(integer);
+//                setTitlePadding();
+//            }
+//        });
         mTitlePadding.observe(this, new Observer<float[]>() {
             @Override
             public void onChanged(float[] floats) {
@@ -416,6 +412,6 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         if (padding == null) {
             return requireContext().getResources().getDimensionPixelSize(R.dimen.content);
         }
-        return toPix(padding[0]);
+        return SizeUtils.dp2px(padding[0]);
     }
 }

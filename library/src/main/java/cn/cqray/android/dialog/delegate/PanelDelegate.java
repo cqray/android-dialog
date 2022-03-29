@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
@@ -45,33 +44,37 @@ public class PanelDelegate extends ViewDelegate<ViewGroup> {
     }
 
     @Override
-    protected void onCreate(@NonNull LifecycleOwner owner) {
-        super.onCreate(owner);
+    public void setView(ViewGroup view) {
+        super.setView(view);
+        LifecycleOwner owner = getLifecycleOwner();
         // 设置位置情况
-        mGravity.observe(owner, aInt -> post(() -> {
-            ViewGroup parent = (ViewGroup) requireView().getParent();
+        mGravity.observe(owner, aInt -> {
+            ViewGroup parent = (ViewGroup) view.getParent();
             if (parent instanceof FrameLayout) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) requireView().getLayoutParams();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
                 params.gravity = aInt;
                 parent.setLayoutParams(params);
             } else if (parent instanceof LinearLayout) {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) requireView().getLayoutParams();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
                 params.gravity = aInt;
                 parent.setLayoutParams(params);
             }
-        }));
+        });
         // 设置偏移位置监听
         mOffset.observe(owner, floats -> {
-            requireView().setTranslationX(floats[0]);
-            requireView().setTranslationY(floats[1]);
+//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+//            params.leftMargin = (int) floats[0];
+//            params.topMargin = (int) floats[1];
+            view.setTranslationX(floats[0]);
+            view.setTranslationY(floats[1]);
         });
         // 设置面板大小监听
         mSize.observe(owner, ints -> {
-            ViewGroup.LayoutParams params = requireView().getLayoutParams();
+            ViewGroup.LayoutParams params = view.getLayoutParams();
             if (params.width != ints[0] || params.height != ints[1]) {
                 params.width = ints[0];
                 params.height = ints[1];
-                requireView().requestLayout();
+                view.requestLayout();
             }
         });
         // 设置请求面板大小监听

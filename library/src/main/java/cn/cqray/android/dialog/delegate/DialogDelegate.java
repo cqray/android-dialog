@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.cqray.android.code.lifecycle.SimpleLiveData;
-import cn.cqray.android.code.util.Utils;
 import cn.cqray.android.dialog.BaseDelegate;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
@@ -62,7 +61,6 @@ public class DialogDelegate extends BaseDelegate {
     protected final SimpleLiveData<Boolean> mCancelable = new SimpleLiveData<>();
     protected final SimpleLiveData<Boolean> mCancelableOutsize = new SimpleLiveData<>();
     protected final SimpleLiveData<Boolean> mBlackStatusBar = new SimpleLiveData<>();
-
     /** 取消监听 **/
     private List<OnCancelListener> mCancelListeners = new ArrayList<>();
     /** 关闭监听 **/
@@ -296,5 +294,9 @@ public class DialogDelegate extends BaseDelegate {
 
     public void addOnShowListener(OnShowListener listener) {
         mShowListeners.add(listener);
+    }
+
+    public PanelDelegate getPanelDelegate() {
+        return mPanelDelegate;
     }
 }
