@@ -26,6 +26,7 @@ import java.util.List;
 
 import cn.cqray.android.code.lifecycle.SimpleLiveData;
 import cn.cqray.android.dialog.BaseDelegate;
+import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
 import cn.cqray.android.dialog.listener.OnShowListener;
@@ -181,11 +182,11 @@ public class DialogDelegate extends BaseDelegate {
     protected void quickDismiss() {
         if (mInnerDialog != null && mInnerDialog.isShowing()) {
             if (mDismissByCanceled) {
-                mDialog.onCancel();
+                //mDialog.onCancel();
                 setState(CANCEL);
             }
             mInnerDialog.dismiss();
-            mDialog.onDismiss();
+            //mDialog.onDismiss();
             setState(DISMISS);
         }
     }
@@ -222,7 +223,7 @@ public class DialogDelegate extends BaseDelegate {
                         Log.e("数据", "小时");
                         quickDismiss();
                     } else {
-                        mDialog.onShow();
+                        //mDialog.onShow();
                         setState(SHOW);
                         //mDialogModule.setState(DialogModule.SHOW);
                     }

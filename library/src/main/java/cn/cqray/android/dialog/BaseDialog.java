@@ -54,12 +54,27 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     private FrameLayout mPanelView;
     private Object mUnBinder;
     private boolean mDismissing;
+
+    /** 界面是否能够取消 **/
+    protected boolean mCancelable = true;
+    /** 点击外部取消 */
+    protected boolean mCancelableOutsize = true;
+    /** 自定义遮罩透明度 **/
+    protected float mCustomAmountCount = 0.15f;
+    /** 原始遮罩透明度 **/
+    protected float mNativeAmountCount = 0.0f;
+
     protected final DialogModule mDialogModule;
     protected final PanelDelegate mPanelDelegate;
     /** 持有对话框的Fragment **/
     protected final Fragment mOwnerFragment;
     /** 持有对话框的Activity **/
     protected final FragmentActivity mOwnerActivity;
+
+    /** 遮罩动画 **/
+    protected final ValueAnimator mDimAnimator = new ValueAnimator();
+    /** 对话框显示、消失动画，提示显示、消失动画 **/
+    protected final DialogAnimator[] mAnimators = new DialogAnimator[4];
     /** 取消监听 **/
     protected List<OnCancelListener> mCancelListeners = new ArrayList<>();
     /** 消除监听 **/
@@ -89,9 +104,9 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         mAnimView = mRootView.findViewById(R.id._dialog_anim);
         mPanelView = mRootView.findViewById(R.id._dialog_panel);
         mRootView.setOnClickListener(v -> {
-            if (mDialogModule.isCancelableOutsize()
-                    && mDialogModule.isCancelable()
-                    && !mDismissing) {
+            // 可点击外部取消、可取消、且没有被消除
+            if (mCancelableOutsize && mCancelable && !mDismissing) {
+                // 消除对话框
                 dismiss();
             }
         });
@@ -137,10 +152,18 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dlg = new Dialog(requireActivity(), R.style.DialogFullTheme) {
+        // 初始化对话框
+        Dialog dialog = new Dialog(requireActivity(), R.style.DialogFullTheme) {
             @Override
             public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
-                if (BaseDialog.this.dispatchTouchEvent(ev) || mDialogModule.isDialogAnimRunning()) {
+                // 事件是否被消费掉
+                boolean dispatch = BaseDialog.this.dispatchTouchEvent(ev);
+                // 是否正在显示（显示）动画
+                boolean showing = mAnimators[0] != null && mAnimators[0].isRunning();
+                // 是否正在显示（消除）动画
+                boolean dismissing = mAnimators[1] != null && mAnimators[1].isRunning();
+                // 任意一个条件满足则不继续
+                if (dispatch || showing || dismissing) {
                     return true;
                 }
                 return super.dispatchTouchEvent(ev);
@@ -148,23 +171,25 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
 
             @Override
             public void onBackPressed() {
-                if (!BaseDialog.this.onBackPressed()
-                        && mDialogModule.isCancelable()
-                        && !mDismissing) {
+                // 回退事件是否被拦截
+                boolean backPressed = BaseDialog.this.onBackPressed();
+                // 如果可以被取消、且没有正在消除对话框、回退事件未被拦截
+                if (mCancelable && !mDismissing && !backPressed) {
+                    // 消除对话框
                     BaseDialog.this.dismiss();
                 }
             }
         };
-        dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dlg.setCanceledOnTouchOutside(false);
-        dlg.setCancelable(false);
-        Window window = dlg.getWindow();
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        Window window = dialog.getWindow();
         assert window != null;
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        window.setDimAmount(mDialogModule.getNativeAmountCount());
+        window.setDimAmount(mNativeAmountCount);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialogModule.setWindow(window);
-        return dlg;
+        return dialog;
     }
 
     @Override
@@ -219,12 +244,16 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         return false;
     }
 
-    public void setContentView(@LayoutRes int layoutResId) {
+    protected void checkLifecycleState() {
         if (!getLifecycle()
                 .getCurrentState()
                 .isAtLeast(Lifecycle.State.CREATED)) {
             throw new IllegalStateException("please call setContentView in onCreating().");
         }
+    }
+
+    public void setContentView(@LayoutRes int layoutResId) {
+        checkLifecycleState();
         View view = LayoutInflater.from(requireContext())
                 .inflate(layoutResId, mPanelView, false);
         mPanelView.removeAllViews();
@@ -233,23 +262,19 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     }
 
     public void setContentView(View view) {
-        if (!getLifecycle()
-                .getCurrentState()
-                .isAtLeast(Lifecycle.State.CREATED)) {
-            throw new IllegalStateException("please call setContentView in onCreating().");
-        }
+        checkLifecycleState();
         mPanelView.removeAllViews();
         mPanelView.addView(view);
         mUnBinder = ButterKnifeUtils.bind(this, view);
     }
 
     public T cancelable(boolean cancelable) {
-        mDialogModule.setCancelable(cancelable);
+        mCancelable = cancelable;
         return (T) this;
     }
 
     public T cancelableOutsize(boolean cancelable) {
-        mDialogModule.setCancelableOutsize(cancelable);
+        mCancelableOutsize = cancelable;
         return (T) this;
     }
 
@@ -259,12 +284,12 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     }
 
     public T customDimAmount(@FloatRange(from = 0, to = 1) float amount) {
-        mDialogModule.setCustomAmountCount(amount);
+        mCustomAmountCount = amount;
         return (T) this;
     }
 
     public T nativeDimAmount(@FloatRange(from = 0, to = 1) float amount) {
-        mDialogModule.setNativeAmountCount(amount);
+        mNativeAmountCount = amount;
         return (T) this;
     }
 
@@ -402,12 +427,12 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     }
 
     public T showAnimator(DialogAnimator animator) {
-        mDialogModule.setDialogAnimator(animator, true);
+        mAnimators[0] = animator;
         return (T) this;
     }
 
     public T dismissAnimator(DialogAnimator animator) {
-        mDialogModule.setDialogAnimator(animator, false);
+        mAnimators[1] = animator;
         return (T) this;
     }
 
@@ -436,7 +461,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
      * 显示或者消除对话框
      * @param show 是否显示
      */
-    private void showOrDismiss(final boolean show) {
+    protected void showOrDismiss(final boolean show) {
         mDismissing = !show;
         mRootView.setVisibility(View.VISIBLE);
         DialogAnimator animator = mDialogModule.getDialogAnimators(show);
@@ -469,18 +494,21 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
      * @param duration 显示时长
      * @param show true显示对话框，false关闭对话框
      */
-    private void doDimAnimator(int duration, boolean show) {
-        // 遮罩动画
-        ValueAnimator dimAnimator = mDialogModule.getCustomDimAnimator(show);
-        if (dimAnimator != null) {
-            dimAnimator.addUpdateListener(animation -> {
+    protected void doDimAnimator(int duration, boolean show) {
+        if (mDimAnimator.isRunning()) {
+            mDimAnimator.cancel();
+        }
+        if (mCustomAmountCount != 0) {
+            int start = show ? 0 : (int) (255 * mCustomAmountCount);
+            int end = show ? (int) (255 * mCustomAmountCount) : 0;
+            mDimAnimator.setIntValues(start, end);
+            mDimAnimator.addUpdateListener(animation -> {
                 int value = (int) animation.getAnimatedValue();
                 String alpha = String.format("%02X", value);
                 String color = "#" + alpha + "000000";
                 mDimView.setBackgroundColor(Color.parseColor(color));
             });
-            dimAnimator.setDuration(duration).start();
+            mDimAnimator.setDuration(duration).start();
         }
     }
-
 }

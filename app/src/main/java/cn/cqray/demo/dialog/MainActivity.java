@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             })
                             //.nativeDimAmount(0.15f)
-                            .customDimAmount(0.15f);
+                            .customDimAmount(0.3f);
                 }
                 dialog.show();
 
