@@ -1,6 +1,7 @@
 package cn.cqray.demo.dialog;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -9,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,6 +22,8 @@ import java.util.Locale;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
 
+import cn.cqray.android.dialog.amin.BounceIn;
+import cn.cqray.android.dialog.amin.SlideTopIn;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
 import cn.cqray.android.dialog.PanelModule;
@@ -59,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
                 if (dialog == null) {
 
                     dialog = new BottomAlterDialog<>(MainActivity.this)
-                            .width(300)
-                            .height(200)
+                            .width(200)
+                            .height(100)
                             .title("车哈哈还是算法还是算法还是算法还是算法")
 //                            .titleVisible(true)
 //                            .titlePadding(16)
@@ -103,9 +107,12 @@ public class MainActivity extends AppCompatActivity {
                             //.showAnimator(new NoAnimator())
                             //.nativeDimAmount(0.15f)
                             //.blackStatusBar(true)
+                            .gravity(GravityCompat.END)
+                            .showAnimator(new BounceIn())
+                            .offset(-20, 20)
                             .cornerRadius(10);
                 }
-                dialog.show();
+                new Thread(() -> dialog.show()).start();
 
 //                new BaseDialog(MainActivity.this) {
 //                    @Override

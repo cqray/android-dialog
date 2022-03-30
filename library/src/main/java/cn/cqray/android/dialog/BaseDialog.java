@@ -9,6 +9,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -68,7 +70,9 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     protected float mNativeAmountCount = 0.15f;
     /** 自定义遮罩四周间隔 **/
     private MutableLiveData<float []> mCustomDimMargin = new MutableLiveData<>();
-    protected final PanelModule mPanelModule = new PanelModule();
+
+    protected final Handler mHandler = new Handler(Looper.getMainLooper());
+    protected final PanelModule mPanelModule = new PanelModule(this);
     /** 持有对话框的Fragment **/
     protected final Fragment mOwnerFragment;
     /** 持有对话框的Activity **/
@@ -169,12 +173,10 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
             public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
                 // 事件是否被消费掉
                 boolean dispatch = BaseDialog.this.dispatchTouchEvent(ev);
-                // 是否正在显示（显示）动画
-                boolean showing = mAnimators[0] != null && mAnimators[0].isRunning();
-                // 是否正在显示（消除）动画
-                boolean dismissing = mAnimators[1] != null && mAnimators[1].isRunning();
+                // 面板动画正在进行
+                boolean running = mPanelModule.isPanelAnimatorRunning();
                 // 任意一个条件满足则不继续
-                if (dispatch || showing || dismissing) {
+                if (dispatch || running) {
                     return true;
                 }
                 return super.dispatchTouchEvent(ev);
@@ -205,6 +207,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        //mPanelModule.show();
         showOrDismiss(true);
     }
 
@@ -216,7 +219,11 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         } else {
             fm = mOwnerFragment.getParentFragmentManager();
         }
-        super.show(fm, getClass().getName());
+        mHandler.post(()-> {
+            try {
+                super.showNow(fm, getClass().getName());
+            } catch (IllegalStateException ignore) {}
+        });
     }
 
     @Deprecated
@@ -240,6 +247,8 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     @Override
     public void dismiss() {
         showOrDismiss(false);
+        //mPanelModule.dismiss();
+        //doDimAnimator(animator.getDuration(), show);
     }
 
     public void quickDismiss() {
@@ -500,12 +509,12 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     }
 
     public T showAnimator(DialogAnimator animator) {
-        mAnimators[0] = animator;
+        mPanelModule.setShowAnimator(animator);
         return (T) this;
     }
 
     public T dismissAnimator(DialogAnimator animator) {
-        mAnimators[1] = animator;
+        mPanelModule.setDismissAnimator(animator);
         return (T) this;
     }
 

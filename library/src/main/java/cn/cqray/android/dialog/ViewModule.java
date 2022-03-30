@@ -25,6 +25,8 @@ public class ViewModule<T extends View> {
 
     /** 圆角数量 **/
     protected static final int RADII_LENGTH = 8;
+    /** 控件 **/
+    protected T mView;
     /** 圆角 **/
     protected final float[] mBackgroundRadii = new float[RADII_LENGTH];
     /** 间隔 **/
@@ -41,6 +43,7 @@ public class ViewModule<T extends View> {
     public final DialogLiveData<Integer> mBackgroundResource = new DialogLiveData<>();
 
     public void observe(@NonNull LifecycleOwner owner, @NonNull T view) {
+        mView = view;
         // 控件显示状态监听
         mVisibility.observe(owner, view::setVisibility);
         // 宽度变化监听

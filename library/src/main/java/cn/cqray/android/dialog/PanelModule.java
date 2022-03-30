@@ -1,5 +1,6 @@
 package cn.cqray.android.dialog;
 
+import android.animation.Animator;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
@@ -12,16 +13,26 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.SizeUtils;
 
+import cn.cqray.android.dialog.amin.BounceIn;
+import cn.cqray.android.dialog.amin.BounceOut;
+import cn.cqray.android.dialog.amin.DialogAnimator;
+
 /**
  * 对话框面板委托
  * @author Cqray
  */
-public class PanelModule extends ViewModule<ViewGroup> {
+public class PanelModule extends ViewModule<FrameLayout> {
 
+    /** 是否正在消除对话框 **/
+    protected boolean mDismissing;
     /** 对话框根界面 **/
     protected View mRootView;
+    /** 对话框实例 **/
+    protected BaseDialog<?> mDialog;
     /** 面板相关尺寸, 依次为宽度dp值、宽度比例、宽度最小值, 宽度最大值、高度dp值、高度比例值、高度最小值，高度最大值。 **/
     protected final Float[] mSizeArray = new Float[8];
+    /** 对话框显示、消除动画，提示显示、消失动画 **/
+    protected final DialogAnimator[] mAnimators = new DialogAnimator[4];
     /** 对话框位置 **/
     public final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
     /** 对话框偏移 **/
@@ -31,7 +42,8 @@ public class PanelModule extends ViewModule<ViewGroup> {
     /** 面板大小请求 **/
     public final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
 
-    public PanelModule() {
+    public PanelModule(BaseDialog<?> dialog) {
+        mDialog = dialog;
         setBackgroundColor(Color.WHITE);
     }
 
@@ -40,8 +52,9 @@ public class PanelModule extends ViewModule<ViewGroup> {
     }
 
     @Override
-    public void observe(@NonNull LifecycleOwner owner, @NonNull ViewGroup view) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull FrameLayout view) {
         super.observe(owner, view);
+        mRootView = (View) view.getParent();
         // 设置位置情况
         mGravity.observe(owner, aInt -> {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -57,11 +70,12 @@ public class PanelModule extends ViewModule<ViewGroup> {
         });
         // 设置偏移位置监听
         mOffset.observe(owner, floats -> {
-//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            ViewGroup parent = (ViewGroup) view.getParent();
+//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) parent.getLayoutParams();
 //            params.leftMargin = (int) floats[0];
 //            params.topMargin = (int) floats[1];
-            view.setTranslationX(floats[0]);
-            view.setTranslationY(floats[1]);
+            parent.setTranslationX(floats[0]);
+            parent.setTranslationY(floats[1]);
         });
         // 设置面板大小监听
         mSize.observe(owner, ints -> {
@@ -74,6 +88,55 @@ public class PanelModule extends ViewModule<ViewGroup> {
         });
         // 设置请求面板大小监听
         mRequestSize.observe(owner, o -> requestNewSize());
+    }
+
+    /**
+     * 是否面板动画正在进行中
+     */
+    public boolean isPanelAnimatorRunning() {
+        // 是否正在显示（显示）动画
+        boolean showing = mAnimators[0] != null && mAnimators[0].isRunning();
+        // 是否正在显示（消除）动画
+        boolean dismissing = mAnimators[1] != null && mAnimators[1].isRunning();
+        // 两者满足其一，则动画进行中
+        return showing || dismissing;
+    }
+
+    protected void doPanelAnimator(boolean show, Animator.AnimatorListener listener) {
+        if (mView != null) {
+            // 获取对应动画
+            DialogAnimator animator;
+            if (show) {
+                animator = mAnimators[0] == null ? new BounceIn() : mAnimators[0];
+            } else {
+                animator = mAnimators[1] == null ? new BounceOut() : mAnimators[1];
+            }
+            // 动画没有在运行，才继续操作
+            if (!animator.isRunning()) {
+                // 设置目标对象
+                animator.setTarget(mView);
+                // 设置监听
+                animator.addAnimatorListener(listener);
+                // 开始面板动画
+                animator.start();
+            }
+        }
+    }
+
+    public void show() {
+        doPanelAnimator(true, (AnimatorListener) animator -> mDialog.onShow(mDialog.requireDialog()));
+    }
+
+    public void dismiss() {
+        doPanelAnimator(false, (AnimatorListener) animator -> mDialog.quickDismiss());
+    }
+
+    public void setShowAnimator(DialogAnimator animator) {
+        mAnimators[0] = animator;
+    }
+
+    public void setDismissAnimator(DialogAnimator animator) {
+        mAnimators[1] = animator;
     }
 
     public void setGravity(int gravity) {
@@ -220,5 +283,18 @@ public class PanelModule extends ViewModule<ViewGroup> {
                 mSize.setValue(size);
             });
         }
+    }
+
+    @SuppressWarnings("unuse")
+    interface AnimatorListener extends Animator.AnimatorListener {
+
+        @Override
+        default void onAnimationStart(Animator animation) {}
+
+        @Override
+        default void onAnimationCancel(Animator animation) {}
+
+        @Override
+        default void onAnimationRepeat(Animator animation) {}
     }
 }
