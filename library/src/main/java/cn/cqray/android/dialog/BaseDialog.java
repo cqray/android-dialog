@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -72,10 +73,9 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     protected final Fragment mOwnerFragment;
     /** 持有对话框的Activity **/
     protected final FragmentActivity mOwnerActivity;
-
     /** 遮罩动画 **/
     protected final ValueAnimator mDimAnimator = new ValueAnimator();
-    /** 对话框显示、消失动画，提示显示、消失动画 **/
+    /** 对话框显示、消除动画，提示显示、消失动画 **/
     protected final DialogAnimator[] mAnimators = new DialogAnimator[4];
     /** 取消监听 **/
     protected final List<OnCancelListener> mCancelListeners = new ArrayList<>();
@@ -107,6 +107,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
                 // 消除对话框
                 dismiss();
             }
+            Log.e("数据", "编辑");
         });
         mPanelModule.setRootView(mRootView);
         mPanelModule.observe(this, mPanelView);
@@ -269,7 +270,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
             animator = mAnimators[1] == null ? new BounceOut() : mAnimators[1];
         }
         // 设置目标对象
-        animator.setTarget(mAnimView);
+        animator.setTarget(mPanelView);
         // 面板动画
         animator.addAnimatorListener(new Animator.AnimatorListener() {
             @Override

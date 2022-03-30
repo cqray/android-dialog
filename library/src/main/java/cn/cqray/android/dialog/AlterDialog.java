@@ -33,8 +33,6 @@ import com.blankj.utilcode.util.SizeUtils;
 @SuppressWarnings("unchecked")
 public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
 
-    private View mDividerView;
-    private TextView mTitleView;
     private FrameLayout mContentView;
     private LinearLayout mBottomView;
     /** 是否是默认背景 **/
@@ -74,23 +72,15 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     public void onCreating(@Nullable Bundle savedInstanceState) {
         super.onCreating(savedInstanceState);
         super.setContentView(R.layout._dlg_alter_layout);
-        mTitleView = findViewById(R.id._dlg_title);
-        mDividerView = findViewById(R.id._dlg_divider);
         mContentView = findViewById(R.id._dlg_content);
         mBottomView = findViewById(R.id._dlg_bottom);
         // 订阅标题、分割线属性
-        mTitleModule.observe(this, mTitleView);
-        mDividerModule.observe(this, mDividerView);
-
-        mTitleModule.mVisibility.observe(this, mDividerView::setVisibility);
-
+        mTitleModule.observe(this, findViewById(R.id._dlg_title));
+        mDividerModule.observe(this, findViewById(R.id._dlg_divider));
+        // 分割线跟随标题变化
+        mTitleModule.mVisibility.observe(this, mDividerModule::setVisibility);
         // 设置内容间隔
-        mContentPadding.observe(this, new Observer<Float>() {
-            @Override
-            public void onChanged(Float aFloat) {
-                setContentPadding();
-            }
-        });
+        mContentPadding.observe(this, aFloat -> setContentPadding());
         // 设置内容间隔
         setContentPadding();
         // 初始化按钮相关的LiveData
@@ -283,19 +273,16 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
             return;
         }
         // 监听事件
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 控件索引
-                int index = mBottomView.indexOfChild(v);
-                // 获取对应的监听事件
-                View.OnClickListener listener1 = mButtonListeners == null ||
-                        mButtonListeners.length <= index ?
-                        null : mButtonListeners[index];
-                // 回调
-                if (listener1 != null) {
-                    listener1.onClick(v);
-                }
+        View.OnClickListener listener = v -> {
+            // 控件索引
+            int index = mBottomView.indexOfChild(v);
+            // 获取对应的监听事件
+            View.OnClickListener listener1 = mButtonListeners == null ||
+                    mButtonListeners.length <= index ?
+                    null : mButtonListeners[index];
+            // 回调
+            if (listener1 != null) {
+                listener1.onClick(v);
             }
         };
         // 添加控件
