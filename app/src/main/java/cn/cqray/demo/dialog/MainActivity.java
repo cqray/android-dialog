@@ -17,31 +17,20 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-
-import cn.cqray.android.code.util.SizeUnit;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
+
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
-import cn.cqray.android.dialog.delegate.PanelDelegate;
+import cn.cqray.android.dialog.PanelModule;
 
 public class MainActivity extends AppCompatActivity {
-    PanelDelegate delegate = new PanelDelegate(this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         FrameLayout panel = findViewById(R.id.panel);
-        delegate.setView(panel);
-
-        delegate.setBackgroundColor(Color.CYAN);
-        delegate.setWidth(200);
-        delegate.setHeight(200);
-        delegate.setWidthScale(0.8f);
-        delegate.setWidth(250, SizeUnit.DP);
-        delegate.setOffset(50, 50);
 
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,8 +100,10 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "哈哈2", Toast.LENGTH_SHORT).show();
                                 }
                             })
+                            //.showAnimator(new NoAnimator())
                             //.nativeDimAmount(0.15f)
-                            .customDimAmount(0.3f);
+                            //.blackStatusBar(true)
+                            .cornerRadius(10);
                 }
                 dialog.show();
 

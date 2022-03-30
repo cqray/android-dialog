@@ -24,7 +24,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import cn.cqray.android.code.util.SizeUtils;
+import com.blankj.utilcode.util.SizeUtils;
 
 /**
  * 消息对话框
@@ -56,22 +56,18 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 按钮背景资源 **/
     private final MutableLiveData<Drawable[]> mButtonDrawables = new MutableLiveData<>();
     /** 标题程序块 **/
-    protected final TextViewModule mTitleModule;
+    protected final TextViewModule mTitleModule = new TextViewModule();
     /** 分割线程序块 **/
-    protected final ViewModule<View> mDividerModule;
+    protected final ViewModule<View> mDividerModule = new ViewModule<>();
 
     public AlterDialog(FragmentActivity activity) {
         super(activity);
-        mTitleModule = new TextViewModule(activity);
-        mDividerModule = new ViewModule<>(activity);
-        gravityCenter();
+        gravity(Gravity.CENTER);
     }
 
     public AlterDialog(Fragment fragment) {
         super(fragment);
-        mTitleModule = new TextViewModule(fragment);
-        mDividerModule = new ViewModule<>(fragment);
-        gravityCenter();
+        gravity(Gravity.CENTER);
     }
 
     @Override
@@ -85,13 +81,9 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
         // 订阅标题、分割线属性
         mTitleModule.observe(this, mTitleView);
         mDividerModule.observe(this, mDividerView);
-        mTitleModule.observeVisibility(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                mTitleView.setVisibility(integer);
-                mDividerView.setVisibility(integer);
-            }
-        });
+
+        mTitleModule.mVisibility.observe(this, mDividerView::setVisibility);
+
         // 设置内容间隔
         mContentPadding.observe(this, new Observer<Float>() {
             @Override
@@ -174,11 +166,6 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     }
 
     public T dividerColor(int color) {
-        mDividerModule.setBackgroundColor(color);
-        return (T) this;
-    }
-
-    public T dividerColor(String color) {
         mDividerModule.setBackgroundColor(color);
         return (T) this;
     }

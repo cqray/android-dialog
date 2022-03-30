@@ -1,147 +1,188 @@
 package cn.cqray.android.dialog;
 
 import android.graphics.Color;
-
-import android.view.Gravity;
+import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
-import com.smarx.notchlib.INotchScreen;
-import com.smarx.notchlib.NotchScreenManager;
+import com.blankj.utilcode.util.SizeUtils;
 
 /**
- * 对话框面板相关数据
+ * 对话框面板委托
  * @author Cqray
  */
 public class PanelModule extends ViewModule<ViewGroup> {
 
+    /** 对话框根界面 **/
+    protected View mRootView;
     /** 面板相关尺寸, 依次为宽度dp值、宽度比例、宽度最小值, 宽度最大值、高度dp值、高度比例值、高度最小值，高度最大值。 **/
-    private Float[] mSizeArray = new Float[8];
+    protected final Float[] mSizeArray = new Float[8];
     /** 对话框位置 **/
-    private final MutableLiveData<Integer> mGravity = new MutableLiveData<>();
+    public final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
     /** 对话框偏移 **/
-    private final MutableLiveData<float[]> mOffset = new MutableLiveData<>();
+    public final DialogLiveData<float[]> mOffset = new DialogLiveData<>();
     /** 面板宽、高 **/
-    private final MutableLiveData<int[]> mSize = new MutableLiveData<>();
+    public final DialogLiveData<int[]> mSize = new DialogLiveData<>();
+    /** 面板大小请求 **/
+    public final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
 
-    public PanelModule(LifecycleOwner owner) {
-        super(owner);
-        setWidth(0);
+    public PanelModule() {
         setBackgroundColor(Color.WHITE);
-        setGravity(Gravity.CENTER);
+    }
+
+    public void setRootView(View view) {
+        mRootView = view;
     }
 
     @Override
-    public void observe(LifecycleOwner owner, final ViewGroup view) {
+    public void observe(@NonNull LifecycleOwner owner, @NonNull ViewGroup view) {
         super.observe(owner, view);
-        // 设置偏移位置
-        mOffset.observe(owner, new Observer<float[]>() {
-            @Override
-            public void onChanged(float[] floats) {
-                view.setTranslationX(toPix(floats[0]));
-                view.setTranslationY(toPix(floats[1]));
+        // 设置位置情况
+        mGravity.observe(owner, aInt -> {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent instanceof FrameLayout) {
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                params.gravity = aInt;
+                parent.setLayoutParams(params);
+            } else if (parent instanceof LinearLayout) {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                params.gravity = aInt;
+                parent.setLayoutParams(params);
             }
         });
-        // 设置居中位置
-        mGravity.observe(owner, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                ViewGroup parent = (ViewGroup) view.getParent();
-                if (parent instanceof FrameLayout) {
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-                    params.gravity = integer;
-                } else {
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                    params.gravity = integer;
-                }
+        // 设置偏移位置监听
+        mOffset.observe(owner, floats -> {
+//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+//            params.leftMargin = (int) floats[0];
+//            params.topMargin = (int) floats[1];
+            view.setTranslationX(floats[0]);
+            view.setTranslationY(floats[1]);
+        });
+        // 设置面板大小监听
+        mSize.observe(owner, ints -> {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            if (params.width != ints[0] || params.height != ints[1]) {
+                params.width = ints[0];
+                params.height = ints[1];
+                view.requestLayout();
             }
         });
-        // 设置面板大小
-        mSize.observe(owner, new Observer<int[]>() {
-            @Override
-            public void onChanged(int[] ints) {
-                // requestWindowSize();
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-                if (params.width != ints[0] || params.height != ints[1]) {
-                    params.width = ints[0];
-                    params.height = ints[1];
-                    view.requestLayout();
-                }
-            }
-        });
+        // 设置请求面板大小监听
+        mRequestSize.observe(owner, o -> requestNewSize());
     }
 
     public void setGravity(int gravity) {
-        mGravity.postValue(gravity);
+        mGravity.setValue(gravity);
     }
 
     public void setOffset(float offsetX, float offsetY) {
-        mOffset.postValue(new float[]{offsetX, offsetY});
+        setOffset(offsetX, offsetY, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    public void setOffset(float offsetX, float offsetY, int unit) {
+        float [] array = new float[2];
+        array[0] = SizeUtils.applyDimension(offsetX, unit);
+        array[1] = SizeUtils.applyDimension(offsetY, unit);
+        mOffset.setValue(array);
     }
 
     @Override
     public void setWidth(float width) {
-        mSizeArray[0] = width <= 0 ? null : width;
-        mSizeArray[1] = null;
-        requestPanelSize();
+        setWidth(width, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    @Override
+    public void setWidth(float width, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[0] = width <= 0 ? null : SizeUtils.applyDimension(width, unit);
+            mSizeArray[1] = null;
+        }
+        mRequestSize.setValue(null);
     }
 
     public void setWidthScale(float scale) {
-        mSizeArray[0] = null;
-        mSizeArray[1] = scale <= 0 || scale > 1 ? null : scale;
-        requestPanelSize();
+        synchronized (PanelModule.class) {
+            mSizeArray[0] = null;
+            mSizeArray[1] = scale <= 0 || scale > 1 ? null : scale;
+        }
+        mRequestSize.setValue(null);
     }
 
-    public void setWidthMin(float min) {
-        mSizeArray[2] = min <= 0 ? null : min;
-        requestPanelSize();
+    public void setWidthMin(float min, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[2] = min <= 0 ? null : SizeUtils.applyDimension(min, unit);
+        }
+        mRequestSize.setValue(null);
     }
 
-    public void setWidthMax(float max) {
-        mSizeArray[3] = max <= 0 ? null : max;
-        requestPanelSize();
+    public void setWidthMax(float max, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[3] = max <= 0 ? null : SizeUtils.applyDimension(max, unit);
+        }
+        mRequestSize.setValue(null);
     }
 
     @Override
     public void setHeight(float height) {
-        mSizeArray[4] = height <= 0 ? null : height;
-        mSizeArray[5] = null;
-        requestPanelSize();
+        setHeight(height, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    @Override
+    public void setHeight(float height, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[4] = height <= 0 ? null : SizeUtils.applyDimension(height, unit);
+            mSizeArray[5] = null;
+        }
+        mRequestSize.setValue(null);
     }
 
     public void setHeightScale(float scale) {
-        mSizeArray[4] = null;
-        mSizeArray[5] = scale <= 0 || scale > 1 ? null : scale;
-        requestPanelSize();
+        synchronized (PanelModule.class) {
+            mSizeArray[4] = null;
+            mSizeArray[5] = scale <= 0 || scale > 1 ? null : scale;
+        }
+        mRequestSize.setValue(null);
     }
 
-    public void setHeightMin(float min) {
-        mSizeArray[6] = min <= 0 ? null : min;
-        requestPanelSize();
+    public void setHeightMin(float min, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[6] = min <= 0 ? null : SizeUtils.applyDimension(min, unit);
+        }
+        mRequestSize.setValue(null);
     }
 
-    public void setHeightMax(float max) {
-        mSizeArray[7] = max <= 0 ? null : max;
-        requestPanelSize();
+    public void setHeightMax(float max, int unit) {
+        synchronized (PanelModule.class) {
+            mSizeArray[7] = max <= 0 ? null : SizeUtils.applyDimension(max, unit);
+        }
+        mRequestSize.setValue(null);
     }
 
-    protected void requestPanelSize() {
-        NotchScreenManager.getInstance().getNotchInfo(requireActivity(), new INotchScreen.NotchScreenCallback() {
+    protected float getValue(float value, Float min, Float max) {
+        float result = value;
+        if (min != null) {
+            result = Math.max(value, min);
+        }
+        if (max != null) {
+            result = Math.min(result, max);
+        }
+        if (min != null && max != null && min > max) {
+            result = value;
+        }
+        return result;
+    }
 
-            @Override
-            public void onResult(INotchScreen.NotchScreenInfo notchScreenInfo) {
-                // 设置对话框大小
-                int barHeight = DialogUtils.isFull(requireActivity()) ? 0 : DialogUtils.getStatusBarHeight();
-                if (notchScreenInfo.hasNotch) {
-                    barHeight = 0;
-                }
-                int screenWidth = DialogUtils.getWidth();
-                int screenHeight = DialogUtils.getHeight() - barHeight;
+    protected void requestNewSize() {
+        if (mRootView != null) {
+            mRootView.post(() -> {
+                // 获取根布局的宽高
+                int usableWidth = mRootView.getMeasuredWidth();
+                int usableHeight = mRootView.getMeasuredHeight();
                 // 宽高
                 float w, h;
                 // 面板相关尺寸,
@@ -158,41 +199,26 @@ public class PanelModule extends ViewModule<ViewGroup> {
                 int[] size = new int[2];
                 // 宽度计算
                 if (widthDp != null) {
-                    w = DialogUtils.dp2px(getValue(widthDp, minWidth, maxWidth));
+                    w = getValue(widthDp, minWidth, maxWidth);
                 } else if (widthScale != null) {
-                    w = DialogUtils.px2dp((int) (widthScale * screenWidth));
-                    w = DialogUtils.dp2px(getValue(w, minWidth, maxWidth));
+                    w = widthScale * usableWidth;
+                    w = getValue(w, minWidth, maxWidth);
                 } else {
-                    w = minWidth != null ? DialogUtils.dp2px(minWidth) : -2;
+                    w = minWidth != null ? minWidth : -2;
                 }
                 size[0] = (int) w;
                 // 高度计算
                 if (heightDp != null) {
-                    h = DialogUtils.dp2px(getValue(heightDp, minHeight, maxHeight));
+                    h = getValue(heightDp, minHeight, maxHeight);
                 } else if (heightScale != null) {
-                    h = DialogUtils.px2dp((int) (heightScale * screenHeight));
-                    h = DialogUtils.dp2px(getValue(h, minHeight, maxHeight));
+                    h = heightScale * usableHeight;
+                    h = getValue(h, minHeight, maxHeight);
                 } else {
-                    h = minHeight != null ? DialogUtils.dp2px(minHeight) : -2;
+                    h = minHeight != null ? minHeight : -2;
                 }
                 size[1] = (int) h;
-                mSize.postValue(size);
-            }
-        });
-
-    }
-
-    private float getValue(float value, Float min, Float max) {
-        float result = value;
-        if (min != null) {
-            result = Math.max(value, min);
+                mSize.setValue(size);
+            });
         }
-        if (max != null) {
-            result = Math.min(result, max);
-        }
-        if (min != null && max != null && min > max) {
-            result = value;
-        }
-        return result;
     }
 }

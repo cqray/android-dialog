@@ -21,11 +21,11 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.blankj.utilcode.util.SizeUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.cqray.android.code.delegate.TextViewDelegate;
-import cn.cqray.android.code.util.SizeUtils;
 import cn.cqray.android.dialog.amin.SlideBottomIn;
 import cn.cqray.android.dialog.amin.SlideBottomOut;
 
@@ -55,30 +55,26 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     /** 内容内部间隔 **/
     private final MutableLiveData<float[]> mContentPadding = new MutableLiveData<>();
     /** 标题文本代码块 **/
-    protected final TextViewDelegate mTitleModule;
+    protected final TextViewModule mTitleModule = new TextViewModule();
     /** 标题左边边按钮代码块 **/
-    protected final TextViewDelegate mStartModule;
+    protected final TextViewModule mStartModule = new TextViewModule();
     /** 标题右边按钮代码块 **/
-    protected final TextViewDelegate mEndModule;
+    protected final TextViewModule mEndModule = new TextViewModule();
     /** 分割线代码块 **/
-    protected final ViewModule<View> mDividerModule;
+    protected final ViewModule<View> mDividerModule = new ViewModule<>();
 
     public BottomAlterDialog(FragmentActivity activity) {
         super(activity);
-        mTitleModule = new TextViewDelegate(activity);
-        mStartModule = new TextViewDelegate(activity);
-        mEndModule = new TextViewDelegate(activity);
-        mDividerModule = new ViewModule<>(activity);
-        gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
+        gravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL)
+                .showAnimator(new SlideBottomIn())
+                .dismissAnimator(new SlideBottomOut());
     }
 
     public BottomAlterDialog(Fragment fragment) {
         super(fragment);
-        mTitleModule = new TextViewDelegate(fragment);
-        mStartModule = new TextViewDelegate(fragment);
-        mEndModule = new TextViewDelegate(fragment);
-        mDividerModule = new ViewModule<>(fragment);
-        gravityBottom().showAnimator(new SlideBottomIn()).dismissAnimator(new SlideBottomOut());
+        gravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL)
+                .showAnimator(new SlideBottomIn())
+                .dismissAnimator(new SlideBottomOut());
     }
 
     @Override
@@ -113,38 +109,22 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
      * 初始化标题相关代码块
      */
     private void initTitleModule() {
-        mTitleModule.setView(mTitleView);
-        mStartModule.setView(mStartView);
-        mEndModule.setView(mEndView);
+        mTitleModule.observe(this, mTitleView);
+        mStartModule.observe(this, mStartView);
+        mEndModule.observe(this, mEndView);
         mDividerModule.observe(this, mDividerView);
-//        mTitleModule.observeVisibility(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                View parent = (View) mTitleView.getParent();
-//                parent.setVisibility(integer);
-//                mDividerView.setVisibility(integer);
-//            }
-//        });
-//        mTitleModule.observeGravity(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                setTitleCenter(integer);
-//            }
-//        });
-//        mStartModule.observeVisibility(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                mStartView.setVisibility(integer);
-//                setTitlePadding();
-//            }
-//        });
-//        mEndModule.observeVisibility(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                mEndView.setVisibility(integer);
-//                setTitlePadding();
-//            }
-//        });
+        mTitleModule.mVisibility.removeObservers(this);
+        mTitleModule.mVisibility.observe(this, aInt -> {
+            View parent = (View) mTitleView.getParent();
+            parent.setVisibility(aInt);
+            mDividerView.setVisibility(aInt);
+        });
+        mTitleModule.mGravity.removeObservers(this);
+        mTitleModule.mGravity.observe(this, this::setTitleCenter);
+
+        mStartModule.mVisibility.observe(this, aInt -> setTitlePadding());
+        mEndModule.mVisibility.observe(this, aInt -> setTitlePadding());
+
         mTitlePadding.observe(this, new Observer<float[]>() {
             @Override
             public void onChanged(float[] floats) {
@@ -222,11 +202,6 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     }
 
     public T dividerColor(int color) {
-        mDividerModule.setBackgroundColor(color);
-        return (T) this;
-    }
-
-    public T dividerColor(String color) {
         mDividerModule.setBackgroundColor(color);
         return (T) this;
     }
