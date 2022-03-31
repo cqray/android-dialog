@@ -6,5 +6,8 @@ package cn.cqray.android.dialog.listener;
  */
 public interface OnShowListener {
 
+    /**
+     * 对话框显示（动画执行完毕）
+     */
     void onShow();
 }

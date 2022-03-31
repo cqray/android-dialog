@@ -17,20 +17,27 @@ import androidx.lifecycle.LifecycleOwner;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.Utils;
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
 /**
  * 控件相关操作模块
  * @author Cqray
  */
+@Accessors(prefix = "m")
 public class ViewModule<T extends View> {
 
     /** 圆角数量 **/
-    protected static final int RADII_LENGTH = 8;
+    private static final int RADII_LENGTH = 8;
     /** 控件 **/
-    protected T mView;
+    @Getter
+    private T mView;
     /** 圆角 **/
-    protected final float[] mBackgroundRadii = new float[RADII_LENGTH];
+    private final float[] mBackgroundRadii = new float[RADII_LENGTH];
     /** 间隔 **/
-    public final DialogLiveData<float[]> mPadding = new DialogLiveData<>();
+    public final DialogLiveData<int[]> mMargin = new DialogLiveData<>();
+    /** 间隔 **/
+    public final DialogLiveData<int[]> mPadding = new DialogLiveData<>();
     /** 显示 **/
     public final DialogLiveData<Integer> mVisibility = new DialogLiveData<>();
     /** 高度 **/
@@ -44,6 +51,14 @@ public class ViewModule<T extends View> {
 
     public void observe(@NonNull LifecycleOwner owner, @NonNull T view) {
         mView = view;
+        // 控件外部间隔监听
+        mMargin.observe(owner, floats -> {
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            params.setMargins(floats[0], floats[1], floats[2], floats[3]);
+            view.setLayoutParams(params);
+        });
+        // 控件内部间隔变化监听
+        mPadding.observe(owner, floats -> view.setPadding(floats[0], floats[1], floats[2], floats[3]));
         // 控件显示状态监听
         mVisibility.observe(owner, view::setVisibility);
         // 宽度变化监听
@@ -65,24 +80,7 @@ public class ViewModule<T extends View> {
             view.setLayoutParams(params);
         });
         // 设置背景变化监听
-        mBackground.observe(owner, drawable -> {
-            if (drawable == null) {
-                // 不设置背景
-                ViewCompat.setBackground(view, null);
-            } else if (drawable instanceof ColorDrawable) {
-                // 纯色背景设置圆角
-                int color = ((ColorDrawable) drawable).getColor();
-                GradientDrawable background = new GradientDrawable();
-                background.setColor(color);
-                background.setCornerRadii(mBackgroundRadii);
-                ViewCompat.setBackground(view, background);
-            } else {
-                // 图片背景设置圆角
-                RoundDrawable background = new RoundDrawable(drawable);
-                background.setRadii(mBackgroundRadii);
-                ViewCompat.setBackground(view, background);
-            }
-        });
+        mBackground.observe(owner, drawable -> setBackground(view, drawable));
         // 设置背景资源变化监听
         mBackgroundResource.observe(owner, aInt -> {
             Drawable drawable = ContextCompat.getDrawable(Utils.getApp(), aInt);
@@ -90,16 +88,41 @@ public class ViewModule<T extends View> {
         });
     }
 
+    public void setMargin(float left, float top, float right, float bottom) {
+        setMargin(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    public void setMargin(float left, float top, float right, float bottom, int unit) {
+        int[] array = new int[4];
+        array[0] = (int) SizeUtils.applyDimension(left, unit);
+        array[1] = (int) SizeUtils.applyDimension(top, unit);
+        array[2] = (int) SizeUtils.applyDimension(right, unit);
+        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
+        mMargin.setValue(array);
+    }
+
+    public void setMargin(float margin) {
+        setMargin(margin, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    public void setMargin(float margin, int unit) {
+        int[] array = new int[4];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) SizeUtils.applyDimension(margin, unit);
+        }
+        mMargin.setValue(array);
+    }
+
     public void setPadding(float left, float top, float right, float bottom) {
         setPadding(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP);
     }
 
     public void setPadding(float left, float top, float right, float bottom, int unit) {
-        float[] array = new float[4];
-        array[0] = SizeUtils.applyDimension(left, unit);
-        array[1] = SizeUtils.applyDimension(top, unit);
-        array[2] = SizeUtils.applyDimension(right, unit);
-        array[3] = SizeUtils.applyDimension(bottom, unit);
+        int[] array = new int[4];
+        array[0] = (int) SizeUtils.applyDimension(left, unit);
+        array[1] = (int) SizeUtils.applyDimension(top, unit);
+        array[2] = (int) SizeUtils.applyDimension(right, unit);
+        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
         mPadding.setValue(array);
     }
 
@@ -108,9 +131,9 @@ public class ViewModule<T extends View> {
     }
 
     public void setPadding(float padding, int unit) {
-        float[] array = new float[4];
+        int[] array = new int[4];
         for (int i = 0; i < array.length; i++) {
-            array[i] = SizeUtils.applyDimension(padding, unit);
+            array[i] = (int) SizeUtils.applyDimension(padding, unit);
         }
         mPadding.setValue(array);
     }
@@ -184,8 +207,8 @@ public class ViewModule<T extends View> {
      * <p>默认单位DP</p>
      * @param radii 8个值的数组，4对[X，Y]半径
      */
-    public void setRadii(float [] radii) {
-        setRadii(radii, TypedValue.COMPLEX_UNIT_DIP);
+    public void setBackgroundRadii(float [] radii) {
+        setBackgroundRadii(radii, TypedValue.COMPLEX_UNIT_DIP);
     }
 
     /**
@@ -193,7 +216,7 @@ public class ViewModule<T extends View> {
      * @param radii 8个值的数组，4对[X，Y]半径
      * @param unit  值单位
      */
-    public void setRadii(float [] radii, int unit) {
+    public void setBackgroundRadii(float [] radii, int unit) {
         if (radii == null || radii.length < RADII_LENGTH) {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
@@ -208,8 +231,8 @@ public class ViewModule<T extends View> {
      * <p>默认单位DP</p>
      * @param radius 圆角半径
      */
-    public void setRadius(float radius) {
-        setRadius(radius, TypedValue.COMPLEX_UNIT_DIP);
+    public void setBackgroundRadius(float radius) {
+        setBackgroundRadius(radius, TypedValue.COMPLEX_UNIT_DIP);
     }
 
     /**
@@ -217,12 +240,12 @@ public class ViewModule<T extends View> {
      * @param radius 圆角半径
      * @param unit 值单位
      */
-    public void setRadius(float radius, int unit) {
+    public void setBackgroundRadius(float radius, int unit) {
         float [] radii = new float[RADII_LENGTH];
         for (int i = 0; i < RADII_LENGTH; i++) {
             radii[i] = radius;
         }
-        setRadii(radii, unit);
+        setBackgroundRadii(radii, unit);
     }
 
     public void setBackground(Drawable drawable) {
@@ -237,4 +260,22 @@ public class ViewModule<T extends View> {
         mBackgroundResource.setValue(resId);
     }
 
+    protected void setBackground(View view, Drawable background) {
+        if (background == null) {
+            // 不设置背景
+            ViewCompat.setBackground(view, null);
+        } else if (background instanceof ColorDrawable) {
+            // 纯色背景设置圆角
+            int color = ((ColorDrawable) background).getColor();
+            GradientDrawable drawable = new GradientDrawable();
+            drawable.setColor(color);
+            drawable.setCornerRadii(mBackgroundRadii);
+            ViewCompat.setBackground(view, drawable);
+        } else {
+            // 图片背景设置圆角
+            RoundDrawable drawable = new RoundDrawable(background);
+            drawable.setRadii(mBackgroundRadii);
+            ViewCompat.setBackground(view, drawable);
+        }
+    }
 }

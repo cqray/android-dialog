@@ -6,9 +6,10 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.SizeUtils;
@@ -21,14 +22,12 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
  * 对话框面板委托
  * @author Cqray
  */
-public class PanelModule extends ViewModule<FrameLayout> {
+public final class PanelModule extends ViewModule<FrameLayout> {
 
-    /** 是否正在消除对话框 **/
-    protected boolean mDismissing;
     /** 对话框根界面 **/
     protected View mRootView;
     /** 对话框实例 **/
-    protected BaseDialog<?> mDialog;
+    protected final BaseDialog<?> mDialog;
     /** 面板相关尺寸, 依次为宽度dp值、宽度比例、宽度最小值, 宽度最大值、高度dp值、高度比例值、高度最小值，高度最大值。 **/
     protected final Float[] mSizeArray = new Float[8];
     /** 对话框显示、消除动画，提示显示、消失动画 **/
@@ -54,40 +53,43 @@ public class PanelModule extends ViewModule<FrameLayout> {
     @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull FrameLayout view) {
         super.observe(owner, view);
-        mRootView = (View) view.getParent();
         // 设置位置情况
         mGravity.observe(owner, aInt -> {
             ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent instanceof FrameLayout) {
-                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-                params.gravity = aInt;
-                parent.setLayoutParams(params);
-            } else if (parent instanceof LinearLayout) {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+            if (parent.getParent() instanceof FrameLayout) {
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) parent.getLayoutParams();
                 params.gravity = aInt;
                 parent.setLayoutParams(params);
             }
         });
         // 设置偏移位置监听
         mOffset.observe(owner, floats -> {
-            ViewGroup parent = (ViewGroup) view.getParent();
-//            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) parent.getLayoutParams();
-//            params.leftMargin = (int) floats[0];
-//            params.topMargin = (int) floats[1];
-            parent.setTranslationX(floats[0]);
-            parent.setTranslationY(floats[1]);
+            View v = (View) view.getParent();
+            v.setTranslationX(floats[0]);
+            v.setTranslationY(floats[1]);
         });
         // 设置面板大小监听
         mSize.observe(owner, ints -> {
-            ViewGroup.LayoutParams params = view.getLayoutParams();
+            View v = (View) view.getParent();
+            ViewGroup.LayoutParams params = v.getLayoutParams();
             if (params.width != ints[0] || params.height != ints[1]) {
                 params.width = ints[0];
                 params.height = ints[1];
-                view.requestLayout();
+                v.requestLayout();
             }
         });
         // 设置请求面板大小监听
         mRequestSize.observe(owner, o -> requestNewSize());
+        // 销毁资源
+        owner.getLifecycle().addObserver((LifecycleEventObserver) (source, event) -> {
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                for (DialogAnimator animator : mAnimators) {
+                    if (animator != null && animator.isRunning()) {
+                        animator.cancel();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -102,8 +104,20 @@ public class PanelModule extends ViewModule<FrameLayout> {
         return showing || dismissing;
     }
 
-    protected void doPanelAnimator(boolean show, Animator.AnimatorListener listener) {
-        if (mView != null) {
+    /**
+     * 面板是否正在消除
+     */
+    public boolean isDismissing() {
+        return mAnimators[1] != null && mAnimators[1].isRunning();
+    }
+
+    /**
+     * 执行面板动画，返回动画时长
+     * @param show 是否是显示动画
+     * @return 动画时长
+     */
+    protected int doPanelAnimator(boolean show) {
+        if (getView() != null) {
             // 获取对应动画
             DialogAnimator animator;
             if (show) {
@@ -114,21 +128,49 @@ public class PanelModule extends ViewModule<FrameLayout> {
             // 动画没有在运行，才继续操作
             if (!animator.isRunning()) {
                 // 设置目标对象
-                animator.setTarget(mView);
+                animator.setTarget(getView());
                 // 设置监听
-                animator.addAnimatorListener(listener);
+                animator.addAnimatorListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {}
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (show) {
+                            mDialog.onShow(mDialog.requireDialog());
+                        } else {
+                            mDialog.quickDismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {}
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {}
+                });
                 // 开始面板动画
                 animator.start();
             }
+            return animator.getDuration();
         }
+        return 0;
     }
 
-    public void show() {
-        doPanelAnimator(true, (AnimatorListener) animator -> mDialog.onShow(mDialog.requireDialog()));
+    /**
+     * 显示面板
+     * @return 动画时长
+     */
+    public int show() {
+        return doPanelAnimator(true);
     }
 
-    public void dismiss() {
-        doPanelAnimator(false, (AnimatorListener) animator -> mDialog.quickDismiss());
+    /**
+     * 消除面板
+     * @return 动画时长
+     */
+    public int dismiss() {
+        return doPanelAnimator(false);
     }
 
     public void setShowAnimator(DialogAnimator animator) {
@@ -283,18 +325,5 @@ public class PanelModule extends ViewModule<FrameLayout> {
                 mSize.setValue(size);
             });
         }
-    }
-
-    @SuppressWarnings("unuse")
-    interface AnimatorListener extends Animator.AnimatorListener {
-
-        @Override
-        default void onAnimationStart(Animator animation) {}
-
-        @Override
-        default void onAnimationCancel(Animator animation) {}
-
-        @Override
-        default void onAnimationRepeat(Animator animation) {}
     }
 }

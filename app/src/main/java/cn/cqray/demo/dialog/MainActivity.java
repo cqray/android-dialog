@@ -92,23 +92,23 @@ public class MainActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                             })
-                            .addDismissListener(new OnDismissListener() {
+                            .addOnDismissListener(new OnDismissListener() {
                                 @Override
                                 public void onDismiss() {
                                     Toast.makeText(MainActivity.this, "哈哈", Toast.LENGTH_SHORT).show();
                                 }
                             })
-                            .addCancelListener(new OnCancelListener() {
+                            .addOnCancelListener(new OnCancelListener() {
                                 @Override
                                 public void onCancel() {
                                     Toast.makeText(MainActivity.this, "哈哈2", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             //.showAnimator(new NoAnimator())
-                            //.nativeDimAmount(0.15f)
+                            //.nativeDimAmount(0.5f)
                             //.blackStatusBar(true)
                             .gravity(GravityCompat.END)
-                            .showAnimator(new BounceIn())
+                            //.showAnimator(new BounceIn())
                             .offset(-20, 20)
                             .cornerRadius(10);
                 }
