@@ -20,12 +20,12 @@ public class MessageDialog extends AlterDialog<MessageDialog> {
 
     public MessageDialog(FragmentActivity activity) {
         super(activity);
-        mContentModule = new TextViewModule(activity);
+        mContentModule = new TextViewModule();
     }
 
     public MessageDialog(Fragment fragment) {
         super(fragment);
-        mContentModule = new TextViewModule(fragment);
+        mContentModule = new TextViewModule();
     }
 
     @Override

@@ -1,22 +1,16 @@
 package cn.cqray.android.dialog;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.FloatRange;
@@ -24,77 +18,81 @@ import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.cqray.android.dialog.amin.DialogAnimator;
+import cn.cqray.android.dialog.listener.OnCancelListener;
+import cn.cqray.android.dialog.listener.OnDismissListener;
+import cn.cqray.android.dialog.listener.OnShowListener;
 
 /**
  * 内部实现Dialog
  * @author Cqray
  */
 @SuppressWarnings("unchecked")
-public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
+public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
 
-    private View mRootView;
-    private View mDimView;
-    private View mAnimView;
-    private FrameLayout mPanelView;
-    private Object mUnBinder;
-    private boolean mCancel;
-    private boolean mDismissing;
-    private final LifecycleOwner mLifecycleOwner;
-    protected final DialogModule mDialogModule;
+    /** 持有对话框的Fragment **/
+    protected final Fragment mOwnerFragment;
+    /** 持有对话框的Activity **/
+    protected final FragmentActivity mOwnerActivity;
+    /** 取消监听 **/
+    protected final List<OnCancelListener> mCancelListeners = new ArrayList<>();
+    /** 消除监听 **/
+    protected final List<OnDismissListener> mDismissListeners = new ArrayList<>();
+    /** 显示监听 **/
+    protected final List<OnShowListener> mShowListeners = new ArrayList<>();
+    /** 面板模块 **/
     protected final PanelModule mPanelModule;
+    /** 对话框委托 **/
+    protected final DialogDelegate mDelegate;
 
     public BaseDialog(FragmentActivity activity) {
-        this((LifecycleOwner) activity);
+        mOwnerActivity = activity;
+        mOwnerFragment = null;
+        mDelegate = new DialogDelegate(this);
+        mPanelModule = mDelegate.getPanelModule();
     }
 
     public BaseDialog(Fragment fragment) {
-        this((LifecycleOwner) fragment);
-    }
-
-    private BaseDialog(LifecycleOwner owner) {
-        if (owner instanceof FragmentActivity || owner instanceof Fragment) {
-            mLifecycleOwner = owner;
-            mDialogModule = new DialogModule(owner);
-            mPanelModule = new PanelModule(owner);
-            return;
-        }
-        throw new IllegalArgumentException("LifecycleOwner must implements on FragmentActivity or Fragment.");
+        mOwnerActivity = null;
+        mOwnerFragment = fragment;
+        mDelegate = new DialogDelegate(this);
+        mPanelModule = mDelegate.getPanelModule();
     }
 
     @Override
     public final void onCreate(@Nullable Bundle savedInstanceState) {
-        setRetainInstance(true);
         super.onCreate(savedInstanceState);
-        mRootView = View.inflate(getContext(), R.layout._dlg_base_layout, null);
-        mDimView = mRootView.findViewById(R.id._dialog_dim);
-        mAnimView = mRootView.findViewById(R.id._dialog_anim);
-        mPanelView = mRootView.findViewById(R.id._dialog_panel);
-        mRootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mDialogModule.isCancelableOutsize()
-                        && mDialogModule.isCancelable()
-                        && !mDismissing) {
-                    mCancel = true;
-                    dismiss();
-                }
-            }
-        });
-        mDialogModule.observe(this, mRootView);
-        mPanelModule.observe(this, mPanelView);
+        mDelegate.observe(this);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mUnBinder != null) {
-            ButterKnifeUtils.unbind(mUnBinder);
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        for (OnCancelListener listener : mCancelListeners) {
+            listener.onCancel();
+        }
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        for (OnDismissListener listener : mDismissListeners) {
+            listener.onDismiss();
+        }
+    }
+
+    public void onShow(@NonNull DialogInterface dialog) {
+        for (OnShowListener listener : mShowListeners) {
+            listener.onShow();
         }
     }
 
@@ -102,7 +100,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         onCreating(savedInstanceState);
-        return mRootView;
+        return mDelegate.getRootView();
     }
 
     public void onCreating(@Nullable Bundle savedInstanceState) {}
@@ -110,73 +108,53 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
     @NonNull
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Dialog dlg = new Dialog(requireActivity()) {
-            @Override
-            public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
-                if (BaseDialog.this.dispatchTouchEvent(ev) || mDialogModule.isDialogAnimRunning()) {
-                    return true;
-                }
-                return super.dispatchTouchEvent(ev);
-            }
-
-            @Override
-            public void onBackPressed() {
-                if (!BaseDialog.this.onBackPressed()
-                        && mDialogModule.isCancelable()
-                        && !mDismissing) {
-                    mCancel = true;
-                    BaseDialog.this.dismiss();
-                }
-            }
-        };
-        dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dlg.setCanceledOnTouchOutside(false);
-        dlg.setCancelable(false);
-        Window window = dlg.getWindow();
-        assert window != null;
-        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-        window.setDimAmount(mDialogModule.getNativeAmountCount());
-        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        mDialogModule.setWindow(window);
-        return dlg;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        showOrDismiss(true);
-    }
-
-    public void onCancel() {}
-
-    public void onDismiss() {}
-
-    public void onShow() {}
-
-    @Override
-    final void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        if (mCancel) {
-            onCancel();
-            mDialogModule.setState(DialogModule.CANCEL);
-        }
-        onDismiss();
-        mDialogModule.setState(DialogModule.DISMISS);
+        return mDelegate.onCreateDialog();
     }
 
     public void show() {
-        if (mLifecycleOwner instanceof FragmentActivity) {
-            show((FragmentActivity) mLifecycleOwner);
+        FragmentManager fm;
+        Activity act;
+        if (mOwnerFragment == null) {
+            assert mOwnerActivity != null;
+            fm = mOwnerActivity.getSupportFragmentManager();
+            act = mOwnerActivity;
         } else {
-            show((Fragment) mLifecycleOwner);
+            fm = mOwnerFragment.getParentFragmentManager();
+            act = mOwnerFragment.requireActivity();
         }
+        act.runOnUiThread(() -> {
+            try {
+                super.showNow(fm, getClass().getName());
+            } catch (IllegalStateException ignore) {}
+        });
     }
+
+    @Deprecated
+    @Override
+    public void show(@NonNull FragmentManager manager, @Nullable String tag) {}
+
+    @Deprecated
+    @Override
+    public void showNow(@NonNull FragmentManager manager, @Nullable String tag) {}
+
+    @Deprecated
+    @Override
+    public int show(@NonNull FragmentTransaction transaction, @Nullable String tag) {
+        return 0;
+    }
+
+    @Deprecated
+    @Override
+    public void setShowsDialog(boolean showsDialog) {}
 
     @Override
     public void dismiss() {
-        showOrDismiss(false);
+        mDelegate.dismiss();
     }
 
+    /**
+     * 快速消除，无视动画。本质是原始的消除方式
+     */
     public void quickDismiss() {
         super.dismiss();
     }
@@ -189,62 +167,61 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
         return false;
     }
 
-    public void setContentView(@LayoutRes int layoutResId) {
-        if (!getLifecycle()
-                .getCurrentState()
-                .isAtLeast(Lifecycle.State.CREATED)) {
-            throw new IllegalStateException("please call setContentView int onCreating.");
-        }
-        View view = LayoutInflater.from(requireContext())
-                .inflate(layoutResId, mPanelView, false);
-        mPanelView.removeAllViews();
-        mPanelView.addView(view);
-        mUnBinder = ButterKnifeUtils.bind(this, mRootView);
+    public void setContentView(View view) {
+        mDelegate.setContentView(view);
     }
 
-    public void setContentView(View view) {
-        if (!getLifecycle()
-                .getCurrentState()
-                .isAtLeast(Lifecycle.State.CREATED)) {
-            throw new IllegalStateException("please call setContentView int onCreating.");
-        }
-        mPanelView.removeAllViews();
-        mPanelView.addView(view);
-        mUnBinder = ButterKnifeUtils.bind(this, mRootView);
+    public void setContentView(@LayoutRes int layoutResId) {
+        mDelegate.setContentView(layoutResId);
+    }
+
+    public T blackStatusBar(boolean black) {
+        mDelegate.setBlackStatusBar(black);
+        return (T) this;
     }
 
     public T cancelable(boolean cancelable) {
-        mDialogModule.setCancelable(cancelable);
+        mDelegate.setCancelable(cancelable);
         return (T) this;
     }
 
     public T cancelableOutsize(boolean cancelable) {
-        mDialogModule.setCancelableOutsize(cancelable);
+        mDelegate.setCancelableOutsize(cancelable);
         return (T) this;
     }
 
     public T customDimMargin(float l, float t, float r, float b) {
-        mDialogModule.setCustomDimMargin(l, t, r, b);
+
         return (T) this;
     }
 
     public T customDimAmount(@FloatRange(from = 0, to = 1) float amount) {
-        mDialogModule.setCustomAmountCount(amount);
+        mDelegate.setCustomAmountCount(amount);
         return (T) this;
     }
 
     public T nativeDimAmount(@FloatRange(from = 0, to = 1) float amount) {
-        mDialogModule.setNativeAmountCount(amount);
+        mDelegate.setNativeAmountCount(amount);
         return (T) this;
     }
 
     public T cornerRadii(float [] radii) {
-        mPanelModule.setRadii(radii);
+        mPanelModule.setBackgroundRadii(radii);
         return (T) this;
     }
 
-    public T cornerRadius(@FloatRange(from = 0) float radius) {
-        mPanelModule.setRadius(radius);
+    public T cornerRadii(float [] radii, int unit) {
+        mPanelModule.setBackgroundRadii(radii, unit);
+        return (T) this;
+    }
+
+    public T cornerRadius(float radius) {
+        mPanelModule.setBackgroundRadius(radius);
+        return (T) this;
+    }
+
+    public T cornerRadius(float radius, int unit) {
+        mPanelModule.setBackgroundRadius(radius, unit);
         return (T) this;
     }
 
@@ -254,11 +231,6 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
     }
 
     public T backgroundColor(int color) {
-        mPanelModule.setBackgroundColor(color);
-        return (T) this;
-    }
-
-    public T backgroundColor(String color) {
         mPanelModule.setBackgroundColor(color);
         return (T) this;
     }
@@ -273,31 +245,18 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
         return (T) this;
     }
 
-    public T gravityBottom() {
-        return gravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
-    }
-
-    public T gravityCenter() {
-        return gravity(Gravity.CENTER);
-    }
-
-    public T gravityTop() {
-        return gravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL);
-    }
-
-    public T gravity(int gravity, float offsetX, float offsetY) {
-        mPanelModule.setGravity(gravity);
-        mPanelModule.setOffset(offsetX, offsetY);
-        return (T) this;
-    }
-
     public T offset(float offsetX, float offsetY) {
         mPanelModule.setOffset(offsetX, offsetY);
         return (T) this;
     }
 
-    public T width(@FloatRange(from = 0) float width) {
+    public T width(float width) {
         mPanelModule.setWidth(width);
+        return (T) this;
+    }
+
+    public T width(float width, int unit) {
+        mPanelModule.setWidth(width, unit);
         return (T) this;
     }
 
@@ -306,18 +265,33 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
         return (T) this;
     }
 
-    public T widthMin(@FloatRange(from = 0) float min) {
-        mPanelModule.setWidthMin(min);
+    public T widthMin(float min) {
+        mPanelModule.setWidthMin(min, TypedValue.COMPLEX_UNIT_DIP);
         return (T) this;
     }
 
-    public T widthMax(@FloatRange(from = 0) float max) {
-        mPanelModule.setWidthMax(max);
+    public T widthMin(float min, int unit) {
+        mPanelModule.setWidthMin(min, unit);
         return (T) this;
     }
 
-    public T height(@FloatRange(from = 0) float height) {
+    public T widthMax(float max) {
+        mPanelModule.setWidthMax(max, TypedValue.COMPLEX_UNIT_DIP);
+        return (T) this;
+    }
+
+    public T widthMax(float max, int unit) {
+        mPanelModule.setWidthMax(max, unit);
+        return (T) this;
+    }
+
+    public T height(float height) {
         mPanelModule.setHeight(height);
+        return (T) this;
+    }
+
+    public T height(float height, int unit) {
+        mPanelModule.setHeight(height, unit);
         return (T) this;
     }
 
@@ -326,120 +300,59 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogInternal {
         return (T) this;
     }
 
-    public T heightMin(@FloatRange(from = 0) float min) {
-        mPanelModule.setHeightMin(min);
+    public T heightMin(float min) {
+        mPanelModule.setHeightMin(min, TypedValue.COMPLEX_UNIT_DIP);
         return (T) this;
     }
 
-    public T heightMax(@FloatRange(from = 0) float max) {
-        mPanelModule.setHeightMax(max);
+    public T heightMin(float min, int unit) {
+        mPanelModule.setHeightMin(min, unit);
+        return (T) this;
+    }
+
+    public T heightMax(float max) {
+        mPanelModule.setHeightMax(max, TypedValue.COMPLEX_UNIT_DIP);
+        return (T) this;
+    }
+
+    public T heightMax(float max, int unit) {
+        mPanelModule.setHeightMax(max, unit);
         return (T) this;
     }
 
     public T showAnimator(DialogAnimator animator) {
-        mDialogModule.setDialogAnimator(animator, true);
+        mPanelModule.setShowAnimator(animator);
         return (T) this;
     }
 
     public T dismissAnimator(DialogAnimator animator) {
-        mDialogModule.setDialogAnimator(animator, false);
+        mPanelModule.setDismissAnimator(animator);
         return (T) this;
     }
 
     public T addOnCancelListener(OnCancelListener listener) {
-        mDialogModule.addOnCancelListener(listener);
+        synchronized (BaseDialog.class) {
+            mCancelListeners.add(listener);
+        }
         return (T) this;
     }
 
     public T addOnDismissListener(OnDismissListener listener) {
-        mDialogModule.addOnDismissListener(listener);
+        synchronized (BaseDialog.class) {
+            mDismissListeners.add(listener);
+        }
         return (T) this;
     }
 
     public T addOnShowListener(OnShowListener listener) {
-        mDialogModule.addOnShowListener(listener);
+        synchronized (BaseDialog.class) {
+            mShowListeners.add(listener);
+        }
         return (T) this;
     }
 
     public <V extends View> V findViewById(@IdRes int resId) {
-        if (mRootView != null) {
-            return mRootView.findViewById(resId);
-        }
-        return null;
-    }
-
-    protected int getStatusBarHeight() {
-        return DialogUtils.isFull(getActivity()) ? 0 : DialogUtils.getStatusBarHeight();
-    }
-
-    protected int getNavgationBarHeight() {
-        return DialogUtils.isNavigationBarShow(getActivity()) ? DialogUtils.getNavigationBarHeight() : 0;
-    }
-
-    private void showOrDismiss(final boolean show) {
-        mDismissing = !show;
-        mRootView.setVisibility(View.VISIBLE);
-        DialogAnimator animator = mDialogModule.getDialogAnimators(show);
-        animator.setTarget(mAnimView);
-        if (animator.getDuration() <= 0) {
-            // 无动画
-            if (show) {
-                DialogAnimator.reset(mAnimView);
-            } else {
-                quickDismiss();
-            }
-        } else {
-            // 面板动画
-            animator.addAnimatorListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {}
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (!show) {
-                        quickDismiss();
-                    } else {
-                        onShow();
-                        mDialogModule.setState(DialogModule.SHOW);
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {}
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {}
-            });
-            animator.start();
-        }
-        // 执行遮罩动画
-        doDimAnimator(animator.getDuration(), show);
-    }
-
-    /***
-     * 执行遮罩动画
-     * @param duration 显示时长
-     * @param show true显示对话框，false关闭对话框
-     */
-    private void doDimAnimator(int duration, boolean show) {
-        // 遮罩动画
-        ValueAnimator dimAnimator = mDialogModule.getCustomDimAnimator(show);
-        if (dimAnimator != null) {
-            dimAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    int value = (int) animation.getAnimatedValue();
-                    String alpha = String.format("%02X", value);
-                    String color = "#" + alpha + "000000";
-                    mDimView.setBackgroundColor(Color.parseColor(color));
-                }
-            });
-            dimAnimator.setDuration(duration).start();
-        }
-    }
-
-    protected int toPix(float dp) {
-        return (int) (Resources.getSystem().getDisplayMetrics().density * dp + 0.5);
+        return mDelegate.findViewById(resId);
     }
 
 }

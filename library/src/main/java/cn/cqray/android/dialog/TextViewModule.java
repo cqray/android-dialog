@@ -6,121 +6,86 @@ import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
+
+import com.blankj.utilcode.util.SizeUtils;
 
 /**
- * 文本按钮模块
+ * 文本控件相关操作模块
  * @author Cqray
  */
 public class TextViewModule extends ViewModule<TextView> {
 
     /** 文本 **/
-    private final MutableLiveData<CharSequence> mText = new MutableLiveData<>();
+    public final DialogLiveData<CharSequence> mText = new DialogLiveData<>();
+    /** 文本资源 **/
+    public final DialogLiveData<Integer> mTextRes = new DialogLiveData<>();
     /** 文本颜色 **/
-    private final MutableLiveData<ColorStateList> mTextColor = new MutableLiveData<>();
+    public final DialogLiveData<ColorStateList> mTextColor = new DialogLiveData<>();
     /** 文本大小 **/
-    private final MutableLiveData<Integer> mTextSize = new MutableLiveData<>();
+    public final DialogLiveData<Integer> mTextSize = new DialogLiveData<>();
     /** 文本加粗 **/
-    private final MutableLiveData<Boolean> mTextBold = new MutableLiveData<>();
+    public final DialogLiveData<Integer> mTextStyle = new DialogLiveData<>();
     /** 文本位置 **/
-    private final MutableLiveData<Integer> mGravity = new MutableLiveData<>();
-
-    public TextViewModule(LifecycleOwner owner) {
-        super(owner);
-    }
+    public final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
 
     @Override
-    public void observe(LifecycleOwner owner, final TextView tv) {
-        super.observe(owner, tv);
-        observeText(owner, new Observer<CharSequence>() {
-            @Override
-            public void onChanged(CharSequence charSequence) {
-                tv.setText(charSequence);
-            }
-        });
-        observeTextColor(owner, new Observer<ColorStateList>() {
-            @Override
-            public void onChanged(ColorStateList colorStateList) {
-                tv.setTextColor(colorStateList);
-            }
-        });
-        observeTextSize(owner, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, integer);
-            }
-        });
-        observeTextBold(owner, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-                tv.setTypeface(Typeface.defaultFromStyle(aBoolean ? Typeface.BOLD : Typeface.NORMAL));
-            }
-        });
-        observeGravity(owner, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                tv.setGravity(integer);
-            }
-        });
-    }
-
-    public void observeText(LifecycleOwner owner, Observer<CharSequence> observer) {
-        mText.removeObservers(owner);
-        mText.observe(owner, observer);
-    }
-
-    public void observeTextColor(LifecycleOwner owner, Observer<ColorStateList> observer) {
-        mTextColor.removeObservers(owner);
-        mTextColor.observe(owner, observer);
-    }
-
-    public void observeTextSize(LifecycleOwner owner, Observer<Integer> observer) {
-        mTextSize.removeObservers(owner);
-        mTextSize.observe(owner, observer);
-    }
-
-    public void observeTextBold(LifecycleOwner owner, Observer<Boolean> observer) {
-        mTextBold.removeObservers(owner);
-        mTextBold.observe(owner, observer);
-    }
-
-    public void observeGravity(LifecycleOwner owner, Observer<Integer> observer) {
-        mGravity.removeObservers(owner);
-        mGravity.observe(owner, observer);
+    public void observe(@NonNull LifecycleOwner owner, @NonNull TextView view) {
+        super.observe(owner, view);
+        // 设置文本监听
+        mText.observe(owner, view::setText);
+        // 设置文本资源监听
+        mTextRes.observe(owner, view::setText);
+        // 设置文本颜色变化监听
+        mTextColor.observe(owner, view::setTextColor);
+        // 设置文本大小变化监听
+        mTextSize.observe(owner, aInt -> view.setTextSize(TypedValue.COMPLEX_UNIT_PX, aInt));
+        // 设置文本样式变化监听
+        mTextStyle.observe(owner, aBoolean -> view.setTypeface(Typeface.defaultFromStyle(aBoolean)));
+        // 设置文本位置变化监听
+        mGravity.observe(owner, view::setGravity);
     }
 
     public void setText(@StringRes int resId) {
-        mText.postValue(getString(resId));
+        mTextRes.setValue(resId);
     }
 
     public void setText(CharSequence content) {
-        mText.postValue(content);
+        mText.setValue(content);
     }
 
-    public void setTextColor(int color) {
-        mTextColor.postValue(ColorStateList.valueOf(color));
+    public void setTextColor(@ColorInt int color) {
+        mTextColor.setValue(ColorStateList.valueOf(color));
     }
 
     public void setTextColor(String color) {
-        mTextColor.postValue(ColorStateList.valueOf(Color.parseColor(color)));
+        mTextColor.setValue(ColorStateList.valueOf(Color.parseColor(color)));
     }
 
     public void setTextColor(ColorStateList colorStateList) {
-        mTextColor.postValue(colorStateList);
+        mTextColor.setValue(colorStateList);
     }
 
     public void setTextSize(float size) {
-        mTextSize.postValue(toPix(size));
+        mTextSize.setValue((int) SizeUtils.applyDimension(size, TypedValue.COMPLEX_UNIT_DIP));
+    }
+
+    public void setTextSize(float size, int unit) {
+        mTextSize.setValue((int) SizeUtils.applyDimension(size, unit));
     }
 
     public void setTextBold(boolean bold) {
-        mTextBold.postValue(bold);
+        mTextStyle.setValue(bold ? Typeface.BOLD : Typeface.NORMAL);
+    }
+
+    public void setTextStyle(int style) {
+        mTextStyle.setValue(style);
     }
 
     public void setGravity(int gravity) {
-        mGravity.postValue(gravity);
+        mGravity.setValue(gravity);
     }
 }

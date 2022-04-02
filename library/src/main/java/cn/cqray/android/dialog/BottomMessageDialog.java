@@ -16,17 +16,15 @@ import androidx.fragment.app.FragmentActivity;
  */
 public class BottomMessageDialog extends BottomAlterDialog<BottomMessageDialog> {
 
-    private final TextViewModule mContentModule;
+    private final TextViewModule mContentModule = new TextViewModule();
 
     public BottomMessageDialog(FragmentActivity activity) {
         super(activity);
-        mContentModule = new TextViewModule(activity);
         startVisible(false).endVisible(false);
     }
 
     public BottomMessageDialog(Fragment fragment) {
         super(fragment);
-        mContentModule = new TextViewModule(fragment);
         startVisible(false).endVisible(false);
     }
 

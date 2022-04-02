@@ -1,255 +1,281 @@
 package cn.cqray.android.dialog;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.PixelFormat;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
-import androidx.annotation.StringRes;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
+
+import com.blankj.utilcode.util.SizeUtils;
+import com.blankj.utilcode.util.Utils;
+
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 /**
- * View控件模块
+ * 控件相关操作模块
  * @author Cqray
  */
+@Accessors(prefix = "m")
 public class ViewModule<T extends View> {
+
     /** 圆角数量 **/
     private static final int RADII_LENGTH = 8;
-    /** LifeOwner **/
-    private LifecycleOwner mLifecycleOwner;
+    /** 控件 **/
+    @Getter
+    private T mView;
     /** 圆角 **/
-    private float[] mBackgroundRadii;
-    /** 颜色 **/
-    private int mBackgroundColor = Color.WHITE;
+    private final float[] mBackgroundRadii = new float[RADII_LENGTH];
     /** 间隔 **/
-    private final MutableLiveData<float[]> mPadding = new MutableLiveData<>();
+    public final DialogLiveData<int[]> mMargin = new DialogLiveData<>();
+    /** 间隔 **/
+    public final DialogLiveData<int[]> mPadding = new DialogLiveData<>();
     /** 显示 **/
-    private final MutableLiveData<Integer> mVisibility = new MutableLiveData<>();
+    public final DialogLiveData<Integer> mVisibility = new DialogLiveData<>();
     /** 高度 **/
-    private final MutableLiveData<Float> mHeight = new MutableLiveData<>();
+    public final DialogLiveData<Float> mHeight = new DialogLiveData<>();
     /** 高度 **/
-    private final MutableLiveData<Float> mWidth = new MutableLiveData<>();
-    /** 背景 **/
-    private final MutableLiveData<Drawable> mBackground = new MutableLiveData<>();
+    public final DialogLiveData<Float> mWidth = new DialogLiveData<>();
+    /** 背景图 **/
+    public final DialogLiveData<Drawable> mBackground = new DialogLiveData<>();
     /** 背景资源 **/
-    private final MutableLiveData<Integer> mBackgroundResource = new MutableLiveData<>();
+    public final DialogLiveData<Integer> mBackgroundResource = new DialogLiveData<>();
 
-    public ViewModule(LifecycleOwner owner) {
-        if (owner instanceof Activity || owner instanceof Fragment) {
-            mLifecycleOwner = owner;
-            return;
+    public void observe(@NonNull LifecycleOwner owner, @NonNull T view) {
+        mView = view;
+        // 控件外部间隔监听
+        mMargin.observe(owner, floats -> {
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+            params.setMargins(floats[0], floats[1], floats[2], floats[3]);
+            view.setLayoutParams(params);
+        });
+        // 控件内部间隔变化监听
+        mPadding.observe(owner, floats -> view.setPadding(floats[0], floats[1], floats[2], floats[3]));
+        // 控件显示状态监听
+        mVisibility.observe(owner, view::setVisibility);
+        // 宽度变化监听
+        mWidth.observe(owner, aFloat ->  {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            if (params == null) {
+                params = new ViewGroup.LayoutParams(aFloat.intValue(), -2);
+            }
+            params.width = aFloat.intValue();
+            view.setLayoutParams(params);
+        });
+        // 高度变化监听
+        mHeight.observe(owner, aFloat -> {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            if (params == null) {
+                params = new ViewGroup.LayoutParams(-2, aFloat.intValue());
+            }
+            params.height = aFloat.intValue();
+            view.setLayoutParams(params);
+        });
+        // 设置背景变化监听
+        mBackground.observe(owner, drawable -> setBackground(view, drawable));
+        // 设置背景资源变化监听
+        mBackgroundResource.observe(owner, aInt -> {
+            Drawable drawable = ContextCompat.getDrawable(Utils.getApp(), aInt);
+            mBackground.setValue(drawable);
+        });
+    }
+
+    public void setMargin(float left, float top, float right, float bottom) {
+        setMargin(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    public void setMargin(float left, float top, float right, float bottom, int unit) {
+        int[] array = new int[4];
+        array[0] = (int) SizeUtils.applyDimension(left, unit);
+        array[1] = (int) SizeUtils.applyDimension(top, unit);
+        array[2] = (int) SizeUtils.applyDimension(right, unit);
+        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
+        mMargin.setValue(array);
+    }
+
+    public void setMargin(float margin) {
+        setMargin(margin, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    public void setMargin(float margin, int unit) {
+        int[] array = new int[4];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) SizeUtils.applyDimension(margin, unit);
         }
-        throw new IllegalArgumentException("LifecycleOwner must implements on FragmentActivity or Fragment.");
+        mMargin.setValue(array);
     }
 
-    public void observe(LifecycleOwner owner, final T view) {
-        observePadding(owner, new Observer<float[]>() {
-            @Override
-            public void onChanged(float[] ints) {
-                view.setPadding(toPix(ints[0]), toPix(ints[1]), toPix(ints[2]), toPix(ints[3]));
-            }
-        });
-        observeVisibility(owner, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                view.setVisibility(integer);
-            }
-        });
-        observeWidth(owner, new Observer<Float>() {
-            @Override
-            public void onChanged(Float aFloat) {
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-                params.width = toPix(aFloat);
-                view.requestLayout();
-            }
-        });
-        observeHeight(owner, new Observer<Float>() {
-            @Override
-            public void onChanged(Float aFloat) {
-                ViewGroup.LayoutParams params = view.getLayoutParams();
-                params.height = toPix(aFloat);
-                view.requestLayout();
-            }
-        });
-        observeBackground(owner, new Observer<Drawable>() {
-            @Override
-            public void onChanged(Drawable drawable) {
-                ViewCompat.setBackground(view, drawable);
-            }
-        });
-        observeBackgroundResource(owner, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                Drawable drawable = ContextCompat.getDrawable(requireContext(), integer);
-                requestBackground(drawable);
-            }
-        });
+    public void setPadding(float left, float top, float right, float bottom) {
+        setPadding(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP);
     }
 
-    public void observeVisibility(LifecycleOwner owner, Observer<Integer> observer) {
-        mVisibility.removeObservers(owner);
-        mVisibility.observe(owner, observer);
+    public void setPadding(float left, float top, float right, float bottom, int unit) {
+        int[] array = new int[4];
+        array[0] = (int) SizeUtils.applyDimension(left, unit);
+        array[1] = (int) SizeUtils.applyDimension(top, unit);
+        array[2] = (int) SizeUtils.applyDimension(right, unit);
+        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
+        mPadding.setValue(array);
     }
 
-    public void observePadding(LifecycleOwner owner, Observer<float[]> observer) {
-        mPadding.removeObservers(owner);
-        mPadding.observe(owner, observer);
+    public void setPadding(float padding) {
+        setPadding(padding, TypedValue.COMPLEX_UNIT_DIP);
     }
 
-    public void observeWidth(LifecycleOwner owner, Observer<Float> observer) {
-        mWidth.removeObservers(owner);
-        mWidth.observe(owner, observer);
+    public void setPadding(float padding, int unit) {
+        int[] array = new int[4];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) SizeUtils.applyDimension(padding, unit);
+        }
+        mPadding.setValue(array);
     }
 
-    public void observeHeight(LifecycleOwner owner, Observer<Float> observer) {
-        mHeight.removeObservers(owner);
-        mHeight.observe(owner, observer);
-    }
-
-    public void observeBackground(LifecycleOwner owner, Observer<Drawable> observer) {
-        mBackground.removeObservers(owner);
-        mBackground.observe(owner, observer);
-    }
-
-    public void observeBackgroundResource(LifecycleOwner owner, Observer<Integer> observer) {
-        mBackgroundResource.removeObservers(owner);
-        mBackgroundResource.observe(owner, observer);
-    }
-
-    public void setPadding(float l, float t, float r, float b) {
-        mPadding.postValue(new float[] {l, t, r, b});
-    }
-
-    public void setVisibility(int visibility) {
-        mVisibility.postValue(visibility);
-    }
-
+    /**
+     * 设置控件宽度
+     * <p>默认单位DP</p>
+     * @param width 宽度
+     */
     public void setWidth(float width) {
-        mWidth.postValue(width);
+        float size = SizeUtils.applyDimension(width, TypedValue.COMPLEX_UNIT_DIP);
+        mWidth.setValue(size);
     }
 
+    /**
+     * 设置控件宽度
+     * @param width 宽度
+     * @param unit 值单位
+     */
+    public void setWidth(float width, int unit) {
+        float size = SizeUtils.applyDimension(width, unit);
+        mWidth.setValue(size);
+    }
+
+    /**
+     * 设置控件高度
+     * <p>默认单位DP</p>
+     * @param height 高度
+     */
     public void setHeight(float height) {
-        mHeight.postValue(height);
+        float size = SizeUtils.applyDimension(height, TypedValue.COMPLEX_UNIT_DIP);
+        mHeight.setValue(size);
     }
 
-    public void setRadii(float [] radii) {
+    /**
+     * 设置控件高度
+     * @param height 高度
+     * @param unit 值单位
+     */
+    public void setHeight(float height, int unit) {
+        float size = SizeUtils.applyDimension(height, unit);
+        mHeight.setValue(size);
+    }
+
+    /**
+     * 设置控件显示
+     * @param visible 是否显示
+     */
+    public void setVisible(boolean visible) {
+        mVisibility.setValue(visible ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    /**
+     * 设置控件隐藏
+     * @param gone 是否隐藏
+     */
+    public void setGone(boolean gone) {
+        mVisibility.setValue(gone ? View.GONE : View.VISIBLE);
+    }
+
+    /**
+     * 设置控件显示状态
+     * @param visibility 显示状态
+     */
+    public void setVisibility(int visibility) {
+        mVisibility.setValue(visibility);
+    }
+
+    /**
+     * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
+     * <p>默认单位DP</p>
+     * @param radii 8个值的数组，4对[X，Y]半径
+     */
+    public void setBackgroundRadii(float [] radii) {
+        setBackgroundRadii(radii, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    /**
+     * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
+     * @param radii 8个值的数组，4对[X，Y]半径
+     * @param unit  值单位
+     */
+    public void setBackgroundRadii(float [] radii, int unit) {
         if (radii == null || radii.length < RADII_LENGTH) {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
-        mBackgroundRadii = new float[RADII_LENGTH];
         for (int i = 0; i < RADII_LENGTH; i++) {
-            mBackgroundRadii[i] = toPix(radii[i]);
+            mBackgroundRadii[i] = SizeUtils.applyDimension(radii[i], unit);
         }
-        requestBackground();
+        mBackground.setValue(mBackground.getValue());
     }
 
-    public void setRadius(float radius) {
+    /**
+     * 设置圆角大小
+     * <p>默认单位DP</p>
+     * @param radius 圆角半径
+     */
+    public void setBackgroundRadius(float radius) {
+        setBackgroundRadius(radius, TypedValue.COMPLEX_UNIT_DIP);
+    }
+
+    /**
+     * 设置圆角大小
+     * @param radius 圆角半径
+     * @param unit 值单位
+     */
+    public void setBackgroundRadius(float radius, int unit) {
         float [] radii = new float[RADII_LENGTH];
         for (int i = 0; i < RADII_LENGTH; i++) {
             radii[i] = radius;
         }
-        setRadii(radii);
+        setBackgroundRadii(radii, unit);
     }
 
     public void setBackground(Drawable drawable) {
-        requestBackground(drawable);
+        mBackground.setValue(drawable);
     }
 
-    public void setBackgroundColor(int color) {
-        mBackgroundColor = color;
-        requestBackground();
-    }
-
-    public void setBackgroundColor(String color) {
-        mBackgroundColor = Color.parseColor(color);
-        requestBackground();
+    public void setBackgroundColor(@ColorInt int color) {
+        mBackground.setValue(new ColorDrawable(color));
     }
 
     public void setBackgroundResource(@DrawableRes int resId) {
-        mBackgroundResource.postValue(resId);
+        mBackgroundResource.setValue(resId);
     }
 
-    protected FragmentActivity requireActivity() {
-        if (mLifecycleOwner instanceof FragmentActivity) {
-            return (FragmentActivity) mLifecycleOwner;
-        } else {
-            return ((Fragment) mLifecycleOwner).requireActivity();
-        }
-    }
-
-    protected Context requireContext() {
-        return requireActivity();
-    }
-
-    protected String getString(@StringRes int resId) {
-        return requireContext().getString(resId);
-    }
-
-    protected int toPix(float dp) {
-        float density = Resources.getSystem().getDisplayMetrics().density;
-        return (int) (density * dp + 0.5f);
-    }
-
-    private void requestBackground() {
-        if (mBackgroundRadii == null) {
-            mBackground.postValue(new ColorDrawable(mBackgroundColor));
-        } else {
+    protected void setBackground(View view, Drawable background) {
+        if (background == null) {
+            // 不设置背景
+            ViewCompat.setBackground(view, null);
+        } else if (background instanceof ColorDrawable) {
+            // 纯色背景设置圆角
+            int color = ((ColorDrawable) background).getColor();
             GradientDrawable drawable = new GradientDrawable();
-            drawable.setColor(mBackgroundColor);
+            drawable.setColor(color);
             drawable.setCornerRadii(mBackgroundRadii);
-            mBackground.postValue(drawable);
-        }
-    }
-
-    private void requestBackground(Drawable drawable) {
-        if (drawable == null) {
-            mBackground.postValue(null);
-            return;
-        }
-        if (mBackgroundRadii == null) {
-            mBackground.postValue(drawable);
-            return;
-        }
-        boolean equal = true;
-        float value = mBackgroundRadii[0];
-        for (float v : mBackgroundRadii) {
-            if (Math.abs(v - value) < 0.01f) {
-                equal = false;
-                break;
-            }
-        }
-        if (equal) {
-            Bitmap bitmap = Bitmap.createBitmap(
-                    drawable.getIntrinsicWidth(),
-                    drawable.getIntrinsicHeight(),
-                    drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-            drawable.draw(canvas);
-
-            RoundedBitmapDrawable newDrawable = RoundedBitmapDrawableFactory.create(requireContext().getResources(), bitmap);
-            newDrawable.setCornerRadius(value);
-            newDrawable.setAntiAlias(true);
-            mBackground.postValue(newDrawable);
+            ViewCompat.setBackground(view, drawable);
         } else {
-            mBackground.postValue(drawable);
+            // 图片背景设置圆角
+            RoundDrawable drawable = new RoundDrawable(background);
+            drawable.setRadii(mBackgroundRadii);
+            ViewCompat.setBackground(view, drawable);
         }
     }
 }

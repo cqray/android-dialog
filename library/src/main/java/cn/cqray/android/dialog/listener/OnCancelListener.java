@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog;
+package cn.cqray.android.dialog.listener;
 
 /**
  * 取消监听
@@ -6,5 +6,8 @@ package cn.cqray.android.dialog;
  */
 public interface OnCancelListener {
 
+    /**
+     * 对话框被取消
+     */
     void onCancel();
 }

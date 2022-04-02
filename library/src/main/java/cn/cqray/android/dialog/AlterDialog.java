@@ -24,6 +24,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.blankj.utilcode.util.SizeUtils;
+
 /**
  * 消息对话框
  * @author Cqray
@@ -31,8 +33,6 @@ import androidx.lifecycle.Observer;
 @SuppressWarnings("unchecked")
 public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
 
-    private View mDividerView;
-    private TextView mTitleView;
     private FrameLayout mContentView;
     private LinearLayout mBottomView;
     /** 是否是默认背景 **/
@@ -54,49 +54,33 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     /** 按钮背景资源 **/
     private final MutableLiveData<Drawable[]> mButtonDrawables = new MutableLiveData<>();
     /** 标题程序块 **/
-    protected final TextViewModule mTitleModule;
+    protected final TextViewModule mTitleModule = new TextViewModule();
     /** 分割线程序块 **/
-    protected final ViewModule<View> mDividerModule;
+    protected final ViewModule<View> mDividerModule = new ViewModule<>();
 
     public AlterDialog(FragmentActivity activity) {
         super(activity);
-        mTitleModule = new TextViewModule(activity);
-        mDividerModule = new ViewModule<>(activity);
-        gravityCenter();
+        gravity(Gravity.CENTER);
     }
 
     public AlterDialog(Fragment fragment) {
         super(fragment);
-        mTitleModule = new TextViewModule(fragment);
-        mDividerModule = new ViewModule<>(fragment);
-        gravityCenter();
+        gravity(Gravity.CENTER);
     }
 
     @Override
     public void onCreating(@Nullable Bundle savedInstanceState) {
         super.onCreating(savedInstanceState);
         super.setContentView(R.layout._dlg_alter_layout);
-        mTitleView = findViewById(R.id._dlg_title);
-        mDividerView = findViewById(R.id._dlg_divider);
         mContentView = findViewById(R.id._dlg_content);
         mBottomView = findViewById(R.id._dlg_bottom);
         // 订阅标题、分割线属性
-        mTitleModule.observe(this, mTitleView);
-        mDividerModule.observe(this, mDividerView);
-        mTitleModule.observeVisibility(this, new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer integer) {
-                mTitleView.setVisibility(integer);
-                mDividerView.setVisibility(integer);
-            }
-        });
+        mTitleModule.observe(this, findViewById(R.id._dlg_title));
+        mDividerModule.observe(this, findViewById(R.id._dlg_divider));
+        // 分割线跟随标题变化
+        mTitleModule.mVisibility.observe(this, mDividerModule::setVisibility);
         // 设置内容间隔
-        mContentPadding.observe(this, new Observer<Float>() {
-            @Override
-            public void onChanged(Float aFloat) {
-                setContentPadding();
-            }
-        });
+        mContentPadding.observe(this, aFloat -> setContentPadding());
         // 设置内容间隔
         setContentPadding();
         // 初始化按钮相关的LiveData
@@ -172,11 +156,6 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
     }
 
     public T dividerColor(int color) {
-        mDividerModule.setBackgroundColor(color);
-        return (T) this;
-    }
-
-    public T dividerColor(String color) {
         mDividerModule.setBackgroundColor(color);
         return (T) this;
     }
@@ -276,7 +255,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      */
     private void setContentPadding() {
         Float value = mContentPadding.getValue();
-        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : toPix(value);
+        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : SizeUtils.dp2px(value);
         int count = mBottomView.getChildCount();
         int half = mDefaultButtonBackground ? padding / 2 : padding;
         mContentView.setPadding(padding, padding, padding, count > 0 ? padding : half);
@@ -294,19 +273,16 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
             return;
         }
         // 监听事件
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 控件索引
-                int index = mBottomView.indexOfChild(v);
-                // 获取对应的监听事件
-                View.OnClickListener listener1 = mButtonListeners == null ||
-                        mButtonListeners.length <= index ?
-                        null : mButtonListeners[index];
-                // 回调
-                if (listener1 != null) {
-                    listener1.onClick(v);
-                }
+        View.OnClickListener listener = v -> {
+            // 控件索引
+            int index = mBottomView.indexOfChild(v);
+            // 获取对应的监听事件
+            View.OnClickListener listener1 = mButtonListeners == null ||
+                    mButtonListeners.length <= index ?
+                    null : mButtonListeners[index];
+            // 回调
+            if (listener1 != null) {
+                listener1.onClick(v);
             }
         };
         // 添加控件
@@ -333,7 +309,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      */
     private void setButtonTextSize() {
         Float value = mButtonTextSize.getValue();
-        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : toPix(value);
+        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : SizeUtils.dp2px(value);
         int count = mBottomView.getChildCount();
         for (int i = 0; i < count; i++) {
             // 获取文本控件
