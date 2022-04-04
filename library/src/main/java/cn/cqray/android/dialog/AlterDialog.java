@@ -26,6 +26,9 @@ import androidx.lifecycle.Observer;
 
 import com.blankj.utilcode.util.SizeUtils;
 
+import cn.cqray.android.dialog.module.TextViewModule;
+import cn.cqray.android.dialog.module.ViewModule;
+
 /**
  * 消息对话框
  * @author Cqray
@@ -78,7 +81,7 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
         mTitleModule.observe(this, findViewById(R.id._dlg_title));
         mDividerModule.observe(this, findViewById(R.id._dlg_divider));
         // 分割线跟随标题变化
-        mTitleModule.mVisibility.observe(this, mDividerModule::setVisibility);
+        mTitleModule.getVisibility().observe(this, mDividerModule::setVisibility);
         // 设置内容间隔
         mContentPadding.observe(this, aFloat -> setContentPadding());
         // 设置内容间隔

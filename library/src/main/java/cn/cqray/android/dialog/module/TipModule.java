@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog;
+package cn.cqray.android.dialog.module;
 
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -15,6 +15,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.Utils;
 
+import cn.cqray.android.dialog.DialogLiveData;
+import cn.cqray.android.dialog.R;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
 import cn.cqray.android.dialog.amin.DialogAnimator;

@@ -28,6 +28,8 @@ import java.util.List;
 
 import cn.cqray.android.dialog.amin.SlideBottomIn;
 import cn.cqray.android.dialog.amin.SlideBottomOut;
+import cn.cqray.android.dialog.module.TextViewModule;
+import cn.cqray.android.dialog.module.ViewModule;
 
 /**
  * 消息对话框
@@ -113,24 +115,19 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mStartModule.observe(this, mStartView);
         mEndModule.observe(this, mEndView);
         mDividerModule.observe(this, mDividerView);
-        mTitleModule.mVisibility.removeObservers(this);
-        mTitleModule.mVisibility.observe(this, aInt -> {
+        mTitleModule.getVisibility().removeObservers(this);
+        mTitleModule.getVisibility().observe(this, aInt -> {
             View parent = (View) mTitleView.getParent();
             parent.setVisibility(aInt);
             mDividerView.setVisibility(aInt);
         });
-        mTitleModule.mGravity.removeObservers(this);
-        mTitleModule.mGravity.observe(this, this::setTitleCenter);
+        mTitleModule.getGravity().removeObservers(this);
+        mTitleModule.getGravity().observe(this, this::setTitleCenter);
 
-        mStartModule.mVisibility.observe(this, aInt -> setTitlePadding());
-        mEndModule.mVisibility.observe(this, aInt -> setTitlePadding());
+        mStartModule.getVisibility().observe(this, aInt -> setTitlePadding());
+        mEndModule.getVisibility().observe(this, aInt -> setTitlePadding());
 
-        mTitlePadding.observe(this, new Observer<float[]>() {
-            @Override
-            public void onChanged(float[] floats) {
-                setTitlePadding();
-            }
-        });
+        mTitlePadding.observe(this, floats -> setTitlePadding());
     }
 
     @Override

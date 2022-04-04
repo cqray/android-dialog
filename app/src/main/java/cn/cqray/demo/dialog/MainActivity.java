@@ -5,12 +5,10 @@ import androidx.core.view.GravityCompat;
 
 import android.app.Activity;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,11 +20,8 @@ import java.util.Locale;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.BottomAlterDialog;
 
-import cn.cqray.android.dialog.amin.BounceIn;
-import cn.cqray.android.dialog.amin.SlideTopIn;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
-import cn.cqray.android.dialog.PanelModule;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -34,32 +29,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FrameLayout panel = findViewById(R.id.panel);
-
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int [] location = new int[2];
                 v.getLocationOnScreen(location);
-                Log.e("数据", location[0] + "|" + location[1]);
-//                new BottomMessageDialog()
-//                        .title("我爱你66666666666666666666666")
-////                        .titleCenter()
-////                        .titleHeight(60)
-//                        .content("55555555555555555")
-//                        .dividerColor(Color.BLACK)
-//                        .cornerRadius(4)
-////                        .heightMax(400)
-////                        .height(200)
-////                        .heightMin(300)
-////                        .titleCenter()
-////                        .leftVisible(false)
-////                        .btnTextColor(Color.GRAY, Color.GREEN)
-//                        .contentPadding(16)
-//                        .widthMax(300)
-//                        .widthScale(0.8f)
-//                        .backgroundColor(Color.WHITE)
-//                        .show(MainActivity.this);
+
                 if (dialog == null) {
 
                     dialog = new BottomAlterDialog<>(MainActivity.this)
@@ -114,16 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 new Thread(() -> dialog.show()).start();
 
-//                new BaseDialog(MainActivity.this) {
-//                    @Override
-//                    public void onCreating(Bundle savedInstanceState) {
-//                        super.onCreating(savedInstanceState);
-//                        setContentView(R.layout.activity_content);
-//                    }
-//                }
-//                .offset(20, 20)
-////                .blackStatusBar(true)
-//                .show();
             }
         });
     }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.cqray.android.anim.AnimatorBuilder;
+import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.anim.ViewAnimator;
 
 /**
@@ -18,7 +19,7 @@ import cn.cqray.android.anim.ViewAnimator;
 public abstract class DialogAnimator {
 
     private ViewAnimator mAnimator;
-    private List<Animator.AnimatorListener> mListeners = new ArrayList<>();
+    private List<AnimatorListener> mListeners = new ArrayList<>();
 
     public static void reset(@NonNull View view) {
         view.setAlpha(1);
@@ -41,14 +42,14 @@ public abstract class DialogAnimator {
         mAnimator = ViewAnimator.playOn(view).convert();
     }
 
-    public void addAnimatorListener(Animator.AnimatorListener listener) {
+    public void addAnimatorListener(AnimatorListener listener) {
         mListeners.add(listener);
     }
 
     public void start() {
-        AnimatorBuilder builder = mAnimator.getAnimationBuilders().get(0);
+        AnimatorBuilder builder = mAnimator.getAnimatorBuilders().get(0);
         onHandle(builder);
-        for (Animator.AnimatorListener listener : mListeners) {
+        for (AnimatorListener listener : mListeners) {
             mAnimator.addAnimatorListener(listener);
         }
         mAnimator.start();
@@ -67,11 +68,10 @@ public abstract class DialogAnimator {
         return false;
     }
 
-    public int getDuration() {
+    public void getDuration(ViewAnimator.Callback callback) {
         if (mAnimator != null) {
-            return mAnimator.getDuration();
+            mAnimator.getDuration(callback);
         }
-        return 0;
     }
 
 }

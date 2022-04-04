@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog;
+package cn.cqray.android.dialog.module;
 
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,6 +17,8 @@ import androidx.lifecycle.LifecycleOwner;
 import com.blankj.utilcode.util.SizeUtils;
 import com.blankj.utilcode.util.Utils;
 
+import cn.cqray.android.dialog.DialogLiveData;
+import cn.cqray.android.dialog.RoundDrawable;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -33,21 +35,29 @@ public class ViewModule<T extends View> {
     @Getter
     private T mView;
     /** 圆角 **/
+    @Getter
     private final float[] mBackgroundRadii = new float[RADII_LENGTH];
     /** 间隔 **/
-    public final DialogLiveData<int[]> mMargin = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<int[]> mMargin = new DialogLiveData<>();
     /** 间隔 **/
-    public final DialogLiveData<int[]> mPadding = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<int[]> mPadding = new DialogLiveData<>();
     /** 显示 **/
-    public final DialogLiveData<Integer> mVisibility = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mVisibility = new DialogLiveData<>();
     /** 高度 **/
-    public final DialogLiveData<Float> mHeight = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Float> mHeight = new DialogLiveData<>();
     /** 高度 **/
-    public final DialogLiveData<Float> mWidth = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Float> mWidth = new DialogLiveData<>();
     /** 背景图 **/
-    public final DialogLiveData<Drawable> mBackground = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Drawable> mBackground = new DialogLiveData<>();
     /** 背景资源 **/
-    public final DialogLiveData<Integer> mBackgroundResource = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mBackgroundResource = new DialogLiveData<>();
 
     public void observe(@NonNull LifecycleOwner owner, @NonNull T view) {
         mView = view;

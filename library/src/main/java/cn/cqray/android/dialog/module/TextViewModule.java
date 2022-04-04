@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog;
+package cn.cqray.android.dialog.module;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -13,24 +13,35 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.SizeUtils;
 
+import cn.cqray.android.dialog.DialogLiveData;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+
 /**
  * 文本控件相关操作模块
  * @author Cqray
  */
+@Accessors(prefix = "m")
 public class TextViewModule extends ViewModule<TextView> {
 
     /** 文本 **/
-    public final DialogLiveData<CharSequence> mText = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<CharSequence> mText = new DialogLiveData<>();
     /** 文本资源 **/
-    public final DialogLiveData<Integer> mTextRes = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mTextRes = new DialogLiveData<>();
     /** 文本颜色 **/
-    public final DialogLiveData<ColorStateList> mTextColor = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<ColorStateList> mTextColor = new DialogLiveData<>();
     /** 文本大小 **/
-    public final DialogLiveData<Integer> mTextSize = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mTextSize = new DialogLiveData<>();
     /** 文本加粗 **/
-    public final DialogLiveData<Integer> mTextStyle = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mTextStyle = new DialogLiveData<>();
     /** 文本位置 **/
-    public final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
+    @Getter
+    protected final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
 
     @Override
     public void observe(@NonNull LifecycleOwner owner, @NonNull TextView view) {

@@ -25,6 +25,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.ScreenUtils;
 
+import cn.cqray.android.dialog.module.PanelModule;
+import cn.cqray.android.dialog.module.TipModule;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -144,9 +146,10 @@ public final class DialogDelegate {
 
     private void onStart() {
         // 执行面板动画
-        int duration = mPanelModule.show();
-        // 执行遮罩动画
-        doDimAnimator(duration, true);
+        mPanelModule.show(duration -> {
+            // 执行遮罩动画
+            doDimAnimator(duration, true);
+        });
         mTipModule.show();
     }
 
@@ -204,8 +207,11 @@ public final class DialogDelegate {
      * 消除对话框
      */
     public void dismiss() {
-        int duration = mPanelModule.dismiss();
-        doDimAnimator(duration, false);
+        // 消除面板
+        mPanelModule.dismiss(duration -> {
+            // 执行遮罩动画
+            doDimAnimator(duration, false);
+        });
     }
 
     public void setContentView(View view) {

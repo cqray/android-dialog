@@ -10,6 +10,8 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import cn.cqray.android.dialog.module.TextViewModule;
+
 /**
  * 消息对话框
  * @author Cqray

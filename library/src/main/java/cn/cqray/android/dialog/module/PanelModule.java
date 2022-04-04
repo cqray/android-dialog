@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog;
+package cn.cqray.android.dialog.module;
 
 import android.animation.Animator;
 import android.graphics.Color;
@@ -14,6 +14,10 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.SizeUtils;
 
+import cn.cqray.android.anim.AnimatorListener;
+import cn.cqray.android.anim.ViewAnimator;
+import cn.cqray.android.dialog.BaseDialog;
+import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
 import cn.cqray.android.dialog.amin.DialogAnimator;
@@ -25,21 +29,21 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
 public final class PanelModule extends ViewModule<FrameLayout> {
 
     /** 对话框根界面 **/
-    protected View mRootView;
+    private View mRootView;
     /** 对话框实例 **/
-    protected final BaseDialog<?> mDialog;
+    private final BaseDialog<?> mDialog;
     /** 面板相关尺寸, 依次为宽度dp值、宽度比例、宽度最小值, 宽度最大值、高度dp值、高度比例值、高度最小值，高度最大值。 **/
-    protected final Float[] mSizeArray = new Float[8];
+    private final Float[] mSizeArray = new Float[8];
     /** 对话框显示、消除动画，提示显示、消失动画 **/
-    protected final DialogAnimator[] mAnimators = new DialogAnimator[4];
+    private final DialogAnimator[] mAnimators = new DialogAnimator[2];
     /** 对话框位置 **/
-    public final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
+    private final DialogLiveData<Integer> mGravity = new DialogLiveData<>();
     /** 对话框偏移 **/
-    public final DialogLiveData<float[]> mOffset = new DialogLiveData<>();
+    private final DialogLiveData<float[]> mOffset = new DialogLiveData<>();
     /** 面板宽、高 **/
-    public final DialogLiveData<int[]> mSize = new DialogLiveData<>();
+    private final DialogLiveData<int[]> mSize = new DialogLiveData<>();
     /** 面板大小请求 **/
-    public final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
+    private final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
 
     public PanelModule(BaseDialog<?> dialog) {
         mDialog = dialog;
@@ -114,9 +118,8 @@ public final class PanelModule extends ViewModule<FrameLayout> {
     /**
      * 执行面板动画，返回动画时长
      * @param show 是否是显示动画
-     * @return 动画时长
      */
-    protected int doPanelAnimator(boolean show) {
+    protected void doPanelAnimator(boolean show, ViewAnimator.Callback callback) {
         if (getView() != null) {
             // 获取对应动画
             DialogAnimator animator;
@@ -130,9 +133,7 @@ public final class PanelModule extends ViewModule<FrameLayout> {
                 // 设置目标对象
                 animator.setTarget(getView());
                 // 设置监听
-                animator.addAnimatorListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {}
+                animator.addAnimatorListener(new AnimatorListener() {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -143,34 +144,26 @@ public final class PanelModule extends ViewModule<FrameLayout> {
                         }
                     }
 
-                    @Override
-                    public void onAnimationCancel(Animator animation) {}
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {}
                 });
                 // 开始面板动画
                 animator.start();
             }
-            return animator.getDuration();
+            animator.getDuration(callback);
         }
-        return 0;
     }
 
     /**
      * 显示面板
-     * @return 动画时长
      */
-    public int show() {
-        return doPanelAnimator(true);
+    public void show(ViewAnimator.Callback callback) {
+        doPanelAnimator(true, callback);
     }
 
     /**
      * 消除面板
-     * @return 动画时长
      */
-    public int dismiss() {
-        return doPanelAnimator(false);
+    public void dismiss(ViewAnimator.Callback callback) {
+        doPanelAnimator(false, callback);
     }
 
     public void setShowAnimator(DialogAnimator animator) {

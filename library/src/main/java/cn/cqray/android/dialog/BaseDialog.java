@@ -31,6 +31,7 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
 import cn.cqray.android.dialog.listener.OnShowListener;
+import cn.cqray.android.dialog.module.PanelModule;
 
 /**
  * 内部实现Dialog
