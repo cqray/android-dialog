@@ -219,7 +219,7 @@ public final class DialogDelegate {
         mPanelLayout.removeAllViews();
         mPanelLayout.addView(view);
         mContentView = view;
-        mUnBinder = ButterKnifeUtils.bind(this, view);
+        mUnBinder = ButterKnifeUtils.bind(mDialog, view);
     }
 
     public void setContentView(@LayoutRes int layoutResId) {
@@ -228,7 +228,7 @@ public final class DialogDelegate {
         mPanelLayout.removeAllViews();
         mPanelLayout.addView(view);
         mContentView = view;
-        mUnBinder = ButterKnifeUtils.bind(this, view);
+        mUnBinder = ButterKnifeUtils.bind(mDialog, view);
     }
 
     public void setBlackStatusBar(boolean black) {
