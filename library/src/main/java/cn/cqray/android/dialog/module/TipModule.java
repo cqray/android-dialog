@@ -3,6 +3,8 @@ package cn.cqray.android.dialog.module;
 import android.animation.Animator;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -29,10 +31,14 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
  */
 public class TipModule extends TextViewModule {
 
+    /** 正在显示 **/
+    private boolean mShowing;
     /** 显示时长 **/
     private int mDuration = 1500;
     /** 提示显示、消失动画 **/
     private final DialogAnimator[] mAnimators = new DialogAnimator[2];
+    /** Handler对象 **/
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     /** 提示位置信息 **/
     private final DialogLiveData<Integer> mLayoutGravity = new DialogLiveData<>(Gravity.CENTER);
 
@@ -76,6 +82,7 @@ public class TipModule extends TextViewModule {
                         animator.cancel();
                     }
                 }
+                mHandler.removeCallbacksAndMessages(null);
             }
         });
     }
@@ -88,8 +95,21 @@ public class TipModule extends TextViewModule {
         mDuration = duration;
     }
 
+    public void setShowAnimator(DialogAnimator animator) {
+        mAnimators[0] = animator;
+    }
+
+    public void setDismissAnimator(DialogAnimator animator) {
+        mAnimators[1] = animator;
+    }
+
     public void show() {
-        doTipAnimator(true);
+        if (mShowing) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler.postDelayed(this::dismiss, mDuration);
+        } else {
+            doTipAnimator(true);
+        }
     }
 
     public void dismiss() {
@@ -102,6 +122,9 @@ public class TipModule extends TextViewModule {
      */
     private void doTipAnimator(boolean show) {
         if (getView() != null) {
+            mShowing = show;
+            // 清除所有延时任务
+            mHandler.removeCallbacksAndMessages(null);
             // 获取对应动画
             DialogAnimator animator;
             if (show) {
@@ -116,9 +139,14 @@ public class TipModule extends TextViewModule {
                 // 动画监听
                 animator.addAnimatorListener(new AnimatorListener() {
                     @Override
+                    public void onAnimationStart(Animator animation, boolean isReverse) {
+                        getView().setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
                     public void onAnimationEnd(Animator animator) {
                         if (show) {
-                            getView().postDelayed(() -> dismiss(), mDuration);
+                            mHandler.postDelayed(() -> dismiss(), mDuration);
                         }
                     }
                 });

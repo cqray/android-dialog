@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
                             .addEndClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    dialog.dismiss();
+                                    dialog.getDelegate().showTip("66666666");
+                                    //dialog.dismiss();
                                 }
                             })
                             .addOnDismissListener(new OnDismissListener() {

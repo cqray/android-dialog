@@ -150,7 +150,6 @@ public final class DialogDelegate {
             // 执行遮罩动画
             doDimAnimator(duration, true);
         });
-        mTipModule.show();
     }
 
     private void onDestroy() {

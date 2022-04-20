@@ -32,12 +32,16 @@ import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
 import cn.cqray.android.dialog.listener.OnShowListener;
 import cn.cqray.android.dialog.module.PanelModule;
+import cn.cqray.android.dialog.module.TipModule;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 /**
  * 内部实现Dialog
  * @author Cqray
  */
 @SuppressWarnings("unchecked")
+@Accessors(prefix = "m")
 public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
 
     /** 持有对话框的Fragment **/
@@ -50,15 +54,18 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     protected final List<OnDismissListener> mDismissListeners = new ArrayList<>();
     /** 显示监听 **/
     protected final List<OnShowListener> mShowListeners = new ArrayList<>();
+    /** 提示模块 **/
+    protected @Getter final TipModule mTipModule;
     /** 面板模块 **/
-    protected final PanelModule mPanelModule;
+    protected @Getter final PanelModule mPanelModule;
     /** 对话框委托 **/
-    protected final DialogDelegate mDelegate;
+    protected @Getter final DialogDelegate mDelegate;
 
     public BaseDialog(FragmentActivity activity) {
         mOwnerActivity = activity;
         mOwnerFragment = null;
         mDelegate = new DialogDelegate(this);
+        mTipModule = mDelegate.getTipModule();
         mPanelModule = mDelegate.getPanelModule();
     }
 
@@ -66,6 +73,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         mOwnerActivity = null;
         mOwnerFragment = fragment;
         mDelegate = new DialogDelegate(this);
+        mTipModule = mDelegate.getTipModule();
         mPanelModule = mDelegate.getPanelModule();
     }
 
@@ -356,11 +364,11 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         return mDelegate.findViewById(resId);
     }
 
-    protected void showTip(String tip) {
+    public void showTip(String tip) {
         mDelegate.showTip(tip);
     }
 
-    protected void showTip(String tip, int duration) {
+    public void showTip(String tip, int duration) {
         mDelegate.showTip(tip, duration);
     }
 }
