@@ -356,4 +356,11 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         return mDelegate.findViewById(resId);
     }
 
+    protected void showTip(String tip) {
+        mDelegate.showTip(tip);
+    }
+
+    protected void showTip(String tip, int duration) {
+        mDelegate.showTip(tip, duration);
+    }
 }

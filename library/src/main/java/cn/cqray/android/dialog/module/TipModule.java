@@ -1,5 +1,6 @@
 package cn.cqray.android.dialog.module;
 
+import android.animation.Animator;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.TypedValue;
@@ -15,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.Utils;
 
+import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.R;
 import cn.cqray.android.dialog.amin.BounceIn;
@@ -27,6 +29,8 @@ import cn.cqray.android.dialog.amin.DialogAnimator;
  */
 public class TipModule extends TextViewModule {
 
+    /** 显示时长 **/
+    private int mDuration = 1500;
     /** 提示显示、消失动画 **/
     private final DialogAnimator[] mAnimators = new DialogAnimator[2];
     /** 提示位置信息 **/
@@ -80,6 +84,10 @@ public class TipModule extends TextViewModule {
         mLayoutGravity.setValue(gravity);
     }
 
+    public void setDuration(int duration) {
+        mDuration = duration;
+    }
+
     public void show() {
         doTipAnimator(true);
     }
@@ -105,6 +113,15 @@ public class TipModule extends TextViewModule {
             if (!animator.isRunning()) {
                 // 设置目标对象
                 animator.setTarget(getView());
+                // 动画监听
+                animator.addAnimatorListener(new AnimatorListener() {
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        if (show) {
+                            getView().postDelayed(() -> dismiss(), mDuration);
+                        }
+                    }
+                });
                 // 开始面板动画
                 animator.start();
             }

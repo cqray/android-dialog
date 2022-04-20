@@ -235,7 +235,18 @@ public final class DialogDelegate {
         mBlackStatusBar.setValue(black);
     }
 
-    public <V extends View> V findViewById(@IdRes int resId) {
+    public void showTip(String tip) {
+        mTipModule.setText(tip);
+        mTipModule.show();
+    }
+
+    public void showTip(String tip, int duration) {
+        mTipModule.setText(tip);
+        mTipModule.setDuration(duration);
+        mTipModule.show();
+    }
+
+   public <V extends View> V findViewById(@IdRes int resId) {
         if (mRootView != null) {
             return mRootView.findViewById(resId);
         }
