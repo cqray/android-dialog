@@ -89,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                             .cornerRadius(10);
                 }
                 new Thread(() -> dialog.show()).start();
-
             }
         });
     }

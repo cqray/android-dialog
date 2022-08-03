@@ -199,6 +199,7 @@ public final class DialogDelegate {
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         window.setDimAmount(mNativeAmountCount);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
         return dialog;
     }
 
