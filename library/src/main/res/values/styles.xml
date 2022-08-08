@@ -2,7 +2,7 @@
 <resources>
 
     <!--自定义对话框样式-->
-    <style name="DialogFragmentNoAnimation" parent="android:Theme.Dialog">
+    <style name="DialogNoAnimationTheme" parent="android:Theme.Dialog">
         <!--透明主题-->
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>

@@ -75,6 +75,7 @@ public final class DialogDelegate {
     @Getter
     private final PanelModule mPanelModule;
 
+
     public DialogDelegate(BaseDialog<?> dialog) {
         mDialog = dialog;
         mTipModule = new TipModule();

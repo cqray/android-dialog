@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LifecycleOwner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +119,10 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     @Override
     public final Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return mDelegate.onCreateDialog();
+    }
+
+    public final LifecycleOwner getParentLifecycleOwner() {
+        return mOwnerFragment == null ? mOwnerActivity : mOwnerFragment;
     }
 
     public void show() {
