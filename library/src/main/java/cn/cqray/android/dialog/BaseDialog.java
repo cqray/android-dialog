@@ -170,7 +170,9 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
      * 快速消除，无视动画。本质是原始的消除方式
      */
     public void quickDismiss() {
-        super.dismiss();
+        if (!isStateSaved()) {
+            super.dismiss();
+        }
     }
 
     public boolean onBackPressed() {
