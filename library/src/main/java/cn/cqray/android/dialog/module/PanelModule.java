@@ -44,24 +44,10 @@ public final class PanelModule extends ViewModule<FrameLayout> {
     private final DialogLiveData<int[]> mSize = new DialogLiveData<>();
     /** 面板大小请求 **/
     private final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
-//    /** 父级生命周期监听 **/
-//    private final LifecycleEventObserver mParentObserver;
 
     public PanelModule(BaseDialog<?> dialog) {
         mDialog = dialog;
         setBackgroundColor(Color.WHITE);
-//        mParentObserver = (LifecycleEventObserver) (source, event) -> {
-//            if (event == Lifecycle.Event.ON_DESTROY) {
-//                if (dialog.getLifecycle()
-//                        .getCurrentState()
-//                        .isAtLeast(Lifecycle.State.INITIALIZED)) {
-//                    mDialog.quickDismiss();
-//                }
-//            }
-//        };
-//        mDialog.getParentLifecycleOwner()
-//                .getLifecycle()
-//                .addObserver(mParentObserver);
     }
 
     public void setRootView(View view) {
