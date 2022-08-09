@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LifecycleOwner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,6 +157,10 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
     @Override
     public void setShowsDialog(boolean showsDialog) {}
 
+    public LifecycleOwner getParentLifecycleOwner() {
+        return mOwnerFragment == null ? mOwnerActivity : mOwnerFragment;
+    }
+
     @Override
     public void dismiss() {
         mDelegate.dismiss();
@@ -168,7 +173,7 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
         try {
             FragmentManager fm = getParentFragmentManager();
             if (!fm.isStateSaved() && !fm.isDestroyed() && !isStateSaved()) {
-                // 保证Fragment及其父类状态可用
+                // 保证Fragment及其父类状态存活
                 super.dismiss();
             }
         } catch (IllegalStateException ignore) {}

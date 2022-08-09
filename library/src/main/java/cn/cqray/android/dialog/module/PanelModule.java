@@ -44,10 +44,21 @@ public final class PanelModule extends ViewModule<FrameLayout> {
     private final DialogLiveData<int[]> mSize = new DialogLiveData<>();
     /** 面板大小请求 **/
     private final DialogLiveData<Object> mRequestSize = new DialogLiveData<>();
+    /** 父级生命周期监听 **/
+    private final LifecycleEventObserver mParentObserver;
 
     public PanelModule(BaseDialog<?> dialog) {
         mDialog = dialog;
         setBackgroundColor(Color.WHITE);
+        mParentObserver = (LifecycleEventObserver) (source, event) -> {
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                if (dialog.getLifecycle()
+                        .getCurrentState()
+                        .isAtLeast(Lifecycle.State.INITIALIZED)) {
+                    mDialog.quickDismiss();
+                }
+            }
+        };
     }
 
     public void setRootView(View view) {
@@ -94,6 +105,8 @@ public final class PanelModule extends ViewModule<FrameLayout> {
                 }
             }
         });
+        // 注册父级销毁监听
+        mDialog.getParentLifecycleOwner().getLifecycle().addObserver(mParentObserver);
     }
 
     /**
@@ -140,10 +153,10 @@ public final class PanelModule extends ViewModule<FrameLayout> {
                         if (show) {
                             mDialog.onShow(mDialog.requireDialog());
                         } else {
+                            // 取消父级销毁监听
+                            mDialog.getParentLifecycleOwner().getLifecycle().removeObserver(mParentObserver);
+                            // 销毁对话框
                             mDialog.quickDismiss();
-//                            mDialog.getParentLifecycleOwner()
-//                                    .getLifecycle()
-//                                    .removeObserver(mParentObserver);
                         }
                     }
 
