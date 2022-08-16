@@ -176,11 +176,9 @@ public class BaseDialog<T extends BaseDialog<T>> extends DialogFragment {
                 // 保证Fragment及其父类状态存活
                 super.dismiss();
             } else {
-                onDestroyView();
+                super.dismissAllowingStateLoss();
             }
-        } catch (IllegalStateException ignore) {
-            onDestroyView();
-        }
+        } catch (IllegalStateException ignore) {}
     }
 
     public boolean onBackPressed() {
