@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dlg_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:clipChildren="false">
 
     <View
-        android:id="@+id/dim"
+        android:id="@+id/dlg_dim"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <FrameLayout
+        android:id="@+id/dlg_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <FrameLayout
-            android:id="@+id/panel"
+            android:id="@+id/dlg_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"

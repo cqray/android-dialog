@@ -1,7 +1,11 @@
 package cn.cqray.android.dialog
 
+import android.content.Context
 import android.content.res.Resources
+import android.graphics.Point
 import android.util.TypedValue
+import android.view.WindowManager
+import com.blankj.utilcode.util.Utils
 
 internal object DialogUtils {
 
@@ -16,5 +20,17 @@ internal object DialogUtils {
             TypedValue.COMPLEX_UNIT_MM -> return value * metrics.xdpi * (1.0f / 25.4f)
         }
         return 0F
+    }
+
+    @Suppress("Deprecation")
+    fun getAppScreenWidth(context: Context): Int {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        return Point().also { wm.defaultDisplay.getSize(it) }.x
+    }
+
+    @Suppress("Deprecation")
+    fun getAppScreenHeight(context: Context): Int {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        return Point().also { wm.defaultDisplay.getSize(it) }.y
     }
 }

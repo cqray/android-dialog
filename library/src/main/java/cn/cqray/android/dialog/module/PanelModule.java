@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.SizeUtils;
 
 import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.anim.ViewAnimator;
-import cn.cqray.android.dialog.BaseDialog;
+import cn.cqray.android.dialog.module2.BaseDialog;
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
@@ -83,16 +83,16 @@ public final class PanelModule extends ViewModule<FrameLayout> {
             v.setTranslationX(floats[0]);
             v.setTranslationY(floats[1]);
         });
-        // 设置面板大小监听
-        mSize.observe(owner, ints -> {
-            View v = (View) view.getParent();
-            ViewGroup.LayoutParams params = v.getLayoutParams();
-            if (params.width != ints[0] || params.height != ints[1]) {
-                params.width = ints[0];
-                params.height = ints[1];
-                v.requestLayout();
-            }
-        });
+//        // 设置面板大小监听
+//        mSize.observe(owner, ints -> {
+//            View v = (View) view.getParent();
+//            ViewGroup.LayoutParams params = v.getLayoutParams();
+//            if (params.width != ints[0] || params.height != ints[1]) {
+//                params.width = ints[0];
+//                params.height = ints[1];
+//                v.requestLayout();
+//            }
+//        });
         // 设置请求面板大小监听
         mRequestSize.observe(owner, o -> requestNewSize());
         // 销毁资源

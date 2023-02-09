@@ -73,13 +73,13 @@ public final class DialogDelegate {
     private final TipModule mTipModule;
     /** 面板实现模块 **/
     @Getter
-    private final PanelModule mPanelModule;
+    private PanelModule mPanelModule;
 
 
     public DialogDelegate(BaseDialog<?> dialog) {
         mDialog = dialog;
         mTipModule = new TipModule();
-        mPanelModule = new PanelModule(dialog);
+//        mPanelModule = new PanelModule(dialog);
     }
 
     public void observe(@NonNull LifecycleOwner owner) {
