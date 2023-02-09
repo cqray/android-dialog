@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog
+package cn.cqray.android.dialog.module
 
 import android.view.View
 import butterknife.ButterKnife
@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * @author Cqray
  */
 object ButterKnifeUtils {
+
     /** ButterKnife是否可用  */
     private val supported = AtomicBoolean(true)
 

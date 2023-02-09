@@ -13,10 +13,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.blankj.utilcode.util.SizeUtils;
+
+import org.jetbrains.annotations.Nullable;
+
+import lombok.NonNull;
 
 /**
  * 圆角图片
