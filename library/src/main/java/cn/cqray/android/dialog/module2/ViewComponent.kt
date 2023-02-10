@@ -13,8 +13,25 @@ import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.DialogUtils
 import cn.cqray.android.dialog.RoundDrawable
 
-@Suppress("MemberVisibilityCanBePrivate", "Unused")
-open class ViewModule<T : View>(val lifecycleOwner: LifecycleOwner, val view: T) {
+/**
+ * 基础视图组件
+ * @Cqray LeiJue
+ */
+@Suppress(
+    "MemberVisibilityCanBePrivate",
+    "Unchecked_cast",
+    "Unused"
+)
+open class ViewComponent<
+        // Module泛型，主要是统一返回类型
+        M : ViewComponent<M, V>,
+        // 针对的视图泛型
+        V : View>(
+    // 生命周期管理实例
+    val lifecycleOwner: LifecycleOwner,
+    // 针对的视图
+    val view: V
+) {
 
     /** 内部间隔 **/
     private val padding = DialogLiveData<Array<Int>>()
@@ -47,7 +64,9 @@ open class ViewModule<T : View>(val lifecycleOwner: LifecycleOwner, val view: T)
         // 控件内部间隔变化监听
         padding.observe(lifecycleOwner) { view.setPadding(it[0], it[1], it[2], it[3]) }
         // 控件外部间隔变化监听
-        margin.observe(lifecycleOwner) { view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) } }
+        margin.observe(lifecycleOwner) {
+            view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) }
+        }
         // 宽度变化监听
         width.observe(lifecycleOwner) { view.layoutParams = params.also { p -> p.width = it } }
         // 高度变化监听
@@ -63,7 +82,7 @@ open class ViewModule<T : View>(val lifecycleOwner: LifecycleOwner, val view: T)
      * 默认单位DP
      * @param radii 8个值的数组，4对[X，Y]半径
      */
-    fun setBackgroundRadii(radii: FloatArray?) = also { setBackgroundRadii(radii, TypedValue.COMPLEX_UNIT_DIP) }
+    fun setBackgroundRadii(radii: FloatArray?) = also { setBackgroundRadii(radii, TypedValue.COMPLEX_UNIT_DIP) } as M
 
     /**
      * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
@@ -83,7 +102,7 @@ open class ViewModule<T : View>(val lifecycleOwner: LifecycleOwner, val view: T)
         }
         // 更新背景
         background.value = background.value
-    }
+    } as M
 
     /**
      * 设置圆角大小
@@ -98,15 +117,12 @@ open class ViewModule<T : View>(val lifecycleOwner: LifecycleOwner, val view: T)
      * @param radius 圆角半径
      * @param unit  值单位
      */
-    fun setBackgroundRadius(radius: Float?, unit: Int) = also {
-        val radii = FloatArray(8) { radius ?: 0F }
-        setBackgroundRadii(radii, unit)
-    }
+    fun setBackgroundRadius(radius: Float?, unit: Int) = setBackgroundRadii(FloatArray(8) { radius ?: 0F }, unit)
 
     /**
      * 改变视图背景
      */
-    fun changeBackground(any: Any?) {
+    private fun changeBackground(any: Any?) {
         // 获取Drawable对象
         val drawable = when (any) {
             is Int -> ContextCompat.getDrawable(view.context, any)

@@ -15,6 +15,7 @@ import cn.cqray.android.dialog.BottomAlterDialog;
 
 import cn.cqray.android.dialog.listener.OnCancelListener;
 import cn.cqray.android.dialog.listener.OnDismissListener;
+import cn.cqray.android.dialog.module2.BaseDialog2;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -28,9 +29,11 @@ public class MainActivity extends AppCompatActivity {
                 int [] location = new int[2];
                 v.getLocationOnScreen(location);
 
+
                 if (dialog == null) {
 
-                    dialog = new BaseDialog(MainActivity.this);
+                    dialog = new BaseDialog2(MainActivity.this);
+                   // dialog.setContentView(R.layout.activity_content);
 //                            .width(200)
 //                            .height(100)
 //                            .title("车哈哈还是算法还是算法还是算法还是算法")
@@ -44,6 +47,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    BaseDialog dialog ;
+    BaseDialog2 dialog ;
 
 }

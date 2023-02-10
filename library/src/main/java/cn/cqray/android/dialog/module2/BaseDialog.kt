@@ -3,7 +3,9 @@ package cn.cqray.android.dialog.module2
 import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -15,7 +17,6 @@ import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.listener.OnCancelListener
 import cn.cqray.android.dialog.listener.OnDismissListener
 import cn.cqray.android.dialog.listener.OnShowListener
-import cn.cqray.android.dialog.module.PanelModule
 
 /**
  * 内部实现Dialog
@@ -42,8 +43,8 @@ class BaseDialog<T : BaseDialog<T>> : DialogFragment {
 //    @Getter
 //    private val mTipModule: TipModule
 
-    /** 面板模块  */
-    private val mPanelModule: PanelModule
+//    /** 面板模块  */
+//    private val mPanelModule: PanelModule
 
     /** 对话框委托  */
     private val mDelegate: DialogDelegate
@@ -53,7 +54,7 @@ class BaseDialog<T : BaseDialog<T>> : DialogFragment {
         mOwnerFragment = null
         mDelegate = DialogDelegate(this)
 //        mTipModule = mDelegate.tipModule
-        mPanelModule = mDelegate.panelModule
+//        mPanelModule = mDelegate.panelModule
     }
 
 //    constructor(fragment: Fragment?) {
@@ -67,6 +68,11 @@ class BaseDialog<T : BaseDialog<T>> : DialogFragment {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mDelegate.observe(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.e("数据", "onResume")
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -112,22 +118,30 @@ class BaseDialog<T : BaseDialog<T>> : DialogFragment {
             act = mOwnerFragment.requireActivity()
         }
         act.runOnUiThread {
+//            super.show(fm, null)
             try {
+                val fragment = fm.findFragmentByTag(javaClass.name)
+                fragment?.let {
+                    val ft = fm.beginTransaction()
+                    ft.remove(it)
+                    ft.commitNow()
+                }
                 super.showNow(fm, javaClass.name)
             } catch (ignore: IllegalStateException) {
+                ignore.printStackTrace()
             }
         }
     }
 
-    @Deprecated("")
+//    @Deprecated("")
     override fun show(manager: FragmentManager, tag: String?) {
     }
 
-    @Deprecated("")
+//    @Deprecated("")
     override fun showNow(manager: FragmentManager, tag: String?) {
     }
 
-    @Deprecated("")
+//    @Deprecated("")
     override fun show(transaction: FragmentTransaction, tag: String?): Int {
         return 0
     }
@@ -170,6 +184,10 @@ class BaseDialog<T : BaseDialog<T>> : DialogFragment {
     fun setContentView(view: View) = mDelegate.setContentView(view)
 
     fun setContentView(@LayoutRes layoutResId: Int) = mDelegate.setContentView(layoutResId)
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
 
 //    fun blackStatusBar(black: Boolean): T {
 //        mDelegate.setBlackStatusBar(black)
