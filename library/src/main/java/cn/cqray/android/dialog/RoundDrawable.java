@@ -109,7 +109,7 @@ public class RoundDrawable extends Drawable {
 
     /**
      * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param radii 8个值的数组，4对[X，Y]半径
      */
     public void setRadii(float [] radii) {
@@ -133,7 +133,7 @@ public class RoundDrawable extends Drawable {
 
     /**
      * 设置圆角大小
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param radius 圆角半径
      */
     public void setRadius(float radius) {

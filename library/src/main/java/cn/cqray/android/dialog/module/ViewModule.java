@@ -150,7 +150,7 @@ public class ViewModule<T extends View> {
 
     /**
      * 设置控件宽度
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param width 宽度
      */
     public void setWidth(float width) {
@@ -170,7 +170,7 @@ public class ViewModule<T extends View> {
 
     /**
      * 设置控件高度
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param height 高度
      */
     public void setHeight(float height) {
@@ -214,7 +214,7 @@ public class ViewModule<T extends View> {
 
     /**
      * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param radii 8个值的数组，4对[X，Y]半径
      */
     public void setBackgroundRadii(float [] radii) {
@@ -238,7 +238,7 @@ public class ViewModule<T extends View> {
 
     /**
      * 设置圆角大小
-     * <p>默认单位DP</p>
+     * <p>默认单位DIP</p>
      * @param radius 圆角半径
      */
     public void setBackgroundRadius(float radius) {

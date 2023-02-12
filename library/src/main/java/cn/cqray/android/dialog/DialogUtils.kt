@@ -4,10 +4,27 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Point
 import android.util.TypedValue
+import android.view.LayoutInflater
 import android.view.WindowManager
-import com.blankj.utilcode.util.Utils
+import androidx.viewbinding.ViewBinding
 
+@Suppress("Unchecked_cast")
 internal object DialogUtils {
+
+    @Throws(Exception::class)
+    fun <T : ViewBinding> getViewBinding(clazz: Class<T>, inflater: LayoutInflater): T {
+        val method = clazz.getMethod("inflate", LayoutInflater::class.java)
+        return method.invoke(null, inflater) as T
+//        runCatching {
+//            return method.invoke(null, inflater) as T
+//        }.onFailure { throw it }
+//        try {
+//            return method.invoke(null, inflater) as T
+//        } catch (exc: Exception) {
+//            throw exc
+//        }
+//        runCatching { return method.invoke(null, inflater) as T }
+    }
 
     fun applyDimension(value: Float, unit: Int): Float {
         val metrics = Resources.getSystem().displayMetrics
