@@ -17,7 +17,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import cn.cqray.android.anim.AnimatorListener
 import cn.cqray.android.anim.ViewAnimator
-import cn.cqray.android.dialog.ButterKnifeUtils
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.Utils
 import cn.cqray.android.dialog.amin.BounceIn
@@ -86,7 +85,7 @@ class DialogFragment(
             // 缓存视图
             atomicContent.set(layout.getChildAt(0))
             // 兼容 ButterKnife
-            atomicUnBinder.set(ButterKnifeUtils.bind(this, atomicContent.get()))
+            atomicUnBinder.set(Utils.bindButterKnife(this, atomicContent.get()))
         }
         // 监听面板位置变化
         gravityLD.observe(this) { int ->
@@ -177,7 +176,7 @@ class DialogFragment(
     override fun onDestroy() {
         super.onDestroy()
         // 移除ButterKnife绑定
-        ButterKnifeUtils.unbind(atomicUnBinder.get())
+        Utils.unbindButterKnife(atomicUnBinder.get())
         // DialogFragment重复展示时，会出现异常。
         // 就是因为根视图已绑定，所以需要移除根布局的绑定。
         (viewBinding.root.parent as? ViewGroup)?.removeView(viewBinding.root)
