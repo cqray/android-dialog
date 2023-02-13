@@ -183,6 +183,9 @@ class DialogFragment(
         (viewBinding.root.parent as? ViewGroup)?.removeView(viewBinding.root)
     }
 
+    /**
+     * 销毁对话框，有动画
+     */
     override fun dismiss() {
         // 执行面板动画
         doPanelAnimator(false) {
@@ -191,6 +194,9 @@ class DialogFragment(
         }
     }
 
+    /**
+     * 快速销毁对话框，无动画
+     */
     fun quickDismiss() {
         runCatching {
             val fm = parentFragmentManager
@@ -212,20 +218,29 @@ class DialogFragment(
 
     fun setDismissAnimator(animator: DialogAnimator) = also { animators[1] = animator }
 
+    /**
+     * 设置原生遮罩透明度
+     * @param account 透明度
+     */
     fun setNativeDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) {
         dimAmount[0] = account
         changeDimAccount(account, true)
     }
 
+    /**
+     * 设置自定义遮罩透明度
+     * @param account 透明度
+     */
     fun setCustomDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) {
         dimAmount[1] = account
         changeDimAccount(account, false)
     }
 
-
-    fun setGravity(gravity: Int) {
-        gravityLD.setValue(gravity)
-    }
+    /**
+     * 设置对话框位置
+     * @param gravity 位置
+     */
+    fun setGravity(gravity: Int) = gravityLD.setValue(gravity)
 
     fun setOffset(offsetX: Float, offsetY: Float) = setOffset(offsetX, offsetY, TypedValue.COMPLEX_UNIT_DIP)
 
