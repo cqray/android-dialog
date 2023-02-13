@@ -9,7 +9,7 @@ import android.view.WindowManager
 import androidx.viewbinding.ViewBinding
 
 @Suppress("Unchecked_cast")
-internal object DialogUtils {
+internal object Utils {
 
     @Throws(Exception::class)
     fun <T : ViewBinding> getViewBinding(clazz: Class<T>, inflater: LayoutInflater): T {

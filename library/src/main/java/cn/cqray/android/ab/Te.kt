@@ -1,10 +1,8 @@
 package cn.cqray.android.ab
 
-
-import android.widget.TextView
-import androidx.fragment.app.DialogFragment
+import android.os.Handler
+import android.view.Gravity
 import androidx.fragment.app.FragmentActivity
-import cn.cqray.android.ab.BaseDialog
 
 class Te {
 
@@ -19,10 +17,21 @@ class Te {
 ////                .heightScale(0.5F)
 //                .show()
 
-            BaseDialog()
+            val dialog = BaseDialog()
                 .widthScale(0.5F)
                 .heightScale(0.5F)
-                .show(activity)
+                .offset(10F, 200F)
+                .gravity(Gravity.START)
+//                .backgroundColor(Color.BLUE)
+                .backgroundRadius(10F)
+                .nativeDimAccount(0.2f)
+//                .customDimAccount(0.5F)
+                .marginLR(50F);
+                dialog.show(activity)
+
+            Handler().postDelayed({
+//                dialog.customDimAccount(0.1f)
+            }, 1500)
         }
 //         @JvmStatic
 //        fun <T: BaseDialog<T>> get(activity: FragmentActivity): DialogFragment {

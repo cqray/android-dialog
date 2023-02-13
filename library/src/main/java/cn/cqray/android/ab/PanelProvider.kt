@@ -1,7 +1,16 @@
 package cn.cqray.android.ab
 
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.FloatRange
+import cn.cqray.android.dialog.component.PanelComponent
 
+/**
+ * 对话框面板相关功能提供器
+ * @author Cqray
+ */
 @Suppress(
     "MemberVisibilityCanBePrivate",
     "Unchecked_cast",
@@ -10,33 +19,267 @@ import android.util.TypedValue
 @JvmDefaultWithoutCompatibility
 interface PanelProvider<T : PanelProvider<T>> {
 
+    /** 面板组件 **/
     val panelComponent: PanelComponent
 
+    /**
+     * 设置面板宽度，单位DIP
+     * @param width 宽度
+     */
     fun width(width: Float) = also { width(width, TypedValue.COMPLEX_UNIT_DIP) } as T
 
+    /**
+     * 设置面板宽度
+     * @param width 宽度
+     * @param unit 值单位[TypedValue]
+     */
     fun width(width: Float, unit: Int) = also { panelComponent.setWidth(width, unit) } as T
 
-    fun widthScale(scale: Float) = also { panelComponent.setWidthScale(scale) } as T
+    /**
+     * 设置面板宽度占用屏幕比例
+     * @param scale 比例
+     */
+    fun widthScale(@FloatRange(from = 0.0, to = 1.0) scale: Float) = also { panelComponent.setWidthScale(scale) } as T
 
+    /**
+     * 设置面板最小宽度，单位DIP
+     * @param width 宽度
+     */
     fun widthMin(width: Float) = also { widthMin(width, TypedValue.COMPLEX_UNIT_DIP) } as T
 
+    /**
+     * 设置面板最小宽度
+     * @param width 宽度
+     * @param unit 值单位[TypedValue]
+     */
     fun widthMin(width: Float, unit: Int) = also { panelComponent.setWidthMin(width, unit) } as T
 
+    /**
+     * 设置面板最大宽度
+     * @param width 宽度
+     */
     fun widthMax(width: Float) = also { widthMax(width, TypedValue.COMPLEX_UNIT_DIP) } as T
 
+    /**
+     * 设置面板最大宽度
+     * @param width 宽度
+     * @param unit 值单位[TypedValue]
+     */
     fun widthMax(width: Float, unit: Int) = also { panelComponent.setWidthMax(width, unit) } as T
 
-    fun height(width: Float) = also { height(width, TypedValue.COMPLEX_UNIT_DIP) } as T
+    /**
+     * 设置面板高度，单位DIP
+     * @param height 高度
+     */
+    fun height(height: Float) = also { height(height, TypedValue.COMPLEX_UNIT_DIP) } as T
 
-    fun height(width: Float, unit: Int) = also { panelComponent.setHeight(width, unit) } as T
+    /**
+     * 设置面板高度
+     * @param height 高度
+     * @param unit 值单位[TypedValue]
+     */
+    fun height(height: Float, unit: Int) = also { panelComponent.setHeight(height, unit) } as T
 
+    /**
+     * 设置面板高度占用屏幕比例
+     * @param scale 比例
+     */
     fun heightScale(scale: Float) = also { panelComponent.setHeightScale(scale) } as T
 
-    fun heightMin(width: Float) = also { heightMin(width, TypedValue.COMPLEX_UNIT_DIP) } as T
+    /**
+     * 设置面板最小高度
+     * @param height 高度
+     */
+    fun heightMin(height: Float) = also { heightMin(height, TypedValue.COMPLEX_UNIT_DIP) } as T
 
-    fun heightMin(width: Float, unit: Int) = also { panelComponent.setHeightMin(width, unit) } as T
+    /**
+     * 设置面板最小高度
+     * @param height 高度
+     * @param unit 值单位[TypedValue]
+     */
+    fun heightMin(height: Float, unit: Int) = also { panelComponent.setHeightMin(height, unit) } as T
 
-    fun heightMax(width: Float) = also { heightMax(width, TypedValue.COMPLEX_UNIT_DIP) } as T
+    /**
+     * 设置面板最大高度
+     * @param height 高度
+     */
+    fun heightMax(height: Float) = also { heightMax(height, TypedValue.COMPLEX_UNIT_DIP) } as T
 
-    fun heightMax(width: Float, unit: Int) = also { panelComponent.setHeightMax(width, unit) } as T
+    /**
+     * 设置面板最大高度
+     * @param height 高度
+     * @param unit 值单位[TypedValue]
+     */
+    fun heightMax(height: Float, unit: Int) = also { panelComponent.setHeightMax(height, unit) } as T
+
+    /**
+     * 设置内部间隔，默认单位DIP
+     * @param padding 间隔值
+     */
+    fun setPadding(padding: Float) = also { panelComponent.setPadding(padding) } as T
+
+    /**
+     * 设置内部间隔
+     * @param padding 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun setPadding(padding: Float, unit: Int) = also { panelComponent.setPadding(padding, unit) } as T
+
+    /**
+     * 设置内部左右间隔，默认单位DIP
+     * @param padding 间隔值
+     */
+    fun setPaddingLR(padding: Float) = also { panelComponent.setPaddingLR(padding) } as T
+
+    /**
+     * 设置内部左右间隔
+     * @param padding 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun setPaddingLR(padding: Float, unit: Int) = also { panelComponent.setPaddingLR(padding, unit) } as T
+
+    /**
+     * 设置内部上下间隔，默认单位DIP
+     * @param padding 间隔值
+     */
+    fun setPaddingTB(padding: Float) = also { panelComponent.setPaddingTB(padding) } as T
+
+    /**
+     * 设置内部部上下间隔
+     * @param padding 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun setPaddingTB(padding: Float, unit: Int) = also { panelComponent.setPaddingTB(padding, unit) } as T
+
+    /**
+     * 设置内部部间隔，默认单位DIP
+     * @param left 左间隔值
+     * @param top 上间隔值
+     * @param right 右间隔值
+     * @param bottom 下间隔值
+     */
+    fun setPadding(left: Float, top: Float, right: Float, bottom: Float) = also {
+        panelComponent.setPadding(left, top, right, bottom)
+    } as T
+
+    /**
+     * 设置内部部间隔
+     * @param left 左间隔值
+     * @param top 上间隔值
+     * @param right 右间隔值
+     * @param bottom 下间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun setPadding(left: Float, top: Float, right: Float, bottom: Float, unit: Int) = also {
+        panelComponent.setPadding(left, top, right, bottom, unit)
+    } as T
+
+    /**
+     * 设置外部间隔，默认单位DIP
+     * @param margin 间隔值
+     */
+    fun margin(margin: Float) = also { panelComponent.setMargin(margin) } as T
+
+    /**
+     * 设置外部间隔
+     * @param margin 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun margin(margin: Float, unit: Int) = also { panelComponent.setMargin(margin, unit) } as T
+
+    /**
+     * 设置外部左右间隔，默认单位DIP
+     * @param margin 间隔值
+     */
+    fun marginLR(margin: Float) = also { panelComponent.setMarginLR(margin) } as T
+
+    /**
+     * 设置外部左右间隔
+     * @param margin 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun marginLR(margin: Float, unit: Int) = also { panelComponent.setMarginLR(margin, unit) } as T
+
+    /**
+     * 设置外部上下间隔，默认单位DIP
+     * @param margin 间隔值
+     */
+    fun marginTB(margin: Float) = also { panelComponent.setMarginTB(margin) } as T
+
+    /**
+     * 设置外部上下间隔
+     * @param margin 间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun marginTB(margin: Float, unit: Int) = also { panelComponent.setMarginTB(margin, unit) } as T
+
+    /**
+     * 设置外部间隔，默认单位DIP
+     * @param left 左间隔值
+     * @param top 上间隔值
+     * @param right 右间隔值
+     * @param bottom 下间隔值
+     */
+    fun margin(left: Float, top: Float, right: Float, bottom: Float) = also {
+        panelComponent.setMargin(left, top, right, bottom)
+    } as T
+
+    /**
+     * 设置外部间隔
+     * @param left 左间隔值
+     * @param top 上间隔值
+     * @param right 右间隔值
+     * @param bottom 下间隔值
+     * @param unit 值单位[TypedValue]
+     */
+    fun margin(left: Float, top: Float, right: Float, bottom: Float, unit: Int) = also {
+        panelComponent.setMargin(left, top, right, bottom, unit)
+    } as T
+
+    /**
+     * 设置背景[Drawable]
+     * @param drawable 背景
+     */
+    fun background(drawable: Drawable?) = also { panelComponent.setBackground(drawable) } as T
+
+    /**
+     * 设置背景颜色
+     * @param color 颜色
+     */
+    fun backgroundColor(@ColorInt color: Int) = also { panelComponent.setBackgroundColor(color) } as T
+
+    /**
+     * 设置背景资源
+     * @param resId 背景资源
+     */
+    fun backgroundResource(@DrawableRes resId: Int) = also { panelComponent.setBackgroundResource(resId) } as T
+
+    /**
+     * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
+     * 默认单位DIP
+     * @param radii 8个值的数组，4对[X，Y]半径
+     */
+    fun backgroundRadii(radii: FloatArray?) = also { panelComponent.setBackgroundRadii(radii) } as T
+
+    /**
+     * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
+     * @param radii 8个值的数组，4对[X，Y]半径
+     * @param unit 值单位[TypedValue]
+     */
+    fun backgroundRadii(radii: FloatArray?, unit: Int) = also { panelComponent.setBackgroundRadii(radii, unit) } as T
+
+    /**
+     * 设置圆角大小
+     * 默认单位DIP
+     * @param radius 圆角半径
+     */
+    fun backgroundRadius(radius: Float?) = also { panelComponent.setBackgroundRadius(radius) } as T
+
+    /**
+     * 设置圆角大小
+     * 默认单位DIP
+     * @param radius 圆角半径
+     * @param unit 值单位[TypedValue]
+     */
+    fun backgroundRadius(radius: Float?, unit: Int) = also { panelComponent.setBackgroundRadius(radius, unit) } as T
 }

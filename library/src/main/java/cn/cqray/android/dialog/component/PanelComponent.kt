@@ -1,28 +1,26 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog.component
 
 import android.graphics.Color
-import android.util.Log
 import android.util.TypedValue
-import android.view.*
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.DialogUtils
+import cn.cqray.android.dialog.Utils
 import com.blankj.utilcode.util.SizeUtils
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * 面板组件，继承于[ViewComponent]
+ * 新增功能：面板的大小变化，（包含比例设置、最大最小设置）
+ * @author Cqray
+ */
 class PanelComponent(
     lifecycleOwner: LifecycleOwner,
     viewGet: Function0<FrameLayout>
 ) : ViewComponent<FrameLayout>(
     lifecycleOwner,
     viewGet,
-//    fragment, {
-//        val layoutInflater = fragment.layoutInflater
-//        val bindingClass = AndroidDlgLayoutBaseBinding::class.java
-//        DialogUtils.getViewBinding(bindingClass, layoutInflater).root
-//    }
 ) {
 
     /** 面板相关尺寸, 依次为:
@@ -32,32 +30,20 @@ class PanelComponent(
     private val sizes = arrayOfNulls<Float?>(8)
 
     /** 对话框位置 **/
-    private val gravityLD = DialogLiveData(Gravity.CENTER)
-
-    /** 对话框偏移 **/
-    private val offsetLD = DialogLiveData<IntArray>()
-
-    /** 对话框位置 **/
     private val sizeLD = DialogLiveData<FloatArray>()
 
     /** 对话框大小**/
     private val sizeChangeLD = DialogLiveData<Unit>()
 
     init {
+        // 设置默认圆大小
         setBackgroundRadius(6F)
+        // 设置默认背景色
         setBackgroundColor(Color.WHITE)
-        // 监听面板位置变化
-        gravityLD.observe(lifecycleOwner) { int ->
-            val parent = view.parent as? FrameLayout
-            val params = parent?.layoutParams as FrameLayout.LayoutParams?
-            params?.let { parent?.layoutParams = it.also { it.gravity = int } }
-        }
-        offsetLD.observe(lifecycleOwner) {}
         // 订阅面板大小监听
         sizeLD.observe(lifecycleOwner) {
             super.setWidth(it[0], TypedValue.COMPLEX_UNIT_PX)
             super.setHeight(it[1], TypedValue.COMPLEX_UNIT_PX)
-            //view.setBackgroundColor(Color.BLUE)
         }
         // 订阅面板大小变更监听
         sizeChangeLD.observe(lifecycleOwner) { changeSizes() }
@@ -120,8 +106,8 @@ class PanelComponent(
      */
     private fun changeSizes() {
         // 对话框宽高（满屏）
-        val dialogWidth = DialogUtils.getAppScreenWidth(view!!.context)
-        val dialogHeight = DialogUtils.getAppScreenHeight(view!!.context)
+        val dialogWidth = Utils.getAppScreenWidth(view.context)
+        val dialogHeight = Utils.getAppScreenHeight(view.context)
         // 计算新的尺寸信息
         val size = FloatArray(2)
         // 宽度计算
@@ -159,5 +145,4 @@ class PanelComponent(
         if (min != null && max != null && min > max) size[0] = value
         return size[0]
     }
-
 }

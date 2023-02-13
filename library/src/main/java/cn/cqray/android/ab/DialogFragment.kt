@@ -5,16 +5,21 @@ import android.animation.ValueAnimator
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
+import android.util.TypedValue
 import android.view.*
 import android.widget.FrameLayout
+import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
+import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
 import cn.cqray.android.anim.AnimatorListener
 import cn.cqray.android.anim.ViewAnimator
 import cn.cqray.android.dialog.ButterKnifeUtils
 import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.DialogUtils
+import cn.cqray.android.dialog.Utils
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
@@ -27,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
     "Unused"
 )
 class DialogFragment(
-    //val provider: DialogProvider
+    val provider: DialogProvider<*>?
 ) : androidx.fragment.app.DialogFragment() {
 
     /** 内容视图 **/
@@ -35,6 +40,9 @@ class DialogFragment(
 
     /** ButterKnife绑定实例  */
     private val atomicUnBinder = AtomicReference<Any>()
+
+    /** 对话框实例 **/
+    private val atomicDialog = AtomicReference<Dialog>()
 
     /** 对话框是否能取消，依次为界面能够取消、点击外部能够取消 **/
     private val cancelable = arrayOf(true, true)
@@ -46,10 +54,16 @@ class DialogFragment(
     private val dimAnimator = ValueAnimator()
 
     /** 对话框显示、消除动画，提示显示、消失动画 **/
-    private val animators : Array<DialogAnimator> = arrayOf(BounceIn(), BounceOut())
+    private val animators: Array<DialogAnimator> = arrayOf(BounceIn(), BounceOut())
 
     /** Fragment视图 **/
     private val contentViewLD = DialogLiveData<Any>()
+
+    /** 对话框位置 **/
+    private val gravityLD = DialogLiveData(Gravity.CENTER)
+
+    /** 对话框偏移 **/
+    private val offsetLD = DialogLiveData(intArrayOf(0, 0))
 
     /** [ViewBinding]实例 **/
     val viewBinding by lazy { AndroidDlgLayoutBaseBinding.inflate(layoutInflater) }
@@ -64,7 +78,7 @@ class DialogFragment(
         super.onCreate(savedInstanceState)
         // Fragment视图变化监听
         contentViewLD.observe(this) {
-            val layout = viewBinding.dlgContent.also { v -> v.removeAllViews() }
+            val layout = viewBinding.dlgPanel.also { v -> v.removeAllViews() }
             when (it) {
                 is Int -> View.inflate(requireContext(), it, layout)
                 is View -> layout.addView(it)
@@ -74,23 +88,22 @@ class DialogFragment(
             // 兼容 ButterKnife
             atomicUnBinder.set(ButterKnifeUtils.bind(this, atomicContent.get()))
         }
+        // 监听面板位置变化
+        gravityLD.observe(this) { int ->
+            val params = viewBinding.dlgLocation.layoutParams as? FrameLayout.LayoutParams
+            params?.let { viewBinding.dlgLocation.layoutParams = it.also { it.gravity = int } }
+        }
+        // 监听对话框位置变化
+        offsetLD.observe(this) {
+            val params = viewBinding.dlgLocation.layoutParams as ViewGroup.MarginLayoutParams
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                params.marginStart = it[0]
+            } else {
+                params.leftMargin = it[0]
+            }
+            params.topMargin = it[1]
+        }
     }
-
-//    override fun onAttach(context: Context) {
-//        super.onAttach(context)
-//        // Fragment视图变化监听
-//        contentViewLD.observe(this) {
-//            val layout = viewBinding.dlgContent.also { v -> v.removeAllViews() }
-//            when (it) {
-//                is Int -> View.inflate(requireContext(), it, layout)
-//                is View -> layout.addView(it)
-//            }
-//            // 缓存视图
-//            atomicContent.set(layout.getChildAt(0))
-//            // 兼容 ButterKnife
-//            atomicUnBinder.set(ButterKnifeUtils.bind(this, atomicContent.get()))
-//        }
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -133,7 +146,8 @@ class DialogFragment(
                 // 如果可以被取消、没有正在关闭面板、回退事件未被拦截
                 if (cancelable[0]
                     && !animators[1].isRunning
-                    && !this@DialogFragment.onBackPressed()) {
+                    && !this@DialogFragment.onBackPressed()
+                ) {
                     // 消除对话框
                     this@DialogFragment.dismiss()
                 }
@@ -143,8 +157,8 @@ class DialogFragment(
         dialog.setCanceledOnTouchOutside(false)
         dialog.setCancelable(false)
         dialog.window?.let {
-            val width = DialogUtils.getAppScreenWidth(requireContext())
-            val height = DialogUtils.getAppScreenHeight(requireContext())
+            val width = Utils.getAppScreenWidth(requireContext())
+            val height = Utils.getAppScreenHeight(requireContext())
             it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             it.setDimAmount(dimAmount[0])
             it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -156,6 +170,7 @@ class DialogFragment(
                 it.setGravity(Gravity.TOP)
             }
         }
+        atomicDialog.set(dialog)
         return dialog
     }
 
@@ -197,9 +212,41 @@ class DialogFragment(
 
     fun setDismissAnimator(animator: DialogAnimator) = also { animators[1] = animator }
 
-    fun onBackPressed() = false
+    fun setNativeDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) {
+        dimAmount[0] = account
+        changeDimAccount(account, true)
+    }
 
-    fun dispatchTouchEvent(ev: MotionEvent) = false
+    fun setCustomDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) {
+        dimAmount[1] = account
+        changeDimAccount(account, false)
+    }
+
+
+    fun setGravity(gravity: Int) {
+        gravityLD.setValue(gravity)
+    }
+
+    fun setOffset(offsetX: Float, offsetY: Float) = setOffset(offsetX, offsetY, TypedValue.COMPLEX_UNIT_DIP)
+
+    @Synchronized
+    fun setOffset(offsetX: Float, offsetY: Float, unit: Int) = also {
+        val offsets = offsetLD.value!!
+        offsets[0] = Utils.applyDimension(offsetX, unit).toInt()
+        offsets[1] = Utils.applyDimension(offsetY, unit).toInt()
+        offsetLD.setValue(offsets)
+    }
+
+    /**
+     * 回退拦截
+     */
+    fun onBackPressed() = provider?.onBackPressed() ?: false
+
+    /**
+     * 分发触摸事件
+     * @param ev 事件
+     */
+    fun dispatchTouchEvent(ev: MotionEvent) = provider?.dispatchTouchEvent(ev) ?: false
 
     /**
      * 执行面板动画，返回动画时长
@@ -214,7 +261,7 @@ class DialogFragment(
         // 动画没有在运行，才继续操作
         if (!animator.isRunning) {
             // 设置目标对象
-            animator.setTarget(viewBinding.dlgContent)
+            animator.setTarget(viewBinding.dlgPanel)
             // 设置监听
             animator.addAnimatorListener(object : AnimatorListener {
                 override fun onAnimationEnd(animation: Animator) {
@@ -248,13 +295,39 @@ class DialogFragment(
             dimAnimator.setIntValues(start, end)
             // 进度监听
             dimAnimator.addUpdateListener { animation: ValueAnimator ->
-                val value = animation.animatedValue as Int
-                val alpha = String.format("%02X", value)
-                val color = "#" + alpha + "000000"
-                viewBinding.dlgDim.setBackgroundColor(Color.parseColor(color))
+                changeDimAccount(
+                    animation.animatedValue as Int / 255F,
+                    false
+                )
             }
             // 开始动画
             dimAnimator.setDuration(tmp.toLong()).start()
+        }
+    }
+
+    /**
+     * 改变遮罩透明度
+     * @param account 透明度
+     * @param native 是否是原生遮罩
+     */
+    private fun changeDimAccount(account: Float, native: Boolean) {
+        // 保证视图已创建
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+            // 设置遮罩透明度
+            val setDimAccount = { b: Boolean ->
+                if (b) atomicDialog.get()?.window?.setDimAmount(account)
+                else {
+                    val alpha = String.format("%02X", (account * 255).toInt())
+                    val color = "#" + alpha + "000000"
+                    viewBinding.dlgDim.setBackgroundColor(Color.parseColor(color))
+                }
+            }
+            // 主线程运行
+            if (Looper.myLooper() == Looper.getMainLooper()) {
+                setDimAccount(native)
+            } else {
+                requireActivity().runOnUiThread { setDimAccount(native) }
+            }
         }
     }
 }

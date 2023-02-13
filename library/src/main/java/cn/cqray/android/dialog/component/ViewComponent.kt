@@ -1,6 +1,5 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog.component
 
-import android.content.res.Resources
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -11,16 +10,22 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LifecycleOwner
-import androidx.viewbinding.ViewBinding
 import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.DialogUtils
 import cn.cqray.android.dialog.RoundDrawable
-import java.util.concurrent.atomic.AtomicReference
+import cn.cqray.android.dialog.Utils
 
+/**
+ * 视图组件，主要实现功能：
+ * 1.内部间隔设置
+ * 2.外部间隔设置
+ * 3.宽高设置
+ * 4.显示隐藏设置
+ * 5.背景设置
+ * 6.背景圆角设置
+ * @author Cqray
+ */
 @Suppress(
     "MemberVisibilityCanBePrivate",
     "Unchecked_cast",
@@ -30,34 +35,6 @@ open class ViewComponent<V : View>(
     val lifecycleOwner: LifecycleOwner,
     val viewGet: Function0<V>
 ) {
-
-//    constructor(activity: FragmentActivity, view: V) : this() {
-//        lifecycleOwner = activity
-//        atomicViewGet.set { view }
-//        observeLD()
-//    }
-//
-//    constructor(fragment: Fragment, view: V) : this() {
-//        lifecycleOwner = fragment
-//        atomicViewGet.set { view }
-//        observeLD()
-//    }
-//
-//    constructor(activity: FragmentActivity, clazz: Class<out ViewBinding>) : this() {
-//        lifecycleOwner = activity
-//        atomicViewGet.set { DialogUtils.getViewBinding(clazz, activity.layoutInflater).root as V }
-//        observeLD()
-//    }
-//
-//    constructor(fragment: Fragment, clazz: Class<out ViewBinding>) : this() {
-//        lifecycleOwner = fragment
-//        atomicViewGet.set { DialogUtils.getViewBinding(clazz, fragment.layoutInflater).root as V }
-//        observeLD()
-//    }
-//
-//    private val lifecycleOwner: LifecycleOwner
-//
-//    private val atomicViewGet = AtomicReference<Function0<V>>()
 
     val view by lazy { viewGet.invoke() }
 
@@ -134,24 +111,6 @@ open class ViewComponent<V : View>(
     }
 
     /**
-     * 应用对应尺寸
-     * @param value 值
-     * @param unit 单位[TypedValue]
-     */
-    fun applyDimension(value: Float, unit: Int): Float {
-        val metrics = Resources.getSystem().displayMetrics
-        when (unit) {
-            TypedValue.COMPLEX_UNIT_PX -> return value
-            TypedValue.COMPLEX_UNIT_DIP -> return value * metrics.density
-            TypedValue.COMPLEX_UNIT_SP -> return value * metrics.scaledDensity
-            TypedValue.COMPLEX_UNIT_PT -> return value * metrics.xdpi * (1.0f / 72)
-            TypedValue.COMPLEX_UNIT_IN -> return value * metrics.xdpi
-            TypedValue.COMPLEX_UNIT_MM -> return value * metrics.xdpi * (1.0f / 25.4f)
-        }
-        return 0F
-    }
-
-    /**
      * 设置内部间隔，默认单位DIP
      * @param padding 间隔值
      */
@@ -160,7 +119,7 @@ open class ViewComponent<V : View>(
     /**
      * 设置内部间隔
      * @param padding 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setPadding(padding: Float, unit: Int) = setPadding(padding, padding, padding, padding, unit)
 
@@ -168,17 +127,17 @@ open class ViewComponent<V : View>(
      * 设置内部左右间隔，默认单位DIP
      * @param padding 间隔值
      */
-    open fun setPaddingLR(padding: Float) = setPaddingLR(padding, TypedValue.COMPLEX_UNIT_PX)
+    open fun setPaddingLR(padding: Float) = setPaddingLR(padding, TypedValue.COMPLEX_UNIT_DIP)
 
     /**
      * 设置内部左右间隔
      * @param padding 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setPaddingLR(padding: Float, unit: Int) = setPadding(
-        applyDimension(padding, unit),
+        Utils.applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(padding, unit),
+        Utils.applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
         TypedValue.COMPLEX_UNIT_PX
     )
@@ -187,18 +146,18 @@ open class ViewComponent<V : View>(
      * 设置内部上下间隔，默认单位DIP
      * @param padding 间隔值
      */
-    open fun setPaddingTB(padding: Float) = setPaddingTB(padding, TypedValue.COMPLEX_UNIT_PX)
+    open fun setPaddingTB(padding: Float) = setPaddingTB(padding, TypedValue.COMPLEX_UNIT_DIP)
 
     /**
      * 设置内部部上下间隔
      * @param padding 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setPaddingTB(padding: Float, unit: Int) = setPadding(
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(padding, unit),
+        Utils.applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(padding, unit),
+        Utils.applyDimension(padding, unit),
         TypedValue.COMPLEX_UNIT_PX
     )
 
@@ -219,16 +178,16 @@ open class ViewComponent<V : View>(
      * @param top 上间隔值
      * @param right 右间隔值
      * @param bottom 下间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     @Synchronized
     open fun setPadding(left: Float, top: Float, right: Float, bottom: Float, unit: Int) {
         val array = paddingLD.value ?: IntArray(4)
         paddingLD.setValue(array.also {
-            it[0] = applyDimension(left, unit).toInt()
-            it[1] = applyDimension(top, unit).toInt()
-            it[2] = applyDimension(right, unit).toInt()
-            it[3] = applyDimension(bottom, unit).toInt()
+            it[0] = Utils.applyDimension(left, unit).toInt()
+            it[1] = Utils.applyDimension(top, unit).toInt()
+            it[2] = Utils.applyDimension(right, unit).toInt()
+            it[3] = Utils.applyDimension(bottom, unit).toInt()
         })
     }
 
@@ -241,7 +200,7 @@ open class ViewComponent<V : View>(
     /**
      * 设置外部间隔
      * @param margin 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setMargin(margin: Float, unit: Int) = setMargin(margin, margin, margin, margin, unit)
 
@@ -249,17 +208,17 @@ open class ViewComponent<V : View>(
      * 设置外部左右间隔，默认单位DIP
      * @param margin 间隔值
      */
-    open fun setMarginLR(margin: Float) = setMarginLR(margin, TypedValue.COMPLEX_UNIT_PX)
+    open fun setMarginLR(margin: Float) = setMarginLR(margin, TypedValue.COMPLEX_UNIT_DIP)
 
     /**
      * 设置外部左右间隔
      * @param margin 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setMarginLR(margin: Float, unit: Int) = setMargin(
-        applyDimension(margin, unit),
+        Utils.applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(margin, unit),
+        Utils.applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
         TypedValue.COMPLEX_UNIT_PX
     )
@@ -268,18 +227,18 @@ open class ViewComponent<V : View>(
      * 设置外部上下间隔，默认单位DIP
      * @param margin 间隔值
      */
-    open fun setMarginTB(margin: Float) = setMarginTB(margin, TypedValue.COMPLEX_UNIT_PX)
+    open fun setMarginTB(margin: Float) = setMarginTB(margin, TypedValue.COMPLEX_UNIT_DIP)
 
     /**
      * 设置外部上下间隔
      * @param margin 间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     open fun setMarginTB(margin: Float, unit: Int) = setMargin(
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(margin, unit),
+        Utils.applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        applyDimension(margin, unit),
+        Utils.applyDimension(margin, unit),
         TypedValue.COMPLEX_UNIT_PX
     )
 
@@ -300,16 +259,16 @@ open class ViewComponent<V : View>(
      * @param top 上间隔值
      * @param right 右间隔值
      * @param bottom 下间隔值
-     * @param unit 单位[TypedValue]
+     * @param unit 值单位[TypedValue]
      */
     @Synchronized
     open fun setMargin(left: Float, top: Float, right: Float, bottom: Float, unit: Int) {
         val array = marginLD.value ?: IntArray(4)
         marginLD.setValue(array.also {
-            it[0] = applyDimension(left, unit).toInt()
-            it[1] = applyDimension(top, unit).toInt()
-            it[2] = applyDimension(right, unit).toInt()
-            it[3] = applyDimension(bottom, unit).toInt()
+            it[0] = Utils.applyDimension(left, unit).toInt()
+            it[1] = Utils.applyDimension(top, unit).toInt()
+            it[2] = Utils.applyDimension(right, unit).toInt()
+            it[3] = Utils.applyDimension(bottom, unit).toInt()
         })
     }
 
@@ -324,7 +283,7 @@ open class ViewComponent<V : View>(
      * @param width 宽度
      * @param unit 值单位[TypedValue]
      */
-    open fun setWidth(width: Float, unit: Int) = widthLD.setValue(applyDimension(width, unit).toInt())
+    open fun setWidth(width: Float, unit: Int) = widthLD.setValue(Utils.applyDimension(width, unit).toInt())
 
     /**
      * 设置控件高度，默认单位DIP
@@ -337,7 +296,7 @@ open class ViewComponent<V : View>(
      * @param height 高度
      * @param unit 值单位[TypedValue]
      */
-    open fun setHeight(height: Float, unit: Int) = heightLD.setValue(applyDimension(height, unit).toInt())
+    open fun setHeight(height: Float, unit: Int) = heightLD.setValue(Utils.applyDimension(height, unit).toInt())
 
     /**
      * 设置视图显示[View.VISIBLE]或隐藏[View.INVISIBLE]
@@ -389,7 +348,7 @@ open class ViewComponent<V : View>(
             radii.size < 8 -> throw IllegalArgumentException("Radii array length must >= 8.")
             // 获取对应的大小
             else -> for (i in backgroundRadii.indices) {
-                backgroundRadii[i] = applyDimension(radii[i], unit)
+                backgroundRadii[i] = Utils.applyDimension(radii[i], unit)
             }
         }
         // 更新背景

@@ -12,19 +12,18 @@
         android:layout_height="match_parent" />
 
     <FrameLayout
-        android:id="@+id/dlg_panel"
+        android:id="@+id/dlg_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:clipToPadding="false">
 
         <FrameLayout
-            android:id="@+id/dlg_content"
+            android:id="@+id/dlg_panel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:focusable="true"
-            android:background="@color/foreground">
+            android:focusable="true">
 
         </FrameLayout>
 

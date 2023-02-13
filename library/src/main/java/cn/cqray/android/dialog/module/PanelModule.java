@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.SizeUtils;
 
 import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.anim.ViewAnimator;
-import cn.cqray.android.dialog.module2.BaseDialog;
+import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;

@@ -2,12 +2,15 @@ package cn.cqray.android.ab
 
 
 import androidx.fragment.app.FragmentActivity
+import cn.cqray.android.dialog.component.PanelComponent
 
-class BaseDialog : PanelProvider<BaseDialog> {
+class BaseDialog :
+    DialogProvider<BaseDialog>,
+    PanelProvider<BaseDialog> {
 
-    val fragment: DialogFragment by lazy { DialogFragment() }
+    override val dialogFragment: DialogFragment by lazy { DialogFragment(this) }
 
-    override val panelComponent by lazy { PanelComponent(fragment) { fragment.viewBinding.dlgContent } }
+    override val panelComponent by lazy { PanelComponent(dialogFragment) { dialogFragment.viewBinding.dlgPanel } }
 
 
 //    constructor(activity: FragmentActivity) {
@@ -27,7 +30,7 @@ class BaseDialog : PanelProvider<BaseDialog> {
 //    }
 
     fun show(activity: FragmentActivity) {
-        fragment.show(activity.supportFragmentManager, fragment::javaClass.name)
+        dialogFragment.show(activity.supportFragmentManager, dialogFragment::javaClass.name)
 //        val fm: FragmentManager
 //        val act: Activity?
 //        if (mOwnerFragment == null) {
