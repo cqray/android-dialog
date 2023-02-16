@@ -1,5 +1,6 @@
 package cn.cqray.android.ab
 
+import android.app.Dialog
 import android.os.Handler
 import android.view.Gravity
 import androidx.fragment.app.FragmentActivity
@@ -18,7 +19,7 @@ class Te {
 ////                .heightScale(0.5F)
 //                .show()
 
-            val dialog = BaseDialog()
+            val dialog = BaseDialog(activity)
                 .widthScale(0.5F)
                 .heightScale(0.5F)
                 .offset(10F, 200F)
@@ -34,6 +35,8 @@ class Te {
             Handler().postDelayed({
 //                dialog.customDimAccount(0.1f)
             }, 1500)
+
+            //val d = Dialog(activity).
         }
 //         @JvmStatic
 //        fun <T: BaseDialog<T>> get(activity: FragmentActivity): DialogFragment {

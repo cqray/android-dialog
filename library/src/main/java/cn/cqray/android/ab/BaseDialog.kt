@@ -4,10 +4,16 @@ package cn.cqray.android.ab
 //import androidx.fragment.app.FragmentActivity
 //import androidx.fragment.app.FragmentManager
 //import androidx.lifecycle.LifecycleOwner
+import androidx.fragment.app.FragmentActivity
 import cn.cqray.android.dialog.component.PanelComponent
 
-open class BaseDialog constructor(
-//    val lifecycleOwner: LifecycleOwner
+@Suppress(
+    "MemberVisibilityCanBePrivate",
+    "Unchecked_cast",
+    "Unused"
+)
+open class BaseDialog (
+    val activity: FragmentActivity
 ) : DialogProvider<BaseDialog>,
     PanelProvider<BaseDialog> {
 
@@ -38,7 +44,7 @@ open class BaseDialog constructor(
 //    }
 
     fun show() {
-//        dialogFragment.show(fragmentManager, dialogFragment::javaClass.name)
+        dialogFragment.show(activity.supportFragmentManager, dialogFragment::javaClass.name)
 //        val fm: FragmentManager
 //        val act: Activity?
 //        if (mOwnerFragment == null) {

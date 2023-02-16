@@ -36,3 +36,6 @@ implementation 'com.github.cqray:android-dialog:0.5.4'
 [底部Alter类对话框 BottomAlterDialog](./library/src/main/java/cn/cqray/android/dialog/BottomAlterDialog.java)
 
 更多使用请阅读源码。
+
+
+最终选择Dialog而不是使用DialogFragment，是为了在Compose中也方便使用
