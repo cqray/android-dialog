@@ -1,6 +1,6 @@
 package cn.cqray.android.dialog.module;
 
-import android.animation.Animator;
+
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,7 +14,6 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.SizeUtils;
 
-import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.anim.ViewAnimator;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.DialogLiveData;
@@ -132,7 +131,7 @@ public final class PanelModule extends ViewModule<FrameLayout> {
      * 执行面板动画，返回动画时长
      * @param show 是否是显示动画
      */
-    protected void doPanelAnimator(boolean show, ViewAnimator.Callback callback) {
+    protected void doPanelAnimator(boolean show) {
         if (getView() != null) {
             // 获取对应动画
             DialogAnimator animator;
@@ -141,45 +140,45 @@ public final class PanelModule extends ViewModule<FrameLayout> {
             } else {
                 animator = mAnimators[1] == null ? new BounceOut() : mAnimators[1];
             }
-            // 动画没有在运行，才继续操作
-            if (!animator.isRunning()) {
-                // 设置目标对象
-                animator.setTarget(getView());
-                // 设置监听
-                animator.addAnimatorListener(new AnimatorListener() {
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        if (show) {
-                            mDialog.onShow(mDialog.requireDialog());
-                        } else {
-                            // 取消父级销毁监听
-                            mDialog.getParentLifecycleOwner().getLifecycle().removeObserver(mParentObserver);
-                            // 销毁对话框
-                            mDialog.quickDismiss();
-                        }
-                    }
-
-                });
-                // 开始面板动画
-                animator.start();
-            }
-            animator.getDuration(callback);
+//            // 动画没有在运行，才继续操作
+//            if (!animator.isRunning()) {
+//                // 设置目标对象
+//                animator.setTarget(getView());
+//                // 设置监听
+//                animator.addAnimatorListener(new AnimatorListener() {
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        if (show) {
+//                            mDialog.onShow(mDialog.requireDialog());
+//                        } else {
+//                            // 取消父级销毁监听
+//                            mDialog.getParentLifecycleOwner().getLifecycle().removeObserver(mParentObserver);
+//                            // 销毁对话框
+//                            mDialog.quickDismiss();
+//                        }
+//                    }
+//
+//                });
+//                // 开始面板动画
+//                animator.start();
+//            }
+//            animator.getDuration(callback);
         }
     }
 
     /**
      * 显示面板
      */
-    public void show(ViewAnimator.Callback callback) {
-        doPanelAnimator(true, callback);
+    public void show() {
+        doPanelAnimator(true);
     }
 
     /**
      * 消除面板
      */
-    public void dismiss(ViewAnimator.Callback callback) {
-        doPanelAnimator(false, callback);
+    public void dismiss() {
+        doPanelAnimator(false);
     }
 
     public void setShowAnimator(DialogAnimator animator) {

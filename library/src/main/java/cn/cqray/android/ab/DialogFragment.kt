@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.FrameLayout
@@ -15,8 +16,7 @@ import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.Lifecycle
 import androidx.viewbinding.ViewBinding
-import cn.cqray.android.anim.AnimatorListener
-import cn.cqray.android.anim.ViewAnimator
+import cn.cqray.android.anim.listener.ViewAnimatorListener
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.Utils
 import cn.cqray.android.dialog.amin.BounceIn
@@ -77,7 +77,10 @@ class DialogFragment(
         super.onCreate(savedInstanceState)
         // Fragment视图变化监听
         contentViewLD.observe(this) {
-            val layout = viewBinding.dlgPanel.also { v -> v.removeAllViews() }
+            val layout = viewBinding.dlgPanel.also { vp ->
+                vp.removeAllViews()
+                vp.addView(viewBinding.dlgTip)
+            }
             when (it) {
                 is Int -> View.inflate(requireContext(), it, layout)
                 is View -> layout.addView(it)
@@ -121,10 +124,7 @@ class DialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // 执行面板动画
-        doPanelAnimator(true) {
-            // 执行遮罩动画
-            doDimAnimator(it, true)
-        }
+        doDimAnimator(doPanelAnimator(true), true)
     }
 
     /**
@@ -185,13 +185,7 @@ class DialogFragment(
     /**
      * 销毁对话框，有动画
      */
-    override fun dismiss() {
-        // 执行面板动画
-        doPanelAnimator(false) {
-            // 执行遮罩动画
-            doDimAnimator(it, false)
-        }
-    }
+    override fun dismiss() = doDimAnimator(doPanelAnimator(false), false)
 
     /**
      * 快速销毁对话框，无动画
@@ -266,7 +260,7 @@ class DialogFragment(
      * 执行面板动画，返回动画时长
      * @param show 是否是显示动画
      */
-    private fun doPanelAnimator(show: Boolean, callback: ViewAnimator.Callback?) {
+    private fun doPanelAnimator(show: Boolean): Long {
         // 获取对应动画
         val animator = when (show) {
             true -> animators[0]
@@ -277,15 +271,16 @@ class DialogFragment(
             // 设置目标对象
             animator.setTarget(viewBinding.dlgPanel)
             // 设置监听
-            animator.addAnimatorListener(object : AnimatorListener {
-                override fun onAnimationEnd(animation: Animator) {
+            animator.addAnimatorListener(object : ViewAnimatorListener {
+                override fun onAnimatorEnd(view: View?, animation: Animator) {
+                    Log.e("数据", "动画结束")
                     if (!show) quickDismiss()
                 }
             })
             // 开始面板动画
             animator.start()
         }
-        animator.getDuration(callback)
+        return animator.usedTime
     }
 
     /***
@@ -293,7 +288,7 @@ class DialogFragment(
      * @param duration 显示时长
      * @param show true显示对话框，false关闭对话框
      */
-    private fun doDimAnimator(duration: Int, show: Boolean) {
+    private fun doDimAnimator(duration: Long, show: Boolean) {
         if (dimAnimator.isRunning) {
             // 取消正在进行的动画
             dimAnimator.cancel()
@@ -315,7 +310,7 @@ class DialogFragment(
                 )
             }
             // 开始动画
-            dimAnimator.setDuration(tmp.toLong()).start()
+            dimAnimator.setDuration(tmp).start()
         }
     }
 

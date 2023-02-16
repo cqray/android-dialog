@@ -18,7 +18,6 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.Utils;
 
-import cn.cqray.android.anim.AnimatorListener;
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.R;
 import cn.cqray.android.dialog.amin.BounceIn;
@@ -136,20 +135,20 @@ public class TipModule extends TextViewModule {
             if (!animator.isRunning()) {
                 // 设置目标对象
                 animator.setTarget(getView());
-                // 动画监听
-                animator.addAnimatorListener(new AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation, boolean isReverse) {
-                        getView().setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        if (show) {
-                            mHandler.postDelayed(() -> dismiss(), mDuration);
-                        }
-                    }
-                });
+//                // 动画监听
+//                animator.addAnimatorListener(new AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animation, boolean isReverse) {
+//                        getView().setVisibility(View.VISIBLE);
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animator) {
+//                        if (show) {
+//                            mHandler.postDelayed(() -> dismiss(), mDuration);
+//                        }
+//                    }
+//                });
                 // 开始面板动画
                 animator.start();
             }

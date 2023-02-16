@@ -26,8 +26,8 @@ import com.blankj.utilcode.util.SizeUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.cqray.android.dialog.amin.SlideBottomIn;
-import cn.cqray.android.dialog.amin.SlideBottomOut;
+import cn.cqray.android.dialog.amin.BottomIn;
+import cn.cqray.android.dialog.amin.BottomOut;
 import cn.cqray.android.dialog.module.TextViewModule;
 import cn.cqray.android.dialog.module.ViewModule;
 
@@ -68,15 +68,15 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
     public BottomAlterDialog(FragmentActivity activity) {
         super(activity);
         gravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL)
-                .showAnimator(new SlideBottomIn())
-                .dismissAnimator(new SlideBottomOut());
+                .showAnimator(new BottomIn())
+                .dismissAnimator(new BottomOut());
     }
 
     public BottomAlterDialog(Fragment fragment) {
         super(fragment);
         gravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL)
-                .showAnimator(new SlideBottomIn())
-                .dismissAnimator(new SlideBottomOut());
+                .showAnimator(new BottomIn())
+                .dismissAnimator(new BottomOut());
     }
 
     @Override

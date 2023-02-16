@@ -146,11 +146,11 @@ public final class DialogDelegate {
     }
 
     private void onStart() {
-        // 执行面板动画
-        mPanelModule.show(duration -> {
-            // 执行遮罩动画
-            doDimAnimator(duration, true);
-        });
+//        // 执行面板动画
+//        mPanelModule.show(duration -> {
+//            // 执行遮罩动画
+//            doDimAnimator(duration, true);
+//        });
     }
 
     private void onDestroy() {
@@ -208,11 +208,11 @@ public final class DialogDelegate {
      * 消除对话框
      */
     public void dismiss() {
-        // 消除面板
-        mPanelModule.dismiss(duration -> {
-            // 执行遮罩动画
-            doDimAnimator(duration, false);
-        });
+//        // 消除面板
+//        mPanelModule.dismiss(duration -> {
+//            // 执行遮罩动画
+//            doDimAnimator(duration, false);
+//        });
     }
 
     public void setContentView(View view) {

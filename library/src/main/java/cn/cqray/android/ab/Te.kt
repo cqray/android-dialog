@@ -3,6 +3,7 @@ package cn.cqray.android.ab
 import android.os.Handler
 import android.view.Gravity
 import androidx.fragment.app.FragmentActivity
+import cn.cqray.android.dialog.amin.BottomIn
 
 class Te {
 
@@ -26,6 +27,7 @@ class Te {
                 .backgroundRadius(10F)
                 .nativeDimAccount(0.2f)
 //                .customDimAccount(0.5F)
+                .showAnimator(BottomIn())
                 .marginLR(50F);
                 dialog.show(activity)
 

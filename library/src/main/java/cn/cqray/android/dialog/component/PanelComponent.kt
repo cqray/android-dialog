@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
+import cn.cqray.android.dialog.R
 import cn.cqray.android.dialog.Utils
 import com.blankj.utilcode.util.SizeUtils
 import kotlin.math.max
@@ -35,6 +36,8 @@ class PanelComponent(
     /** 对话框大小**/
     private val sizeChangeLD = DialogLiveData<Unit>()
 
+    val tipComponent = TipComponent(lifecycleOwner) { viewGet().findViewById(R.id.dlg_tip) }
+
     init {
         // 设置默认圆大小
         setBackgroundRadius(6F)
@@ -47,6 +50,8 @@ class PanelComponent(
         }
         // 订阅面板大小变更监听
         sizeChangeLD.observe(lifecycleOwner) { changeSizes() }
+        // 设置TIP默认圆角
+        tipComponent.setVisible(true)
     }
 
     @Synchronized
