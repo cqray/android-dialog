@@ -29,7 +29,7 @@ class Te {
 //                .customDimAccount(0.5F)
                 .showAnimator(BottomIn())
                 .marginLR(50F);
-                dialog.show(activity)
+                dialog.show()
 
             Handler().postDelayed({
 //                dialog.customDimAccount(0.1f)

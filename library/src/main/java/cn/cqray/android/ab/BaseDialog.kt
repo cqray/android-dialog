@@ -1,25 +1,33 @@
 package cn.cqray.android.ab
 
-
-import androidx.fragment.app.FragmentActivity
+//import androidx.fragment.app.Fragment
+//import androidx.fragment.app.FragmentActivity
+//import androidx.fragment.app.FragmentManager
+//import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.component.PanelComponent
 
-class BaseDialog :
-    DialogProvider<BaseDialog>,
+open class BaseDialog constructor(
+//    val lifecycleOwner: LifecycleOwner
+) : DialogProvider<BaseDialog>,
     PanelProvider<BaseDialog> {
 
     override val dialogFragment: DialogFragment by lazy { DialogFragment(this) }
 
     override val panelComponent by lazy { PanelComponent(dialogFragment) { dialogFragment.viewBinding.dlgPanel } }
 
+//    constructor(activity: FragmentActivity) : this()
+//
+//    constructor(fragment: Fragment) : this()
 
-//    constructor(activity: FragmentActivity) {
-//        mOwnerActivity = activity
-//        mOwnerFragment = null
-//        mDelegate = DialogDelegate(this)
-////        mTipModule = mDelegate.tipModule
-////        mPanelModule = mDelegate.panelModule
-//    }
+//    val fragmentManager: FragmentManager
+//        get() {
+//            return when(lifecycleOwner) {
+//                is FragmentActivity -> lifecycleOwner.supportFragmentManager
+//                else -> (lifecycleOwner as Fragment).childFragmentManager
+//            }
+//        }
+
+//    constructor(activity: FragmentActivity)
 
 //    constructor(fragment: Fragment?) {
 //        mOwnerActivity = null
@@ -29,8 +37,8 @@ class BaseDialog :
 //        mPanelModule = mDelegate.panelModule
 //    }
 
-    fun show(activity: FragmentActivity) {
-        dialogFragment.show(activity.supportFragmentManager, dialogFragment::javaClass.name)
+    fun show() {
+//        dialogFragment.show(fragmentManager, dialogFragment::javaClass.name)
 //        val fm: FragmentManager
 //        val act: Activity?
 //        if (mOwnerFragment == null) {
