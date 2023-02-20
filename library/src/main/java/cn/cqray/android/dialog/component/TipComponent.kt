@@ -17,8 +17,15 @@ import cn.cqray.android.dialog.R
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
+@Suppress(
+    "MemberVisibilityCanBePrivate",
+    "Unchecked_cast",
+    "Unused"
+)
 class TipComponent(
     lifecycleOwner: LifecycleOwner,
     viewGet: Function0<TextView>
@@ -29,7 +36,9 @@ class TipComponent(
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private val atomicDuration = AtomicLong(1500L)
+    private val atomicShown = AtomicBoolean()
+
+    private val atomicDuration = AtomicLong(1800L)
 
     /** 提示显示、消失动画  */
     private val animators = arrayOf<DialogAnimator>(BounceIn(), BounceOut())
@@ -75,6 +84,8 @@ class TipComponent(
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (event == Lifecycle.Event.ON_DESTROY) {
                     handler.removeCallbacksAndMessages(null)
+                } else if (event == Lifecycle.Event.ON_CREATE) {
+                    show()
                 }
             }
         })
@@ -82,27 +93,31 @@ class TipComponent(
 
     fun setLayoutGravity(gravity: Int) = layoutGravity.setValue(gravity)
 
+    fun setDuration(duration: Long) = setDuration(duration, TimeUnit.MILLISECONDS)
+
+    fun setDuration(duration: Long, timeUnit: TimeUnit) = atomicDuration.set(timeUnit.toMillis(duration))
+
     fun show() {
-        val showing = animators[0].isRunning || animators[1].isRunning
-        if (showing) {
+        animators[1].cancel()
+        if (atomicShown.get()) {
+            // 重置取消Tip的时间
             handler.removeMessages(0)
-            //handler.postDelayed({ dismiss() }, atomicDuration.get())
+            handler.postDelayed({ dismiss() }, atomicDuration.get())
         } else doTipAnimator(true)
     }
 
-    fun dismiss() = doTipAnimator(false)
+    fun dismiss() = doTipAnimator   (false)
 
     /**
      * 执行面板动画，返回动画时长
      * @param show 是否是显示动画
      */
     private fun doTipAnimator(show: Boolean) {
-//        if (getView() != null) {
-//            mShowing = show
-//            // 清除所有延时任务
-//            mHandler.removeCallbacksAndMessages(null)
+        // 清除延时Dismiss任务
+        handler.removeMessages(0)
+        // 取消相反类型的动画
+        animators[if (show) 1 else 0].cancel()
         // 获取对应动画
-        //val animator: DialogAnimator
         val animator = animators[if (show) 0 else 1]
         // 动画没有在运行，才继续操作
         if (!animator.isRunning) {
@@ -112,7 +127,15 @@ class TipComponent(
             animator.addAnimatorListener(object : ViewAnimatorListener {
                 override fun onAnimatorStart(view: View?, animation: Animator) {
                     super.onAnimatorStart(view, animation)
-                    this@TipComponent.view.visibility = View.VISIBLE
+                    with(this@TipComponent.view) {
+                        visibility = View.VISIBLE
+                        // 设置最大宽高
+                        val p = parent as View
+                        if ((p.width > 0) and (p.height > 0)) {
+                            maxWidth = p.width
+                            maxHeight = p.height
+                        }
+                    }
                 }
 
                 override fun onAnimatorEnd(view: View?, animation: Animator) {
@@ -127,7 +150,6 @@ class TipComponent(
             // 开始面板动画
             animator.start()
         }
-//        }
     }
 
 }
