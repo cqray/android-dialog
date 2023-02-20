@@ -1,5 +1,6 @@
 package cn.cqray.android.ab
 
+import android.app.Dialog
 import android.os.Handler
 import android.view.Gravity
 import androidx.fragment.app.FragmentActivity
@@ -20,6 +21,8 @@ class Te {
 //                .show()
 
             val dialog = BottomAlterDialog(activity)
+
+
                 .widthScale(0.5F)
                 .heightScale(0.5F)
 //                .offset(10F, 200F)
@@ -28,13 +31,18 @@ class Te {
 //                .backgroundRadius(10F)
                 .nativeDimAccount(0.2f)
 //                .customDimAccount(0.5F)
+
 //                .showAnimator(BottomIn())
 //                .marginLR(50F);
                 dialog.show()
 
-//            Handler().postDelayed({
-////                dialog.customDimAccount(0.1f)
-//            }, 1500)
+
+                dialog.show()
+
+            Handler().postDelayed({
+//                dialog.customDimAccount(0.1f)
+            }, 1500)
+
         }
 //         @JvmStatic
 //        fun <T: BaseDialog<T>> get(activity: FragmentActivity): DialogFragment {

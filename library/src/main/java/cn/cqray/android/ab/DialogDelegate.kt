@@ -1,5 +1,6 @@
 package cn.cqray.android.ab
 
+
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -14,8 +15,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.view.*
 import android.widget.FrameLayout
-import androidx.annotation.FloatRange
-import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -23,14 +22,24 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
+
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.Window
+import android.view.WindowManager
+import androidx.annotation.FloatRange
+import androidx.annotation.LayoutRes
 import cn.cqray.android.anim.listener.ViewAnimatorListener
+
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.Utils
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
+
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
 import cn.cqray.java.tool.SizeUnit
+
 
 class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
 
@@ -129,6 +138,7 @@ class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
     /**
      * 创建对话框
      */
+
     fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // 初始化LiveData数据
         initLDs()
@@ -182,7 +192,9 @@ class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
                 dismiss()
             }
         }
-        // 设置窗口信息
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
         dialog.window?.let {
             val width = Utils.getAppScreenWidth(activity)
             val height = Utils.getAppScreenHeight(activity)
@@ -218,6 +230,7 @@ class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
      * 销毁对话框，有动画
      */
     fun dismiss() = doDimAnimator(doPanelAnimator(false), false)
+
 
     /**
      * 快速销毁对话框，无动画
