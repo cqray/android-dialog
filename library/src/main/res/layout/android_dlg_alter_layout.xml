@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:ignore="HardcodedText">
+
+    <TextView
+        android:id="@+id/dlg_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingLeft="@dimen/content"
+        android:paddingRight="@dimen/content"
+        android:textColor="@color/text"
+        android:textSize="@dimen/h3">
+
+    </TextView>
+
+    <View
+        android:id="@+id/dlg_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider"
+        android:background="@color/divider" />
+
+    <FrameLayout
+        android:id="@+id/dlg_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/dlg_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/content"
+        android:paddingRight="@dimen/content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dialog_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingLeft="@dimen/small"
+            android:paddingTop="@dimen/smaller"
+            android:paddingRight="@dimen/small"
+            android:paddingBottom="@dimen/smaller"
+            android:text="取消"
+            android:textColor="@color/tint"
+            android:textSize="@dimen/h3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-8dp"
+            android:layout_marginRight="-8dp"
+            android:background="@drawable/dialog_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingLeft="@dimen/small"
+            android:paddingTop="@dimen/smaller"
+            android:paddingRight="@dimen/small"
+            android:paddingBottom="@dimen/smaller"
+            android:text="确定"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/h3" />
+    </LinearLayout>
+</LinearLayout>

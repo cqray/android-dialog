@@ -3,6 +3,7 @@ package cn.cqray.android.ab
 import android.os.Handler
 import android.view.Gravity
 import androidx.fragment.app.FragmentActivity
+import cn.cqray.android.dialog.BottomMessageDialog
 import cn.cqray.android.dialog.amin.BottomIn
 
 class Te {
@@ -18,22 +19,22 @@ class Te {
 ////                .heightScale(0.5F)
 //                .show()
 
-            val dialog = BaseDialog()
+            val dialog = BottomAlterDialog(activity)
                 .widthScale(0.5F)
                 .heightScale(0.5F)
-                .offset(10F, 200F)
-                .gravity(Gravity.START)
+//                .offset(10F, 200F)
+//                .gravity(Gravity.BOTTOM)
 //                .backgroundColor(Color.BLUE)
-                .backgroundRadius(10F)
+//                .backgroundRadius(10F)
                 .nativeDimAccount(0.2f)
 //                .customDimAccount(0.5F)
-                .showAnimator(BottomIn())
-                .marginLR(50F);
-                dialog.show(activity)
+//                .showAnimator(BottomIn())
+//                .marginLR(50F);
+                dialog.show()
 
-            Handler().postDelayed({
-//                dialog.customDimAccount(0.1f)
-            }, 1500)
+//            Handler().postDelayed({
+////                dialog.customDimAccount(0.1f)
+//            }, 1500)
         }
 //         @JvmStatic
 //        fun <T: BaseDialog<T>> get(activity: FragmentActivity): DialogFragment {

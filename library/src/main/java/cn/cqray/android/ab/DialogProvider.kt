@@ -1,17 +1,21 @@
 package cn.cqray.android.ab
 
+import android.content.res.Configuration
+import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.util.TypedValue
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import cn.cqray.android.dialog.amin.DialogAnimator
+import cn.cqray.java.tool.SizeUnit
 
 /**
  * 对话框相关功能提供器
  * @author Cqray
  */
 @Suppress(
+    "Deprecation",
     "MemberVisibilityCanBePrivate",
     "Unchecked_cast",
     "Unused"
@@ -19,65 +23,103 @@ import cn.cqray.android.dialog.amin.DialogAnimator
 @JvmDefaultWithoutCompatibility
 interface DialogProvider<T : DialogProvider<T>> {
 
-    /** 对话框Fragment实例 **/
-    val dialogFragment: DialogFragment
+    /** 对话框委托实例 **/
+    val dialogDelegate: DialogDelegate
+
+    /**
+     * 显示对画框
+     */
+    @JvmDefault
+    fun show() = dialogDelegate.show()
+
+    /**
+     * 隐藏对话框
+     */
+    @JvmDefault
+    fun dismiss() = dialogDelegate.dismiss()
+
+    /**
+     * 快速隐藏对话框（无动画）
+     */
+    @JvmDefault
+    fun quickDismiss() = dialogDelegate.quickDismiss()
+
+//    fun autoDismiss()
 
     /**
      * 设置内容视图
      * @param view 视图
      */
-    fun setContentView(view: View) = also { dialogFragment.setContentView(view) } as T
+    @JvmDefault
+    fun setContentView(view: View) = also { dialogDelegate.setContentView(view) } as T
 
     /**
      * 设置内容视图
      * @param id 视图资源ID
      */
-    fun setContentView(@LayoutRes id: Int) = also { dialogFragment.setContentView(id) } as T
+    @JvmDefault
+    fun setContentView(@LayoutRes id: Int) = also { dialogDelegate.setContentView(id) } as T
 
     /**
      * 对话框是否可取消
      * @param cancelable 是否可取消
      */
-    fun cancelable(cancelable: Boolean) = also { dialogFragment.isCancelable = cancelable } as T
+    @JvmDefault
+    fun cancelable(cancelable: Boolean) = also { dialogDelegate.setCancelable(cancelable) } as T
 
     /**
      * 对话框点击外部是否可取消
      * @param cancelable 是否可取消
      */
-    fun cancelableOutsize(cancelable: Boolean) = also { dialogFragment.setCancelableOutsize(cancelable) } as T
+    @JvmDefault
+    fun cancelableOutsize(cancelable: Boolean) = also { dialogDelegate.setCancelableOutsize(cancelable) } as T
 
+    /**
+     * 原始遮罩透明度
+     * @param account 透明度
+     */
+    @JvmDefault
     fun nativeDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) = also {
-        dialogFragment.setNativeDimAccount(account)
+        dialogDelegate.setNativeDimAccount(account)
     } as T
 
+    /**
+     * 自定义遮罩透明度
+     * @param account 透明度
+     */
+    @JvmDefault
     fun customDimAccount(@FloatRange(from = 0.0, to = 1.0) account: Float) = also {
-        dialogFragment.setCustomDimAccount(account)
+        dialogDelegate.setCustomDimAccount(account)
     } as T
 
     /**
      * 显示动画
      * @param animator 动画
      */
-    fun showAnimator(animator: DialogAnimator) = also { dialogFragment.setShowAnimator(animator) } as T
+    @JvmDefault
+    fun showAnimator(animator: DialogAnimator) = also { dialogDelegate.setShowAnimator(animator) } as T
 
     /**
      * 消失动画
      * @param animator 动画
      */
-    fun dismissAnimator(animator: DialogAnimator) = also { dialogFragment.setDismissAnimator(animator) } as T
+    @JvmDefault
+    fun dismissAnimator(animator: DialogAnimator) = also { dialogDelegate.setDismissAnimator(animator) } as T
 
     /**
      * 对话框位置
      * @param gravity 位置
      */
-    fun gravity(gravity: Int) = also { dialogFragment.setGravity(gravity) } as T
+    @JvmDefault
+    fun gravity(gravity: Int) = also { dialogDelegate.setGravity(gravity) } as T
 
     /**
      * 对话框偏移量，默认单位DIP
      * @param offsetX 横向偏移量
      * @param offsetY 纵向向偏移量
      */
-    fun offset(offsetX: Float, offsetY: Float) = also { dialogFragment.setOffset(offsetX, offsetY) } as T
+    @JvmDefault
+    fun offset(offsetX: Float, offsetY: Float) = also { dialogDelegate.setOffset(offsetX, offsetY) } as T
 
     /**
      * 对话框偏移量
@@ -85,18 +127,33 @@ interface DialogProvider<T : DialogProvider<T>> {
      * @param offsetY 纵向向偏移量
      * @param unit 值单位[TypedValue]
      */
-    fun offset(offsetX: Float, offsetY: Float, unit: Int) = also {
-        dialogFragment.setOffset(offsetX, offsetY, unit)
+    @JvmDefault
+    fun offset(offsetX: Float, offsetY: Float, unit: SizeUnit) = also {
+        dialogDelegate.setOffset(offsetX, offsetY, unit)
     } as T
+
+    /**
+     * 生命周期处理
+     */
+    fun onCreating(savedInstanceState: Bundle?) {}
 
     /**
      * 回退拦截
      */
+    @JvmDefault
     fun onBackPressed() = false
 
     /**
      * 分发触摸事件
      * @param ev 事件
      */
+    @JvmDefault
     fun dispatchTouchEvent(ev: MotionEvent) = false
+
+    /**
+     * 配置发生变化
+     * @param newConfig 新配置
+     */
+    @JvmDefault
+    fun onConfigurationChanged(newConfig: Configuration) {}
 }
