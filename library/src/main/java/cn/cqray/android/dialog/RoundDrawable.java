@@ -13,8 +13,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 
-import com.blankj.utilcode.util.SizeUtils;
-
 import org.jetbrains.annotations.Nullable;
 
 import lombok.NonNull;
@@ -126,7 +124,7 @@ public class RoundDrawable extends Drawable {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
         for (int i = 0; i < RADII_LENGTH; i++) {
-            mRadii[i] = SizeUtils.applyDimension(radii[i], unit);
+            mRadii[i] = Utils.applyDimension(radii[i], unit);
         }
         invalidateSelf();
     }

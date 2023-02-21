@@ -12,11 +12,10 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.SizeUtils;
 
-import cn.cqray.android.anim.ViewAnimator;
 import cn.cqray.android.dialog.BaseDialog;
 import cn.cqray.android.dialog.DialogLiveData;
+import cn.cqray.android.dialog.Utils;
 import cn.cqray.android.dialog.amin.BounceIn;
 import cn.cqray.android.dialog.amin.BounceOut;
 import cn.cqray.android.dialog.amin.DialogAnimator;
@@ -199,8 +198,8 @@ public final class PanelModule extends ViewModule<FrameLayout> {
 
     public void setOffset(float offsetX, float offsetY, int unit) {
         float [] array = new float[2];
-        array[0] = SizeUtils.applyDimension(offsetX, unit);
-        array[1] = SizeUtils.applyDimension(offsetY, unit);
+        array[0] = Utils.applyDimension(offsetX, unit);
+        array[1] = Utils.applyDimension(offsetY, unit);
         mOffset.setValue(array);
     }
 
@@ -212,7 +211,7 @@ public final class PanelModule extends ViewModule<FrameLayout> {
     @Override
     public void setWidth(float width, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[0] = width <= 0 ? null : SizeUtils.applyDimension(width, unit);
+            mSizeArray[0] = width <= 0 ? null : Utils.applyDimension(width, unit);
             mSizeArray[1] = null;
         }
         mRequestSize.setValue(null);
@@ -228,14 +227,14 @@ public final class PanelModule extends ViewModule<FrameLayout> {
 
     public void setWidthMin(float min, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[2] = min <= 0 ? null : SizeUtils.applyDimension(min, unit);
+            mSizeArray[2] = min <= 0 ? null : Utils.applyDimension(min, unit);
         }
         mRequestSize.setValue(null);
     }
 
     public void setWidthMax(float max, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[3] = max <= 0 ? null : SizeUtils.applyDimension(max, unit);
+            mSizeArray[3] = max <= 0 ? null : Utils.applyDimension(max, unit);
         }
         mRequestSize.setValue(null);
     }
@@ -248,7 +247,7 @@ public final class PanelModule extends ViewModule<FrameLayout> {
     @Override
     public void setHeight(float height, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[4] = height <= 0 ? null : SizeUtils.applyDimension(height, unit);
+            mSizeArray[4] = height <= 0 ? null : Utils.applyDimension(height, unit);
             mSizeArray[5] = null;
         }
         mRequestSize.setValue(null);
@@ -264,14 +263,14 @@ public final class PanelModule extends ViewModule<FrameLayout> {
 
     public void setHeightMin(float min, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[6] = min <= 0 ? null : SizeUtils.applyDimension(min, unit);
+            mSizeArray[6] = min <= 0 ? null : Utils.applyDimension(min, unit);
         }
         mRequestSize.setValue(null);
     }
 
     public void setHeightMax(float max, int unit) {
         synchronized (PanelModule.class) {
-            mSizeArray[7] = max <= 0 ? null : SizeUtils.applyDimension(max, unit);
+            mSizeArray[7] = max <= 0 ? null : Utils.applyDimension(max, unit);
         }
         mRequestSize.setValue(null);
     }

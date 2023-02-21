@@ -16,8 +16,6 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.Utils;
-
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.R;
 import cn.cqray.android.dialog.amin.BounceIn;
@@ -42,22 +40,22 @@ public class TipModule extends TextViewModule {
     private final DialogLiveData<Integer> mLayoutGravity = new DialogLiveData<>(Gravity.CENTER);
 
     public TipModule() {
-        Resources resources = Utils.getApp().getResources();
-        int textSize = resources.getDimensionPixelSize(R.dimen.body);
-        int sizeC = resources.getDimensionPixelOffset(R.dimen.content);
-        int sizeS = resources.getDimensionPixelOffset(R.dimen.small);
-        int unit = TypedValue.COMPLEX_UNIT_PX;
-        setMargin(sizeS, unit);
-        setPadding(sizeC, sizeS, sizeC, sizeS, unit);
-        setBackgroundColor(Color.parseColor("#484848"));
-        setLayoutGravity(Gravity.CENTER);
-        setTextColor(Color.WHITE);
-        setTextSize(textSize, unit);
-        setGravity(Gravity.CENTER);
-        setHeight(-2);
-        setWidth(-2);
-        setGone(true);
-        setBackgroundRadius(sizeS / 2f, unit);
+//        Resources resources = Utils.getApp().getResources();
+//        int textSize = resources.getDimensionPixelSize(R.dimen.body);
+//        int sizeC = resources.getDimensionPixelOffset(R.dimen.content);
+//        int sizeS = resources.getDimensionPixelOffset(R.dimen.small);
+//        int unit = TypedValue.COMPLEX_UNIT_PX;
+//        setMargin(sizeS, unit);
+//        setPadding(sizeC, sizeS, sizeC, sizeS, unit);
+//        setBackgroundColor(Color.parseColor("#484848"));
+//        setLayoutGravity(Gravity.CENTER);
+//        setTextColor(Color.WHITE);
+//        setTextSize(textSize, unit);
+//        setGravity(Gravity.CENTER);
+//        setHeight(-2);
+//        setWidth(-2);
+//        setGone(true);
+//        setBackgroundRadius(sizeS / 2f, unit);
     }
 
     @Override

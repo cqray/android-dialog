@@ -59,6 +59,7 @@ internal object Utils {
      * @param value 值
      * @param unit 值单位[TypedValue]
      */
+    @JvmStatic
     fun applyDimension(value: Float, unit: Int): Float {
         val metrics = Resources.getSystem().displayMetrics
         when (unit) {

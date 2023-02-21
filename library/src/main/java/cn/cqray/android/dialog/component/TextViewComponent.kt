@@ -10,7 +10,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
-import com.blankj.utilcode.util.SizeUtils
+import cn.cqray.android.dialog.Utils
 
 open class TextViewComponent(
     lifecycleOwner: LifecycleOwner,
@@ -73,7 +73,7 @@ open class TextViewComponent(
 
     fun setTextSize(size: Float) = setTextSize(size, TypedValue.COMPLEX_UNIT_SP)
 
-    fun setTextSize(size: Float, unit: Int) = textSize.setValue(SizeUtils.applyDimension(size, unit))
+    fun setTextSize(size: Float, unit: Int) = textSize.setValue(Utils.applyDimension(size, unit))
 
 
     fun setTextBold(bold: Boolean) = textStyle.setValue(if (bold) Typeface.BOLD else Typeface.NORMAL)

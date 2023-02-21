@@ -24,8 +24,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.blankj.utilcode.util.SizeUtils;
-
 import cn.cqray.android.dialog.module.TextViewModule;
 import cn.cqray.android.dialog.module.ViewModule;
 
@@ -257,12 +255,12 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      * 设置内容间隔
      */
     private void setContentPadding() {
-        Float value = mContentPadding.getValue();
-        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : SizeUtils.dp2px(value);
-        int count = mBottomView.getChildCount();
-        int half = mDefaultButtonBackground ? padding / 2 : padding;
-        mContentView.setPadding(padding, padding, padding, count > 0 ? padding : half);
-        mBottomView.setPadding(padding, 0, padding, half);
+//        Float value = mContentPadding.getValue();
+//        int padding = value == null ? getResources().getDimensionPixelSize(R.dimen.content) : Utils.dp2px(value);
+//        int count = mBottomView.getChildCount();
+//        int half = mDefaultButtonBackground ? padding / 2 : padding;
+//        mContentView.setPadding(padding, padding, padding, count > 0 ? padding : half);
+//        mBottomView.setPadding(padding, 0, padding, half);
     }
 
     /**
@@ -311,29 +309,29 @@ public class AlterDialog<T extends AlterDialog<T>> extends BaseDialog<T> {
      * 设置按钮文本文字大小
      */
     private void setButtonTextSize() {
-        Float value = mButtonTextSize.getValue();
-        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : SizeUtils.dp2px(value);
-        int count = mBottomView.getChildCount();
-        for (int i = 0; i < count; i++) {
-            // 获取文本控件
-            TextView tv = (TextView) mBottomView.getChildAt(i);
-            // 设置文本大小
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
-            // 获取间隔
-            int p = (int) (size / 1.8f);
-            // 设置间隔
-            tv.setPadding(p, p / 2, p, p / 2);
-            // 设置外部间隔
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -2);
-            if (i == count - 1) {
-                // 如果使用的默认背景，设置右间隔
-                params.rightMargin = mDefaultButtonBackground ? -p : 0;
-            } else {
-                // 如果没有使用的默认背景，设置右间隔
-                params.rightMargin = !mDefaultButtonBackground ? p : 0;
-            }
-            tv.setLayoutParams(params);
-        }
+//        Float value = mButtonTextSize.getValue();
+//        int size = value == null ? getResources().getDimensionPixelSize(R.dimen.body) : Utils.dp2px(value);
+//        int count = mBottomView.getChildCount();
+//        for (int i = 0; i < count; i++) {
+//            // 获取文本控件
+//            TextView tv = (TextView) mBottomView.getChildAt(i);
+//            // 设置文本大小
+//            tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+//            // 获取间隔
+//            int p = (int) (size / 1.8f);
+//            // 设置间隔
+//            tv.setPadding(p, p / 2, p, p / 2);
+//            // 设置外部间隔
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -2);
+//            if (i == count - 1) {
+//                // 如果使用的默认背景，设置右间隔
+//                params.rightMargin = mDefaultButtonBackground ? -p : 0;
+//            } else {
+//                // 如果没有使用的默认背景，设置右间隔
+//                params.rightMargin = !mDefaultButtonBackground ? p : 0;
+//            }
+//            tv.setLayoutParams(params);
+//        }
     }
 
     /**

@@ -21,7 +21,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.blankj.utilcode.util.SizeUtils;
+//import com.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +101,7 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
         mContentPadding.observe(this, new Observer<float[]>() {
             @Override
             public void onChanged(float[] floats) {
-                mContentView.setPadding(SizeUtils.dp2px(floats[0]), SizeUtils.dp2px(floats[1]), SizeUtils.dp2px(floats[2]), SizeUtils.dp2px(floats[3]));
+//                mContentView.setPadding(Utils.dp2px(floats[0]), Utils.dp2px(floats[1]), Utils.dp2px(floats[2]), Utils.dp2px(floats[3]));
             }
         });
         initTitleModule();
@@ -380,10 +380,11 @@ public class BottomAlterDialog<T extends BottomAlterDialog<T>> extends BaseDialo
      * 获取默认的标题间隔
      */
     private int getDefaultPadding() {
-        float[] padding = mTitlePadding.getValue();
-        if (padding == null) {
-            return requireContext().getResources().getDimensionPixelSize(R.dimen.content);
-        }
-        return SizeUtils.dp2px(padding[0]);
+//        float[] padding = mTitlePadding.getValue();
+//        if (padding == null) {
+//            return requireContext().getResources().getDimensionPixelSize(R.dimen.content);
+//        }
+//        return Utils.dp2px(padding[0]);
+        return 0;
     }
 }

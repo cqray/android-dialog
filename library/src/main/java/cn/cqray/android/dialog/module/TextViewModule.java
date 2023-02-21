@@ -11,9 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.SizeUtils;
-
 import cn.cqray.android.dialog.DialogLiveData;
+import cn.cqray.android.dialog.Utils;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -81,11 +80,11 @@ public class TextViewModule extends ViewModule<TextView> {
     }
 
     public void setTextSize(float size) {
-        mTextSize.setValue((int) SizeUtils.applyDimension(size, TypedValue.COMPLEX_UNIT_DIP));
+        mTextSize.setValue((int) Utils.applyDimension(size, TypedValue.COMPLEX_UNIT_DIP));
     }
 
     public void setTextSize(float size, int unit) {
-        mTextSize.setValue((int) SizeUtils.applyDimension(size, unit));
+        mTextSize.setValue((int) Utils.applyDimension(size, unit));
     }
 
     public void setTextBold(boolean bold) {

@@ -14,11 +14,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.SizeUtils;
-import com.blankj.utilcode.util.Utils;
-
 import cn.cqray.android.dialog.DialogLiveData;
 import cn.cqray.android.dialog.RoundDrawable;
+import cn.cqray.android.dialog.Utils;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -91,11 +89,11 @@ public class ViewModule<T extends View> {
         });
         // 设置背景变化监听
         mBackground.observe(owner, drawable -> setBackground(view, drawable));
-        // 设置背景资源变化监听
-        mBackgroundResource.observe(owner, aInt -> {
-            Drawable drawable = ContextCompat.getDrawable(Utils.getApp(), aInt);
-            mBackground.setValue(drawable);
-        });
+//        // 设置背景资源变化监听
+//        mBackgroundResource.observe(owner, aInt -> {
+//            Drawable drawable = ContextCompat.getDrawable(Utils.getApp(), aInt);
+//            mBackground.setValue(drawable);
+//        });
     }
 
     public void setMargin(float left, float top, float right, float bottom) {
@@ -104,10 +102,10 @@ public class ViewModule<T extends View> {
 
     public void setMargin(float left, float top, float right, float bottom, int unit) {
         int[] array = new int[4];
-        array[0] = (int) SizeUtils.applyDimension(left, unit);
-        array[1] = (int) SizeUtils.applyDimension(top, unit);
-        array[2] = (int) SizeUtils.applyDimension(right, unit);
-        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
+        array[0] = (int) Utils.applyDimension(left, unit);
+        array[1] = (int) Utils.applyDimension(top, unit);
+        array[2] = (int) Utils.applyDimension(right, unit);
+        array[3] = (int) Utils.applyDimension(bottom, unit);
         mMargin.setValue(array);
     }
 
@@ -118,7 +116,7 @@ public class ViewModule<T extends View> {
     public void setMargin(float margin, int unit) {
         int[] array = new int[4];
         for (int i = 0; i < array.length; i++) {
-            array[i] = (int) SizeUtils.applyDimension(margin, unit);
+            array[i] = (int) Utils.applyDimension(margin, unit);
         }
         mMargin.setValue(array);
     }
@@ -129,10 +127,10 @@ public class ViewModule<T extends View> {
 
     public void setPadding(float left, float top, float right, float bottom, int unit) {
         int[] array = new int[4];
-        array[0] = (int) SizeUtils.applyDimension(left, unit);
-        array[1] = (int) SizeUtils.applyDimension(top, unit);
-        array[2] = (int) SizeUtils.applyDimension(right, unit);
-        array[3] = (int) SizeUtils.applyDimension(bottom, unit);
+        array[0] = (int) Utils.applyDimension(left, unit);
+        array[1] = (int) Utils.applyDimension(top, unit);
+        array[2] = (int) Utils.applyDimension(right, unit);
+        array[3] = (int) Utils.applyDimension(bottom, unit);
         mPadding.setValue(array);
     }
 
@@ -143,7 +141,7 @@ public class ViewModule<T extends View> {
     public void setPadding(float padding, int unit) {
         int[] array = new int[4];
         for (int i = 0; i < array.length; i++) {
-            array[i] = (int) SizeUtils.applyDimension(padding, unit);
+            array[i] = (int) Utils.applyDimension(padding, unit);
         }
         mPadding.setValue(array);
     }
@@ -154,7 +152,7 @@ public class ViewModule<T extends View> {
      * @param width 宽度
      */
     public void setWidth(float width) {
-        float size = SizeUtils.applyDimension(width, TypedValue.COMPLEX_UNIT_DIP);
+        float size = Utils.applyDimension(width, TypedValue.COMPLEX_UNIT_DIP);
         mWidth.setValue(size);
     }
 
@@ -164,7 +162,7 @@ public class ViewModule<T extends View> {
      * @param unit 值单位
      */
     public void setWidth(float width, int unit) {
-        float size = SizeUtils.applyDimension(width, unit);
+        float size = Utils.applyDimension(width, unit);
         mWidth.setValue(size);
     }
 
@@ -174,7 +172,7 @@ public class ViewModule<T extends View> {
      * @param height 高度
      */
     public void setHeight(float height) {
-        float size = SizeUtils.applyDimension(height, TypedValue.COMPLEX_UNIT_DIP);
+        float size = Utils.applyDimension(height, TypedValue.COMPLEX_UNIT_DIP);
         mHeight.setValue(size);
     }
 
@@ -184,7 +182,7 @@ public class ViewModule<T extends View> {
      * @param unit 值单位
      */
     public void setHeight(float height, int unit) {
-        float size = SizeUtils.applyDimension(height, unit);
+        float size = Utils.applyDimension(height, unit);
         mHeight.setValue(size);
     }
 
@@ -231,7 +229,7 @@ public class ViewModule<T extends View> {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
         for (int i = 0; i < RADII_LENGTH; i++) {
-            mBackgroundRadii[i] = SizeUtils.applyDimension(radii[i], unit);
+            mBackgroundRadii[i] = Utils.applyDimension(radii[i], unit);
         }
         mBackground.setValue(mBackground.getValue());
     }

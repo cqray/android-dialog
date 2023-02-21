@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.R
 import cn.cqray.android.dialog.Utils
-import com.blankj.utilcode.util.SizeUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -36,7 +35,7 @@ class PanelComponent(
     /** 对话框大小**/
     private val sizeChangeLD = DialogLiveData<Unit>()
 
-    val tipComponent = TipComponent(lifecycleOwner) { viewGet().findViewById(R.id.dlg_tip) }
+//    val tipComponent = TipComponent(lifecycleOwner) { viewGet().findViewById(R.id.dlg_tip) }
 
     init {
         // 设置默认圆大小
@@ -50,13 +49,13 @@ class PanelComponent(
         }
         // 订阅面板大小变更监听
         sizeChangeLD.observe(lifecycleOwner) { changeSizes() }
-        // 设置TIP默认圆角
-        tipComponent.setVisible(true)
+//        // 设置TIP默认圆角
+//        tipComponent.setVisible(true)
     }
 
     @Synchronized
     override fun setWidth(width: Float, unit: Int) {
-        sizes[0] = if (width <= 0) null else SizeUtils.applyDimension(width, unit)
+        sizes[0] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizes[1] = null
         sizeChangeLD.notifyChanged()
     }
@@ -70,19 +69,19 @@ class PanelComponent(
 
     @Synchronized
     fun setWidthMin(width: Float, unit: Int) {
-        sizes[2] = if (width <= 0) null else SizeUtils.applyDimension(width, unit)
+        sizes[2] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     fun setWidthMax(width: Float, unit: Int) {
-        sizes[3] = if (width <= 0) null else SizeUtils.applyDimension(width, unit)
+        sizes[3] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     override fun setHeight(height: Float, unit: Int) {
-        sizes[4] = if (height <= 0) null else SizeUtils.applyDimension(height, unit)
+        sizes[4] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizes[5] = null
         sizeChangeLD.notifyChanged()
     }
@@ -96,13 +95,13 @@ class PanelComponent(
 
     @Synchronized
     fun setHeightMin(height: Float, unit: Int) {
-        sizes[6] = if (height <= 0) null else SizeUtils.applyDimension(height, unit)
+        sizes[6] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     fun setHeightMax(height: Float, unit: Int) {
-        sizes[7] = if (height <= 0) null else SizeUtils.applyDimension(height, unit)
+        sizes[7] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
 

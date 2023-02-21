@@ -23,8 +23,6 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.ScreenUtils;
-
 import cn.cqray.android.dialog.module.PanelModule;
 import cn.cqray.android.dialog.module.TipModule;
 import lombok.Getter;
@@ -132,16 +130,16 @@ public final class DialogDelegate {
         mPanelModule.observe(mDialog, mPanelLayout);
         // 是否显示黑色状态栏监听
         mBlackStatusBar.observe(mDialog, aBoolean -> {
-            Window window = mDialog.requireDialog().getWindow();
-            assert window != null;
-            boolean portrait = ScreenUtils.isPortrait();
-            WindowManager.LayoutParams lp = window.getAttributes();
-            // lp.width和lp.height均为-1，则会出现黑色状态栏
-            // 竖屏时，宽度设置为屏幕宽度。横屏是设置为-1（考虑到刘海屏，不能直接取宽度）
-            lp.width = aBoolean ? -1 : portrait ? ScreenUtils.getScreenWidth() : -1;
-            // 锁屏时，高度设置为-1（考虑到刘海屏，不能直接取高度）。横屏是设置为屏幕高度
-            lp.height = aBoolean ? -1 : portrait ? -1 : ScreenUtils.getScreenHeight();
-            window.setAttributes(lp);
+//            Window window = mDialog.requireDialog().getWindow();
+//            assert window != null;
+//            boolean portrait = Utils.isPortrait();
+//            WindowManager.LayoutParams lp = window.getAttributes();
+//            // lp.width和lp.height均为-1，则会出现黑色状态栏
+//            // 竖屏时，宽度设置为屏幕宽度。横屏是设置为-1（考虑到刘海屏，不能直接取宽度）
+//            lp.width = aBoolean ? -1 : portrait ? Utils.getScreenWidth() : -1;
+//            // 锁屏时，高度设置为-1（考虑到刘海屏，不能直接取高度）。横屏是设置为屏幕高度
+//            lp.height = aBoolean ? -1 : portrait ? -1 : Utils.getScreenHeight();
+//            window.setAttributes(lp);
         });
     }
 

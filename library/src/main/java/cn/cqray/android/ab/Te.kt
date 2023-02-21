@@ -37,7 +37,7 @@ class Te {
                 dialog.show()
 
 
-                dialog.show()
+//                dialog.show()
 
             Handler().postDelayed({
 //                dialog.customDimAccount(0.1f)
