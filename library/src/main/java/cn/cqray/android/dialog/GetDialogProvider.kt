@@ -1,4 +1,4 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -21,7 +21,7 @@ import cn.cqray.java.tool.SizeUnit
     "Unused"
 )
 @JvmDefaultWithoutCompatibility
-interface DialogProvider<T : DialogProvider<T>> {
+interface GetDialogProvider<T : GetDialogProvider<T>> {
 
     /** 对话框委托实例 **/
     val dialogDelegate: DialogDelegate

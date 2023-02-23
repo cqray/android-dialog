@@ -1,4 +1,4 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog
 
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
@@ -18,7 +18,7 @@ import cn.cqray.android.dialog.component.PanelComponent
     "Unused"
 )
 @JvmDefaultWithoutCompatibility
-interface PanelProvider<T : PanelProvider<T>> {
+interface GetPanelProvider<T : GetPanelProvider<T>> {
 
     /** 面板组件 **/
     val panelComponent: PanelComponent

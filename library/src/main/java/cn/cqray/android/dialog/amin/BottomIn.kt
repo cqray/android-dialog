@@ -8,6 +8,6 @@ import cn.cqray.android.anim.ViewAnimator
  */
 class BottomIn : DialogAnimator() {
     override fun onAnimatorPrepared(animator: ViewAnimator) {
-        animator.bottomIn()
+        animator.bottomIn().alpha(0.4F, 1F, 1F, 1F)
     }
 }

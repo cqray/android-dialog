@@ -39,6 +39,7 @@ abstract class DialogAnimator {
         if (atomicView.get() == null) return
         atomicAnimator.set(ViewAnimator.with(atomicView.get()).also {
             listeners.forEach { listener -> it.addGlobalListener(listener) }
+            it.duration(350L)
             onAnimatorPrepared(it)
             it.start()
         })

@@ -4,8 +4,8 @@
     android:id="@+id/dlg_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:clipChildren="false">
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <View
         android:id="@+id/dlg_dim"
@@ -27,12 +27,11 @@
             android:focusable="true"
             tools:ignore="UselessParent">
 
-
             <TextView
                 android:id="@+id/dlg_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="66666"/>
+                android:visibility="gone" />
 
         </FrameLayout>
 

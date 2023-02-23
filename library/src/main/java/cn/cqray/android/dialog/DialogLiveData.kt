@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData
  * 在主线程中，直接执行。其他线程，跳转线程再执行。
  * @author Cqray
  */
-class DialogLiveData<T> : MutableLiveData<T> {
+internal class DialogLiveData<T> : MutableLiveData<T> {
 
     constructor() : super()
     constructor(value: T) : super(value)

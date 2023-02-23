@@ -1,11 +1,11 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog
 
 import android.app.Activity
 import android.view.Gravity
 import cn.cqray.android.dialog.amin.BottomIn
 import cn.cqray.android.dialog.amin.BottomOut
 
-class BottomAlterDialog(activity: Activity) : AlterDialog<BottomAlterDialog>(activity) {
+class BottomAlterDialog(activity: Activity) : GetAlterDialog<BottomAlterDialog>(activity) {
 
     init {
         // 宽度

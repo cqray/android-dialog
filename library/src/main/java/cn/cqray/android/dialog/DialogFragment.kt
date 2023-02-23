@@ -1,4 +1,4 @@
-package cn.cqray.android.ab
+package cn.cqray.android.dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 
 internal class DialogFragment(
-    private val provider: DialogProvider<*>
+    private val provider: GetDialogProvider<*>
 ) : DialogFragment() {
 
     private val dialogDelegate by lazy { provider.dialogDelegate }

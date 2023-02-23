@@ -3,6 +3,7 @@ package cn.cqray.android.dialog.component
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.util.Log
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -11,6 +12,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.Utils
+import cn.cqray.java.tool.SizeUnit
 
 open class TextViewComponent(
     lifecycleOwner: LifecycleOwner,
@@ -71,10 +73,11 @@ open class TextViewComponent(
 
     fun setTextSize(@DimenRes id: Int) = textSize.setValue(id)
 
-    fun setTextSize(size: Float) = setTextSize(size, TypedValue.COMPLEX_UNIT_SP)
+    fun setTextSize(size: Float) = setTextSize(size, SizeUnit.DIP)
 
-    fun setTextSize(size: Float, unit: Int) = textSize.setValue(Utils.applyDimension(size, unit))
+    fun setTextSize(size: Float, unit: SizeUnit) = textSize.setValue(Utils.applyDimension(size, unit.type))
 
+    fun setTextSize(unit: SizeUnit, size: Float) = textSize.setValue(Utils.applyDimension(size, unit.type))
 
     fun setTextBold(bold: Boolean) = textStyle.setValue(if (bold) Typeface.BOLD else Typeface.NORMAL)
 

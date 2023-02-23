@@ -1,5 +1,4 @@
-package cn.cqray.android.ab
-
+package cn.cqray.android.dialog
 
 import android.animation.Animator
 import android.animation.ValueAnimator
@@ -31,8 +30,6 @@ import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import cn.cqray.android.anim.listener.ViewAnimatorListener
 
-import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.Utils
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
@@ -40,8 +37,13 @@ import cn.cqray.android.dialog.amin.DialogAnimator
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
 import cn.cqray.java.tool.SizeUnit
 
-
-class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
+@Suppress(
+    "MemberVisibilityCanBePrivate",
+)
+class DialogDelegate(
+    val activity: Activity,
+    val provider: GetDialogProvider<*>
+) {
 
     /** ButterKnife绑定实例  */
     private var unBinder: Any? = null
@@ -83,14 +85,17 @@ class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
     val fragment: DialogFragment?
 
     init {
-        // 注册配置变化回调
-        activity.registerComponentCallbacks(object : ComponentCallbacks {
-            override fun onConfigurationChanged(newConfig: Configuration) {
-                provider.onConfigurationChanged(newConfig)
-            }
+        // 主线程运行，并保证在Activity.onCreate前可以初始化
+        activity.runOnUiThread {
+            // 注册配置变化回调
+            activity.registerComponentCallbacks(object : ComponentCallbacks {
+                override fun onConfigurationChanged(newConfig: Configuration) {
+                    provider.onConfigurationChanged(newConfig)
+                }
 
-            override fun onLowMemory() {}
-        })
+                override fun onLowMemory() {}
+            })
+        }
         // 初始化Fragment
         fragment = if (activity !is FragmentActivity) {
             // 不是FragmentActivity，则只能单纯的使用Dialog
@@ -210,7 +215,9 @@ class DialogDelegate(val activity: Activity, val provider: DialogProvider<*>) {
             }
         }
         // 使用Dialog的情况
-        if (fragment == null) { dialog.setContentView(binding.root) }
+        if (fragment == null) {
+            dialog.setContentView(binding.root)
+        }
         // 返回对话框
         return dialog.also { this.dialog = it }
     }

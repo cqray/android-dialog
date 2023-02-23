@@ -13,9 +13,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.NonNull;
 
-import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * 圆角图片
