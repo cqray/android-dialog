@@ -16,7 +16,7 @@ open class GetDialog<T : GetDialog<T>>(val activity: Activity) :
     override val dialogDelegate: DialogDelegate by lazy { DialogDelegate(activity, this) }
 
     /** 面板主键 **/
-    override val panelComponent by lazy { PanelComponent(dialogLifecycleOwner) { dialogDelegate.binding.dlgPanel } }
+    override val panelComponent by lazy { PanelComponent(dialogLifecycleOwner!!) { dialogDelegate.binding.dlgPanel } }
 
     /** 对话框生命周期 **/
     val dialogLifecycleOwner by lazy { dialogDelegate.lifecycleOwner }

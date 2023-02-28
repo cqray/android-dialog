@@ -1,12 +1,14 @@
-package cn.cqray.android.dialog
+package cn.cqray.android.dialog.internal
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import cn.cqray.android.dialog.GetDialogProvider
 
-internal class DialogFragment(
+internal class InternalFragment(
     private val provider: GetDialogProvider<*>
 ) : DialogFragment() {
 
@@ -18,7 +20,17 @@ internal class DialogFragment(
         savedInstanceState: Bundle?
     ): View = dialogDelegate.binding.root
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (!showsDialog) provider.onCreating(savedInstanceState)
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?) = dialogDelegate.onCreateDialog(savedInstanceState)
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        Log.e("数据", "oncreate")
+//    }
 
     override fun onDestroy() {
         super.onDestroy()

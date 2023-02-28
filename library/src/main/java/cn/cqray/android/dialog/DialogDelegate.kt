@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
@@ -28,6 +29,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
+import androidx.fragment.app.Fragment
 import cn.cqray.android.anim.listener.ViewAnimatorListener
 
 import cn.cqray.android.dialog.amin.BounceIn
@@ -35,6 +37,7 @@ import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
 
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
+import cn.cqray.android.dialog.internal.InternalFragment
 import cn.cqray.java.tool.SizeUnit
 
 @Suppress(
@@ -72,11 +75,21 @@ class DialogDelegate(
     /** 对话框偏移 **/
     private val offsetLD = DialogLiveData(intArrayOf(0, 0))
 
-    /** 生命周期管理注册器 **/
-    private val lifecycleRegistry by lazy { LifecycleRegistry(lifecycleOwner) }
+    /**
+     * 对话框生命周期管理注册器
+     * 伴生的Fragment为空，则创建生命周期管理注册器
+     */
+    private val lifecycleRegistry by lazy { if (fragment == null) LifecycleRegistry(lifecycleOwner) else fragment.lifecycle as LifecycleRegistry }
 
-    /** 对话框生命周期 **/
-    val lifecycleOwner: LifecycleOwner by lazy { LifecycleOwner { lifecycleRegistry } }
+    /**
+     * 对话框生命周期
+     * 伴生[Fragment]不为空，则使用伴生[Fragment]的[LifecycleOwner]
+     * 否则，则创建新的[LifecycleOwner]对象
+     */
+    val lifecycleOwner: LifecycleOwner by lazy { fragment ?: LifecycleOwner { lifecycleRegistry } }
+
+//    /** 对话框生命周期 **/
+//    val lifecycleOwner: LifecycleOwner by lazy { LifecycleOwner { lifecycleRegistry } }
 
     /** [ViewBinding]实例 **/
     val binding by lazy { AndroidDlgLayoutBaseBinding.inflate(activity.layoutInflater) }
@@ -102,7 +115,7 @@ class DialogDelegate(
             null
         } else {
             // FragmentActivity，则使用DialogFragment
-            DialogFragment(provider)
+            InternalFragment(provider)
         }
     }
 
@@ -145,6 +158,7 @@ class DialogDelegate(
      */
 
     fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        Log.e("数据", "创建对话框")
         // 初始化LiveData数据
         initLDs()
         // 创建对话框
@@ -152,15 +166,19 @@ class DialogDelegate(
 
             override fun onAttachedToWindow() {
                 super.onAttachedToWindow()
-                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                if (fragment == null) {
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                }
                 provider.onCreating(savedInstanceState)
             }
 
             override fun onDetachedFromWindow() {
                 super.onDetachedFromWindow()
-                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                if (fragment == null) {
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                }
             }
 
             override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
