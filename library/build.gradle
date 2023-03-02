@@ -66,6 +66,11 @@ dependencies {
     compileOnly 'com.jakewharton:butterknife:10.2.3'
 }
 
+afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    generateDebugBuildConfig.enabled =false
+}
+
 /**
  * 生成版本名
  */
