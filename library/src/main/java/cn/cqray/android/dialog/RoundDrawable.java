@@ -124,7 +124,7 @@ public class RoundDrawable extends Drawable {
             throw new IllegalArgumentException("Radii array length must >= " + RADII_LENGTH);
         }
         for (int i = 0; i < RADII_LENGTH; i++) {
-            mRadii[i] = Utils.applyDimension(radii[i], unit);
+            mRadii[i] = DialogUtils.applyDimension(radii[i], unit);
         }
         invalidateSelf();
     }

@@ -4,55 +4,36 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
-
 import android.content.ComponentCallbacks
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
-
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.Window
-import android.view.WindowManager
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
-import androidx.fragment.app.Fragment
 import cn.cqray.android.anim.listener.ViewAnimatorListener
-
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
-
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
-import cn.cqray.android.dialog.internal.InternalFragment
 import cn.cqray.java.tool.SizeUnit
 
-@Suppress(
-    "MemberVisibilityCanBePrivate",
-)
-class DialogDelegate(
-    val activity: Activity,
-    val provider: GetDialogProvider<*>
-) {
+@Suppress("MemberVisibilityCanBePrivate")
+open class DialogDelegate(val activity: Activity, val provider: GetDialogProvider<*>) {
 
     /** ButterKnife绑定实例  */
     private var unBinder: Any? = null
 
     /** 对话框实例 **/
-    private var dialog: Dialog? = null
+    private lateinit var dialog: Dialog
 
     /** 对话框是否能取消，依次为界面能够取消、点击外部能够取消 **/
     private val cancelable = arrayOf(true, true)
@@ -64,10 +45,10 @@ class DialogDelegate(
     private val dimAnimator = ValueAnimator()
 
     /** 对话框显示、消除动画，提示显示、消失动画 **/
-    private val animators: Array<DialogAnimator> = arrayOf(BounceIn(), BounceOut())
+    private val animators = arrayOf(BounceIn(), BounceOut())
 
     /** Fragment视图 **/
-    private val contentViewLD = DialogLiveData<Any>()
+    private val contentLD = DialogLiveData<Any>()
 
     /** 对话框位置 **/
     private val gravityLD = DialogLiveData(Gravity.CENTER)
@@ -75,56 +56,52 @@ class DialogDelegate(
     /** 对话框偏移 **/
     private val offsetLD = DialogLiveData(intArrayOf(0, 0))
 
-    /**
-     * 对话框生命周期管理注册器
-     * 伴生的Fragment为空，则创建生命周期管理注册器
-     */
-    private val lifecycleRegistry by lazy { if (fragment == null) LifecycleRegistry(lifecycleOwner) else fragment.lifecycle as LifecycleRegistry }
+    /** 对话框生命周期管理注册器 **/
+    private val lifecycleRegistry by lazy { LifecycleRegistry(lifecycleOwner) }
 
-    /**
-     * 对话框生命周期
-     * 伴生[Fragment]不为空，则使用伴生[Fragment]的[LifecycleOwner]
-     * 否则，则创建新的[LifecycleOwner]对象
-     */
-    val lifecycleOwner: LifecycleOwner by lazy { fragment ?: LifecycleOwner { lifecycleRegistry } }
-
-//    /** 对话框生命周期 **/
-//    val lifecycleOwner: LifecycleOwner by lazy { LifecycleOwner { lifecycleRegistry } }
+    /** 对话框生命周期 **/
+    val lifecycleOwner: LifecycleOwner by lazy { LifecycleOwner { lifecycleRegistry } }
 
     /** [ViewBinding]实例 **/
     val binding by lazy { AndroidDlgLayoutBaseBinding.inflate(activity.layoutInflater) }
 
-    /** 使用的DialogFragment不为空 **/
-    val fragment: DialogFragment?
+    /**
+     * 关联窗口[Window]
+     */
+    protected open fun onAttachedToWindow() {
+        // 注册配置变化回调
+        activity.registerComponentCallbacks(object : ComponentCallbacks {
+            override fun onConfigurationChanged(newConfig: Configuration) {
+                provider.onConfigurationChanged(newConfig)
+            }
 
-    init {
-        // 主线程运行，并保证在Activity.onCreate前可以初始化
-        activity.runOnUiThread {
-            // 注册配置变化回调
-            activity.registerComponentCallbacks(object : ComponentCallbacks {
-                override fun onConfigurationChanged(newConfig: Configuration) {
-                    provider.onConfigurationChanged(newConfig)
-                }
-
-                override fun onLowMemory() {}
-            })
+            override fun onLowMemory() {}
+        })
+        // 初始化LiveData数据
+        initLDs()
+        // 设置界面
+        dialog.setContentView(binding.root)
+        // 遮罩点击事件
+        binding.root.setOnClickListener {
+            // 可点击外部取消、可取消、且面板没有被消除
+            if (cancelable[0] && cancelable[1] && !animators[1].isRunning) {
+                // 消除对话框
+                dismiss()
+            }
         }
-        // 初始化Fragment
-        fragment = if (activity !is FragmentActivity) {
-            // 不是FragmentActivity，则只能单纯的使用Dialog
-            null
-        } else {
-            // FragmentActivity，则使用DialogFragment
-            InternalFragment(provider)
-        }
+        // 分发生命周期变化
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        // 执行遮罩动画、对话框动画
+        doDimAnimator(doPanelAnimator(true), true)
     }
 
     /**
      * 初始化[LiveData]数据
      */
     private fun initLDs() {
-        // Fragment视图变化监听
-        contentViewLD.observe(lifecycleOwner) {
+        // 视图变化监听
+        contentLD.observe(lifecycleOwner) {
             val layout = binding.dlgPanel.also { vp ->
                 vp.removeAllViews()
                 vp.addView(binding.dlgTip)
@@ -134,7 +111,7 @@ class DialogDelegate(
                 is View -> layout.addView(it)
             }
             // 兼容 ButterKnife
-            unBinder = Utils.bindButterKnife(dialog, layout.getChildAt(1))
+            unBinder = DialogUtils.bindButterKnife(dialog, layout.getChildAt(1))
         }
         // 监听面板位置变化
         gravityLD.observe(lifecycleOwner) { int ->
@@ -154,73 +131,73 @@ class DialogDelegate(
     }
 
     /**
+     * 对话框被创建
+     */
+    protected open fun onCreate(savedInstanceState: Bundle?) = provider.onCreating(savedInstanceState)
+
+    /**
+     * 取消关联窗口[Window]
+     */
+    protected open fun onDetachedFromWindow() {
+        // 分发生命周期变化
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        // 释放ButterKnife
+        DialogUtils.unbindButterKnife(unBinder)
+    }
+
+    /**
+     * 分发触摸事件
+     * @param ev 触摸事件
+     */
+    protected open fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        // 事件是否被消费掉
+        val dispatch = provider.dispatchTouchEvent(ev)
+        // 动画是否正在运行
+        val running = animators[0].isRunning || animators[1].isRunning
+        // 任意一个条件满足则拦截事件
+        return dispatch || running
+    }
+
+    /**
+     * 回退拦截
+     */
+    protected open fun onBackPressed() {
+        // 如果可以被取消、没有正在关闭面板、回退事件未被拦截
+        if (cancelable[0]
+            && !animators[1].isRunning
+            && !provider.onBackPressed()
+        ) {
+            // 消除对话框
+            this@DialogDelegate.dismiss()
+        }
+    }
+
+    /**
      * 创建对话框
      */
-
-    fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Log.e("数据", "创建对话框")
-        // 初始化LiveData数据
-        initLDs()
+    private fun onCreateDialog(): Dialog {
         // 创建对话框
         val dialog = object : Dialog(activity) {
+            override fun onAttachedToWindow() = this@DialogDelegate.onAttachedToWindow()
 
-            override fun onAttachedToWindow() {
-                super.onAttachedToWindow()
-                if (fragment == null) {
-                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
-                }
-                provider.onCreating(savedInstanceState)
-            }
+            override fun onCreate(savedInstanceState: Bundle?) = this@DialogDelegate.onCreate(savedInstanceState)
 
-            override fun onDetachedFromWindow() {
-                super.onDetachedFromWindow()
-                if (fragment == null) {
-                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-                    lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                }
-            }
+            override fun onDetachedFromWindow() = this@DialogDelegate.onDetachedFromWindow()
 
             override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-                // 事件是否被消费掉
-                val dispatch = provider.dispatchTouchEvent(ev)
-                // 动画是否正在运行
-                val running = animators[0].isRunning || animators[1].isRunning
-                // 任意一个条件满足则拦截事件
-                return if (dispatch || running) true else super.dispatchTouchEvent(ev)
+                return if (this@DialogDelegate.dispatchTouchEvent(ev)) true
+                else super.dispatchTouchEvent(ev)
             }
 
-            override fun onBackPressed() {
-                // 如果可以被取消、没有正在关闭面板、回退事件未被拦截
-                if (cancelable[0]
-                    && !animators[1].isRunning
-                    && !provider.onBackPressed()
-                ) {
-                    // 消除对话框
-                    this@DialogDelegate.dismiss()
-                }
-            }
-        }
-        // 执行面板动画
-        dialog.setOnShowListener { doDimAnimator(doPanelAnimator(true), true) }
-        // 无标题栏
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        // 设置点击取消逻辑
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setCancelable(false)
-        binding.root.setOnClickListener {
-            // 可点击外部取消、可取消、且面板没有被消除
-            if (cancelable[0] && cancelable[1] && !animators[1].isRunning) {
-                // 消除对话框
-                dismiss()
-            }
+            override fun onBackPressed() = this@DialogDelegate.onBackPressed()
         }
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(false)
         dialog.setCancelable(false)
         dialog.window?.let {
-            val width = Utils.getAppScreenWidth(activity)
-            val height = Utils.getAppScreenHeight(activity)
+            val width = DialogUtils.getAppScreenWidth(activity)
+            val height = DialogUtils.getAppScreenHeight(activity)
             it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             it.setDimAmount(dimAmount[0])
             it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -232,10 +209,6 @@ class DialogDelegate(
                 it.setGravity(Gravity.TOP)
             }
         }
-        // 使用Dialog的情况
-        if (fragment == null) {
-            dialog.setContentView(binding.root)
-        }
         // 返回对话框
         return dialog.also { this.dialog = it }
     }
@@ -243,39 +216,21 @@ class DialogDelegate(
     /**
      * 显示对话框
      */
-    fun show() {
-        if (fragment == null) {
-            onCreateDialog(null).show()
-        } else if (activity is FragmentActivity) {
-            fragment.show(activity.supportFragmentManager, fragment::javaClass.name)
-        }
-    }
+    fun show() = DialogUtils.runOnUiThread(activity) { onCreateDialog().show() }
 
     /**
      * 销毁对话框，有动画
      */
-    fun dismiss() = doDimAnimator(doPanelAnimator(false), false)
-
+    fun dismiss() = DialogUtils.runOnUiThread(activity) { doDimAnimator(doPanelAnimator(false), false) }
 
     /**
      * 快速销毁对话框，无动画
      */
-    fun quickDismiss() {
-        runCatching {
-            if (activity is FragmentActivity && fragment != null) {
-                val fm = activity.supportFragmentManager
-                if (!fm.isStateSaved && !fm.isDestroyed && !fragment.isStateSaved) {
-                    fragment.dismiss()
-                } else fragment.dismissAllowingStateLoss()
-            } else {
-                dialog?.dismiss()
-            }
-        }
-    }
+    fun quickDismiss() = DialogUtils.runOnUiThread(activity) { dialog.dismiss() }
 
-    fun setContentView(view: View) = contentViewLD.setValue(view)
+    fun setContentView(view: View) = contentLD.setValue(view)
 
-    fun setContentView(@LayoutRes id: Int) = contentViewLD.setValue(id)
+    fun setContentView(@LayoutRes id: Int) = contentLD.setValue(id)
 
     fun setCancelable(cancelable: Boolean) = cancelable.let { this.cancelable[0] = it }
 
@@ -325,8 +280,8 @@ class DialogDelegate(
     @Synchronized
     fun setOffset(offsetX: Float, offsetY: Float, unit: SizeUnit) = also {
         val offsets = offsetLD.value!!
-        offsets[0] = Utils.applyDimension(offsetX, unit.type).toInt()
-        offsets[1] = Utils.applyDimension(offsetY, unit.type).toInt()
+        offsets[0] = DialogUtils.applyDimension(offsetX, unit.type).toInt()
+        offsets[1] = DialogUtils.applyDimension(offsetY, unit.type).toInt()
         offsetLD.setValue(offsets)
     }
 
@@ -395,7 +350,7 @@ class DialogDelegate(
     private fun changeDimAccount(account: Float, native: Boolean) {
         // 设置遮罩透明度
         val setDimAccount = { b: Boolean ->
-            if (b) dialog?.window?.setDimAmount(account)
+            if (b) dialog.window?.setDimAmount(account)
             else {
                 val alpha = String.format("%02X", (account * 255).toInt())
                 val color = "#" + alpha + "000000"
@@ -403,11 +358,6 @@ class DialogDelegate(
             }
         }
         // 主线程运行
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            setDimAccount(native)
-        } else {
-            activity.runOnUiThread { setDimAccount(native) }
-        }
+        DialogUtils.runOnUiThread(activity) {setDimAccount(native)}
     }
-
 }

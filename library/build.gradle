@@ -60,10 +60,10 @@ dependencies {
     api 'com.github.cqray:android-animator:0.6.7'
     //noinspection GradleDependency
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
+    // 流式布局
+    api 'com.google.android:flexbox:2.0.1'
     // ButterKnife
     compileOnly 'com.jakewharton:butterknife:10.2.3'
-
 }
 
 /**

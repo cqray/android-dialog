@@ -3,7 +3,6 @@ package cn.cqray.android.dialog.component
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
@@ -14,7 +13,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.RoundDrawable
-import cn.cqray.android.dialog.Utils
+import cn.cqray.android.dialog.DialogUtils.applyDimension
+import cn.cqray.java.tool.SizeUnit
 
 /**
  * 视图组件，主要实现功能：
@@ -69,7 +69,9 @@ open class ViewComponent<V : View>(
         // 控件内部间隔变化监听
         paddingLD.observe(lifecycleOwner) { view.setPadding(it[0], it[1], it[2], it[3]) }
         // 控件外部间隔变化监听
-        marginLD.observe(lifecycleOwner) { view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) } }
+        marginLD.observe(lifecycleOwner) {
+            view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) }
+        }
         // 宽度变化监听
         widthLD.observe(lifecycleOwner) {
             view.layoutParams = params.also { p -> p.width = it }
@@ -93,7 +95,9 @@ open class ViewComponent<V : View>(
         // 控件内部间隔变化监听
         paddingLD.observe(lifecycleOwner) { view.setPadding(it[0], it[1], it[2], it[3]) }
         // 控件外部间隔变化监听
-        marginLD.observe(lifecycleOwner) { view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) } }
+        marginLD.observe(lifecycleOwner) {
+            view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) }
+        }
         // 宽度变化监听
         widthLD.observe(lifecycleOwner) {
             view.layoutParams = params.also { p -> p.width = it }
@@ -114,80 +118,77 @@ open class ViewComponent<V : View>(
      * 设置内部间隔，默认单位DIP
      * @param padding 间隔值
      */
-    open fun setPadding(padding: Float) = setPadding(padding, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setPadding(padding: Float) = setPadding(padding, SizeUnit.DIP)
 
     /**
      * 设置内部间隔
      * @param padding 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setPadding(padding: Float, unit: Int) = setPadding(padding, padding, padding, padding, unit)
+    open fun setPadding(padding: Float, unit: SizeUnit) = setPadding(padding, padding, padding, padding, unit)
 
     /**
      * 设置内部左右间隔，默认单位DIP
      * @param padding 间隔值
      */
-    open fun setPaddingLR(padding: Float) = setPaddingLR(padding, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setPaddingLR(padding: Float) = setPaddingLR(padding, SizeUnit.DIP)
 
     /**
      * 设置内部左右间隔
      * @param padding 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setPaddingLR(padding: Float, unit: Int) = setPadding(
-        Utils.applyDimension(padding, unit),
+    open fun setPaddingLR(padding: Float, unit: SizeUnit) = setPadding(
+        applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(padding, unit),
+        applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        TypedValue.COMPLEX_UNIT_PX
+        SizeUnit.PX
     )
 
     /**
      * 设置内部上下间隔，默认单位DIP
      * @param padding 间隔值
      */
-    open fun setPaddingTB(padding: Float) = setPaddingTB(padding, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setPaddingTB(padding: Float) = setPaddingTB(padding, SizeUnit.DIP)
 
     /**
      * 设置内部部上下间隔
      * @param padding 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setPaddingTB(padding: Float, unit: Int) = setPadding(
+    open fun setPaddingTB(padding: Float, unit: SizeUnit) = setPadding(
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(padding, unit),
+        applyDimension(padding, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(padding, unit),
-        TypedValue.COMPLEX_UNIT_PX
+        applyDimension(padding, unit),
+        SizeUnit.PX
     )
 
     /**
      * 设置内部部间隔，默认单位DIP
-     * @param left 左间隔值
-     * @param top 上间隔值
-     * @param right 右间隔值
-     * @param bottom 下间隔值
+     * @param l 左间隔值
+     * @param t 上间隔值
+     * @param r 右间隔值
+     * @param b 下间隔值
      */
-    @Synchronized
-    open fun setPadding(left: Float, top: Float, right: Float, bottom: Float) =
-        setPadding(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setPadding(l: Float, t: Float, r: Float, b: Float) = setPadding(l, t, r, b, SizeUnit.DIP)
 
     /**
      * 设置内部部间隔
-     * @param left 左间隔值
-     * @param top 上间隔值
-     * @param right 右间隔值
-     * @param bottom 下间隔值
-     * @param unit 值单位[TypedValue]
+     * @param l 左间隔值
+     * @param t 上间隔值
+     * @param r 右间隔值
+     * @param b 下间隔值
+     * @param unit 值单位[SizeUnit]
      */
-    @Synchronized
-    open fun setPadding(left: Float, top: Float, right: Float, bottom: Float, unit: Int) {
+    open fun setPadding(l: Float, t: Float, r: Float, b: Float, unit: SizeUnit) {
         val array = paddingLD.value ?: IntArray(4)
         paddingLD.setValue(array.also {
-            it[0] = Utils.applyDimension(left, unit).toInt()
-            it[1] = Utils.applyDimension(top, unit).toInt()
-            it[2] = Utils.applyDimension(right, unit).toInt()
-            it[3] = Utils.applyDimension(bottom, unit).toInt()
+            it[0] = applyDimension(l, unit).toInt()
+            it[1] = applyDimension(t, unit).toInt()
+            it[2] = applyDimension(r, unit).toInt()
+            it[3] = applyDimension(b, unit).toInt()
         })
     }
 
@@ -195,80 +196,77 @@ open class ViewComponent<V : View>(
      * 设置外部间隔，默认单位DIP
      * @param margin 间隔值
      */
-    open fun setMargin(margin: Float) = setMargin(margin, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setMargin(margin: Float) = setMargin(margin, SizeUnit.DIP)
 
     /**
      * 设置外部间隔
      * @param margin 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setMargin(margin: Float, unit: Int) = setMargin(margin, margin, margin, margin, unit)
+    open fun setMargin(margin: Float, unit: SizeUnit) = setMargin(margin, margin, margin, margin, unit)
 
     /**
      * 设置外部左右间隔，默认单位DIP
      * @param margin 间隔值
      */
-    open fun setMarginLR(margin: Float) = setMarginLR(margin, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setMarginLR(margin: Float) = setMarginLR(margin, SizeUnit.DIP)
 
     /**
      * 设置外部左右间隔
      * @param margin 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setMarginLR(margin: Float, unit: Int) = setMargin(
-        Utils.applyDimension(margin, unit),
+    open fun setMarginLR(margin: Float, unit: SizeUnit) = setMargin(
+        applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(margin, unit),
+        applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        TypedValue.COMPLEX_UNIT_PX
+        SizeUnit.PX
     )
 
     /**
      * 设置外部上下间隔，默认单位DIP
      * @param margin 间隔值
      */
-    open fun setMarginTB(margin: Float) = setMarginTB(margin, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setMarginTB(margin: Float) = setMarginTB(margin, SizeUnit.DIP)
 
     /**
      * 设置外部上下间隔
      * @param margin 间隔值
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setMarginTB(margin: Float, unit: Int) = setMargin(
+    open fun setMarginTB(margin: Float, unit: SizeUnit) = setMargin(
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(margin, unit),
+        applyDimension(margin, unit),
         paddingLD.value?.get(1)?.toFloat() ?: 0F,
-        Utils.applyDimension(margin, unit),
-        TypedValue.COMPLEX_UNIT_PX
+        applyDimension(margin, unit),
+        SizeUnit.PX
     )
 
     /**
      * 设置外部间隔，默认单位DIP
-     * @param left 左间隔值
-     * @param top 上间隔值
-     * @param right 右间隔值
-     * @param bottom 下间隔值
+     * @param l 左间隔值
+     * @param t 上间隔值
+     * @param r 右间隔值
+     * @param b 下间隔值
      */
-    @Synchronized
-    open fun setMargin(left: Float, top: Float, right: Float, bottom: Float) =
-        setMargin(left, top, right, bottom, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setMargin(l: Float, t: Float, r: Float, b: Float) = setMargin(l, t, r, b, SizeUnit.DIP)
 
     /**
      * 设置外部间隔
-     * @param left 左间隔值
-     * @param top 上间隔值
-     * @param right 右间隔值
-     * @param bottom 下间隔值
-     * @param unit 值单位[TypedValue]
+     * @param l 左间隔值
+     * @param t 上间隔值
+     * @param r 右间隔值
+     * @param b 下间隔值
+     * @param unit 值单位[SizeUnit]
      */
-    @Synchronized
-    open fun setMargin(left: Float, top: Float, right: Float, bottom: Float, unit: Int) {
+    open fun setMargin(l: Float, t: Float, r: Float, b: Float, unit: SizeUnit) {
         val array = marginLD.value ?: IntArray(4)
         marginLD.setValue(array.also {
-            it[0] = Utils.applyDimension(left, unit).toInt()
-            it[1] = Utils.applyDimension(top, unit).toInt()
-            it[2] = Utils.applyDimension(right, unit).toInt()
-            it[3] = Utils.applyDimension(bottom, unit).toInt()
+            it[0] = applyDimension(l, unit).toInt()
+            it[1] = applyDimension(t, unit).toInt()
+            it[2] = applyDimension(r, unit).toInt()
+            it[3] = applyDimension(b, unit).toInt()
         })
     }
 
@@ -276,27 +274,27 @@ open class ViewComponent<V : View>(
      * 设置控件宽度，默认单位DIP
      * @param width 宽度
      */
-    open fun setWidth(width: Float) = setWidth(width, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setWidth(width: Float) = setWidth(width, SizeUnit.DIP)
 
     /**
      * 设置控件宽度
      * @param width 宽度
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setWidth(width: Float, unit: Int) = widthLD.setValue(Utils.applyDimension(width, unit).toInt())
+    open fun setWidth(width: Float, unit: SizeUnit) = widthLD.setValue(applyDimension(width, unit).toInt())
 
     /**
      * 设置控件高度，默认单位DIP
      * @param height 高度
      */
-    open fun setHeight(height: Float) = setHeight(height, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setHeight(height: Float) = setHeight(height, SizeUnit.DIP)
 
     /**
      * 设置控件高度
      * @param height 高度
-     * @param unit 值单位[TypedValue]
+     * @param unit 值单位[SizeUnit]
      */
-    open fun setHeight(height: Float, unit: Int) = heightLD.setValue(Utils.applyDimension(height, unit).toInt())
+    open fun setHeight(height: Float, unit: SizeUnit) = heightLD.setValue(applyDimension(height, unit).toInt())
 
     /**
      * 设置视图显示[View.VISIBLE]或隐藏[View.INVISIBLE]
@@ -324,31 +322,29 @@ open class ViewComponent<V : View>(
 
     /**
      * 设置背景资源
-     * @param resId 背景资源
+     * @param id 背景资源
      */
-    open fun setBackgroundResource(@DrawableRes resId: Int) = backgroundLD.setValue(resId)
+    open fun setBackgroundResource(@DrawableRes id: Int) = backgroundLD.setValue(id)
 
     /**
      * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
      * 默认单位DIP
      * @param radii 8个值的数组，4对[X，Y]半径
      */
-    open fun setBackgroundRadii(radii: FloatArray?) = setBackgroundRadii(radii, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setBackgroundRadii(radii: FloatArray) = setBackgroundRadii(radii, SizeUnit.DIP)
 
     /**
      * 设置圆角大小，每个圆角都有两个半径值[X，Y]。圆角按左上、右上、右下、左下排列
      * @param radii 8个值的数组，4对[X，Y]半径
      * @param unit  值单位
      */
-    open fun setBackgroundRadii(radii: FloatArray?, unit: Int) {
+    open fun setBackgroundRadii(radii: FloatArray, unit: SizeUnit) {
         when {
-            // 清空圆角
-            radii == null -> for (i in backgroundRadii.indices) backgroundRadii[i] = 0F
             // 无效圆角
             radii.size < 8 -> throw IllegalArgumentException("Radii array length must >= 8.")
             // 获取对应的大小
             else -> for (i in backgroundRadii.indices) {
-                backgroundRadii[i] = Utils.applyDimension(radii[i], unit)
+                backgroundRadii[i] = applyDimension(radii[i], unit)
             }
         }
         // 更新背景
@@ -360,7 +356,7 @@ open class ViewComponent<V : View>(
      * 默认单位DIP
      * @param radius 圆角半径
      */
-    open fun setBackgroundRadius(radius: Float?) = setBackgroundRadius(radius, TypedValue.COMPLEX_UNIT_DIP)
+    open fun setBackgroundRadius(radius: Float) = setBackgroundRadius(radius, SizeUnit.DIP)
 
     /**
      * 设置圆角大小
@@ -368,7 +364,7 @@ open class ViewComponent<V : View>(
      * @param radius 圆角半径
      * @param unit  值单位
      */
-    open fun setBackgroundRadius(radius: Float?, unit: Int) = setBackgroundRadii(FloatArray(8) { radius ?: 0F }, unit)
+    open fun setBackgroundRadius(radius: Float, unit: SizeUnit) = setBackgroundRadii(FloatArray(8) { radius }, unit)
 
     /**
      * 改变视图背景

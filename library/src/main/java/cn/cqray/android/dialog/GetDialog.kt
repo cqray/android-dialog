@@ -2,6 +2,7 @@ package cn.cqray.android.dialog
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.component.PanelComponent
 
 /**
@@ -9,17 +10,18 @@ import cn.cqray.android.dialog.component.PanelComponent
  * @author Cqray
  */
 open class GetDialog<T : GetDialog<T>>(val activity: Activity) :
+    LifecycleOwner,
     GetDialogProvider<GetDialog<T>>,
     GetPanelProvider<GetDialog<T>> {
 
     /** 对话框委托 **/
     override val dialogDelegate: DialogDelegate by lazy { DialogDelegate(activity, this) }
 
-    /** 面板主键 **/
-    override val panelComponent by lazy { PanelComponent(dialogLifecycleOwner!!) { dialogDelegate.binding.dlgPanel } }
+    /** 面板组件 **/
+    override val panelComponent by lazy { PanelComponent(this) { dialogDelegate.binding.dlgPanel } }
 
     /** 对话框生命周期 **/
-    val dialogLifecycleOwner by lazy { dialogDelegate.lifecycleOwner }
+    override fun getLifecycle() =  dialogDelegate.lifecycleOwner.lifecycle
 
     override fun onCreating(savedInstanceState: Bundle?) {
         super.onCreating(savedInstanceState)

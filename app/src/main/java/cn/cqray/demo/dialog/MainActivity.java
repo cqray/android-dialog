@@ -1,19 +1,13 @@
 package cn.cqray.demo.dialog;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import cn.cqray.android.dialog.BottomAlterDialog;
+import cn.cqray.android.dialog.GetAlterDialog;
 import cn.cqray.android.dialog.GetDialog;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,38 +24,6 @@ public class MainActivity extends AppCompatActivity {
         //ViewC<View> viewViewC = new ViewC<View>(this, ActivityMainBinding.class);
 
         setContentView(R.layout.activity_main);
-
-
-
-//        new ViewComponent<View>();
-
-        DialogFragment fragment = GetDialog.builder(this)
-                .setContentView(R.layout.activity_main)
-                .getDialogDelegate().getFragment();
-//        fragment.setShowsDialog(false);
-
-        ViewPager2 pager2 = findViewById(R.id.content);
-        FragmentStateAdapter adapter = new FragmentStateAdapter(this) {
-            @NonNull
-            @Override
-            public Fragment createFragment(int position) {
-                return fragment;
-            }
-
-            @Override
-            public int getItemCount() {
-                return 1;
-            }
-        };
-        pager2.setAdapter(adapter);
-
-//        Log.e("数据", "1111" + (fragment == null));
-//        FragmentManager fm = getSupportFragmentManager();
-//        FragmentTransaction ft = fm.beginTransaction();
-//        ft.add(R.id.content, fragment);
-//        ft.commit();
-
-//        cn.cqray.android.dialog.internal.DialogFragment
 
 
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
@@ -81,9 +43,14 @@ public class MainActivity extends AppCompatActivity {
 //                        .setContentView(R.layout.activity_main)
 //                        .show();
 
-                GetDialog.builder(MainActivity.this)
+                GetAlterDialog.builder(MainActivity.this)
                         .setContentView(R.layout.activity_main)
                         .show();
+
+//
+//                GetDialog.builder(MainActivity.this)
+//                        .setContentView(R.layout.activity_main)
+//                        .show();
 
 //
 //                if (dialog == null) {
@@ -113,4 +80,16 @@ public class MainActivity extends AppCompatActivity {
     }
 //    BaseDialog dialog ;
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.e("数据", "onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e("数据", "onStop");
+    }
 }
