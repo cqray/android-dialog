@@ -16,7 +16,6 @@ import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.R
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
-import cn.cqray.android.dialog.amin.DialogAnimator
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
@@ -41,7 +40,7 @@ class TipComponent(
     private val atomicDuration = AtomicLong(1800L)
 
     /** 提示显示、消失动画  */
-    private val animators = arrayOf<DialogAnimator>(BounceIn(), BounceOut())
+    private val animators = arrayOf(BounceIn(), BounceOut())
 
     /** 提示位置信息  */
     private val layoutGravity = DialogLiveData(Gravity.CENTER)
@@ -146,7 +145,7 @@ class TipComponent(
                         this@TipComponent.view.visibility = View.GONE
                     }
                 }
-            });
+            })
             // 开始面板动画
             animator.start()
         }

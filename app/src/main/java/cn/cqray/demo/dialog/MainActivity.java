@@ -44,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
 //                        .show();
 
                 GetAlterDialog.builder(MainActivity.this)
-                        .setContentView(R.layout.activity_main)
+                        //.setContentView(R.layout.activity_main)
+                        .contentText("这是内容")
                         .show();
 
 //

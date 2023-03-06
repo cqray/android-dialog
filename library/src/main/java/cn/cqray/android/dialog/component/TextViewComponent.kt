@@ -31,6 +31,8 @@ open class TextViewComponent(
     /** 文本加粗  */
     private val textStyle = DialogLiveData<Int>()
 
+    private val textTypeface = DialogLiveData<Any?>()
+
     /** 文本位置  */
     private val gravity = DialogLiveData<Int>()
 
@@ -54,7 +56,13 @@ open class TextViewComponent(
             view.setTextSize(SizeUnit.PX.type, size)
         }
         // 文本样式变化监听
-        textStyle.observe(lifecycleOwner) { view.typeface = Typeface.defaultFromStyle(it) }
+        textTypeface.observe(lifecycleOwner) {
+            when(it) {
+                is Int -> view.typeface = Typeface.defaultFromStyle(it)
+                is Typeface -> view.typeface = it
+                else -> view.typeface = null
+            }
+        }
         // 文本位置变化监听
         gravity.observe(lifecycleOwner) { view.gravity = it }
     }
@@ -79,7 +87,9 @@ open class TextViewComponent(
 
     fun setTextBold(bold: Boolean) = textStyle.setValue(if (bold) Typeface.BOLD else Typeface.NORMAL)
 
-    fun setTextStyle(style: Int) = textStyle.setValue(style)
+    fun setTextTypeface(typeface: Int) = textTypeface.setValue(typeface)
+
+    fun setTextTypeface(typeface: Typeface?) = textTypeface.setValue(typeface)
 
     fun setGravity(gravity: Int) = this.gravity.setValue(gravity)
 }

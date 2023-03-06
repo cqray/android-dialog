@@ -1,8 +1,9 @@
 package cn.cqray.android.dialog
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Resources
+import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
@@ -33,13 +34,20 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     protected val binding by lazy { AndroidAlterDialogLayoutBinding.inflate(activity.layoutInflater) }
 
     /** 标题组件 **/
-    protected val titleComponent by lazy { TextViewComponent(this, { binding.dlgTitle }) }
+    val titleComponent by lazy { TextViewComponent(this, { binding.dlgTitle }) }
+
+    /** 内容组件 **/
+    val contentComponent by lazy {
+        val context = binding.root.context
+        val id = R.layout.android_alter_dialog_content
+        TextViewComponent(this, { View.inflate(context, id, null) as TextView })
+    }
 
     /** 分割线组件 **/
-    protected val dividerTopComponent by lazy { ViewComponent(this, { binding.dlgDividerTop }) }
+    val dividerTopComponent by lazy { ViewComponent(this, { binding.dlgDividerTop }) }
 
     /** 分割线组件 **/
-    protected val dividerBottomComponent by lazy { ViewComponent(this, { binding.dlgDividerBottom }) }
+    val dividerBottomComponent by lazy { ViewComponent(this, { binding.dlgDividerBottom }) }
 
     /** 按钮组件集合 **/
     private val buttonComponents = mutableListOf<TextViewComponent>()
@@ -52,6 +60,12 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     /** 按钮文本大小 **/
     private val buttonTextSizes = mutableListOf<Float?>()
+
+    /** 按钮文本字体样式 **/
+    private val buttonTextTypefaces = mutableListOf<Any?>()
+
+    /** 按钮背景 **/
+    private val buttonBackgrounds = mutableListOf<Any?>()
 
     /** 按钮点击监听 **/
     private val buttonListeners = mutableListOf<View.OnClickListener?>()
@@ -68,15 +82,14 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     /** 分割线大小 **/
     private val dividerSizeLD = DialogLiveData<Float?>()
 
+    /** 分割线是否显示 **/
+    private val dividerVisibleLD = DialogLiveData(arrayOf(true, true, true))
+
     init {
-//        title("77777")
-//        titleGravity(Gravity.CENTER)
-//        titleTextSize(20F)
-//        titleVisible(false)
-//        backgroundColor(Color.BLACK)
-//        buttonTextColors(Color.BLACK, Color.BLUE)
-//        buttonTextSizes(20F, 20F)
         buttonTexts("取消", "确认")
+        buttonTextTypefaces(Typeface.BOLD_ITALIC)
+        this.topDividerVisible(false)
+        this.bottomDividerVisible(false)
         this.widthScale(0.8F)
         this.widthMax(300F)
     }
@@ -84,6 +97,8 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     override fun onCreating(savedInstanceState: Bundle?) {
         super.onCreating(savedInstanceState)
         super.setContentView(binding.root)
+        // 未设置布局，则使用默认布局
+        if (contentViewLD.value == null) contentViewLD.setValue(contentComponent.view)
         // 新的内容布局实现
         contentViewLD.observe(this) {
             with(binding.dlgContent) {
@@ -110,28 +125,65 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         // 分割线
         dividerColorLD.observe(this) { changeDividerProperties() }
         dividerSizeLD.observe(this) { changeDividerProperties() }
+        dividerVisibleLD.observe(this) { changeDividerProperties() }
     }
 
     override fun setContentView(id: Int) = also { contentViewLD.setValue(id) } as T
 
     override fun setContentView(view: View) = also { contentViewLD.setValue(view) } as T
 
+    protected fun getButtonComponent(index: Int) = buttonComponents.getOrNull(index)
+
+    fun titleHeight(height: Float) = also { titleComponent.setHeight(height) } as T
+
+    fun titleHeight(height: Float, unit: SizeUnit) = also { titleComponent.setHeight(height, unit) } as T
+
+    fun titleVisible(visible: Boolean) = also {
+        titleComponent.setVisible(visible)
+        if (!visible) topDividerVisible(false)
+    } as T
+
+    fun titleGravity(gravity: Int) = also { titleComponent.setGravity(gravity) } as T
+
     fun titleText(title: CharSequence?) = also { titleComponent.setText(title) } as T
 
     fun titleText(@StringRes id: Int) = also { titleComponent.setText(id) } as T
 
-    fun titleTextColor(color: Int) = also { titleComponent.setTextColor(color) }
+    fun titleTextColor(color: Int) = also { titleComponent.setTextColor(color) } as T
 
-    fun titleTextSize(size: Float) = titleTextSize(size, SizeUnit.DIP)
+    fun titleTextSize(size: Float) = also { titleComponent.setTextSize(size) } as T
 
-    fun titleTextSize(size: Float, unit: SizeUnit) = also { titleComponent.setTextSize(size, unit) }
+    fun titleTextSize(size: Float, unit: SizeUnit) = also { titleComponent.setTextSize(size, unit) } as T
 
-    fun titleGravity(gravity: Int) = also { titleComponent.setGravity(gravity) } as T
+    fun titleTextBold(bold: Boolean) = also { titleComponent.setTextBold(bold) } as T
 
-    fun titleVisible(visible: Boolean) = also {
-        titleComponent.setVisible(visible)
-        dividerTopComponent.setVisible(visible)
-    }
+    fun titleTextTypeface(typeface: Int) = also { titleComponent.setTextTypeface(typeface) } as T
+
+    fun titleTextTypeface(typeface: Typeface) = also { titleComponent.setTextTypeface(typeface) } as T
+
+    fun contentHeight(height: Float) = also { contentComponent.setHeight(height) } as T
+
+    fun contentHeight(height: Float, unit: SizeUnit) = also { contentComponent.setHeight(height, unit) } as T
+
+    fun contentText(content: CharSequence?) = also { contentComponent.setText(content) } as T
+
+    fun contentText(@StringRes id: Int) = also { contentComponent.setText(id) } as T
+
+    fun contentTextColor(color: Int) = also { contentComponent.setTextColor(color) } as T
+
+    fun contentTextSize(size: Float) = also { contentComponent.setTextSize(size) } as T
+
+    fun contentTextSize(size: Float, unit: SizeUnit) = also { contentComponent.setTextSize(size, unit) } as T
+
+    fun contentTextBold(bold: Boolean) = also { contentComponent.setTextBold(bold) } as T
+
+    fun contentTextTypeface(typeface: Int) = also { contentComponent.setTextTypeface(typeface) } as T
+
+    fun contentTextTypeface(typeface: Typeface) = also { contentComponent.setTextTypeface(typeface) } as T
+
+    fun contentPadding(padding: Float) = also { contentComponent.setPadding(padding) } as T
+
+    fun contentPadding(padding: Float, unit: SizeUnit) = also { contentComponent.setPadding(padding, unit) } as T
 
     fun buttonTexts(vararg texts: CharSequence) = also {
         synchronized(buttonTexts) {
@@ -166,18 +218,75 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         }
     } as T
 
+    fun buttonTextBolds(vararg bold: Boolean?) = also {
+        synchronized(buttonTextTypefaces) {
+            val array = arrayOfNulls<Int?>(bold.size)
+            bold.forEachIndexed { index, item ->
+                val typeface = if (item == true) Typeface.BOLD else Typeface.NORMAL
+                array[index] = typeface
+            }
+            buttonTextTypefaces(*array)
+        }
+    }
+
+    fun buttonTextTypefaces(vararg typefaces: Int?) = also {
+        synchronized(buttonTextTypefaces) {
+            buttonTextTypefaces.clear()
+            buttonTextTypefaces.addAll(typefaces.toMutableList())
+            buttonLD.notifyChanged()
+        }
+    } as T
+
+    fun buttonTextTypefaces(vararg typefaces: Typeface?) = also {
+        synchronized(buttonTextTypefaces) {
+            buttonTextTypefaces.clear()
+            buttonTextTypefaces.addAll(typefaces.toMutableList())
+            buttonLD.notifyChanged()
+        }
+    } as T
+
+    fun buttonBackground(vararg drawables: Drawable?) = also {
+        synchronized(buttonBackgrounds) {
+            buttonBackgrounds.clear()
+            buttonBackgrounds.addAll(drawables.toMutableList())
+            buttonLD.notifyChanged()
+        }
+    } as T
+
+    fun buttonBackgroundResources(vararg resources: Int?) = also {
+        synchronized(buttonBackgrounds) {
+            buttonBackgrounds.clear()
+            buttonBackgrounds.addAll(resources.toMutableList())
+            buttonLD.notifyChanged()
+        }
+    } as T
+
     fun buttonListeners(vararg listeners: View.OnClickListener?) = also {
         synchronized(buttonListeners) {
             buttonListeners.clear()
             buttonListeners.addAll(listeners.toMutableList())
             buttonLD.notifyChanged()
         }
-    }
+    } as T
+
+    fun buttonDividerVisible(visible: Boolean) = also {
+        val visibleArray = dividerVisibleLD.value!!.also { it[2] = visible }
+        dividerVisibleLD.setValue(visibleArray)
+    } as T
+
+    fun topDividerVisible(visible: Boolean) = also {
+        val visibleArray = dividerVisibleLD.value!!.also { it[0] = visible }
+        dividerVisibleLD.setValue(visibleArray)
+    } as T
+
+    fun bottomDividerVisible(visible: Boolean) = also {
+        val visibleArray = dividerVisibleLD.value!!.also { it[1] = visible }
+        dividerVisibleLD.setValue(visibleArray)
+    } as T
 
     /**
      * 改变缓存的Button组件
      */
-    @SuppressLint("ResourceType")
     private fun changeButtonComponents() {
         // 如果现有的按钮数量大于或等于文本数量
         if (buttonComponents.size >= buttonTexts.size) {
@@ -201,8 +310,8 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         }
         // 更新位置信息
         for (i in buttonComponents.indices) {
-            val params = buttonComponents[i].view.layoutParams as FlexboxLayout.LayoutParams
-            params.flexBasisPercent = 100F / buttonComponents.size
+            val params = buttonComponents[i].view.layoutParams as? FlexboxLayout.LayoutParams
+            params?.flexBasisPercent = 100F / buttonComponents.size
         }
     }
 
@@ -231,8 +340,28 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
                 if (i < size) component.setTextSize(getOrNull(i) ?: textSize, SizeUnit.PX)
                 else component.setTextSize(getOrNull(size - 1) ?: textSize, SizeUnit.PX)
             }
+            // 文字样式
+            with(buttonTextTypefaces) {
+                val typeface =
+                    if (i < size) getOrNull(i)
+                    else getOrNull(size - 1)
+                when (typeface) {
+                    is Int -> component.setTextTypeface(typeface)
+                    is Typeface -> component.setTextTypeface(typeface)
+                    else -> component.setTextTypeface(null)
+                }
+            }
             // 设置背景
-            DialogUtils.setRippleBackground(component.view)
+            with(buttonBackgrounds) {
+                val background =
+                    if (i < size) getOrNull(i)
+                    else getOrNull(size - 1)
+                when (background) {
+                    is Int -> component.setBackgroundResource(background)
+                    is Drawable -> component.setBackground(background)
+                    else -> DialogUtils.setRippleBackground(component.view)
+                }
+            }
             // 点击事件
             component.view.setOnClickListener {
                 dismiss()
@@ -248,16 +377,30 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         val context = dividerTopComponent.view.context
         val color = dividerColorLD.value ?: ContextCompat.getColor(context, R.color.divider)
         val size = dividerSizeLD.value ?: Resources.getSystem().displayMetrics.density * 0.75 + 0.5
-        // 设置颜色
-        dividerTopComponent.setBackgroundColor(color)
-        dividerBottomComponent.setBackgroundColor(color)
-        // 设置大小
-        dividerTopComponent.view.layoutParams.height = size.toInt()
-        dividerBottomComponent.view.layoutParams.height = size.toInt()
-        binding.dlgBottom.setDividerDrawable(GradientDrawable().also {
-            it.setColor(color)
-            it.setSize(size.toInt(), Int.MAX_VALUE)
-        })
+        val visible = dividerVisibleLD.value!!
+        // 顶部分割线
+        with(dividerTopComponent) {
+            setBackgroundColor(color)
+            view.layoutParams.height = size.toInt()
+            view.visibility = if (visible[0]) View.VISIBLE else View.INVISIBLE
+        }
+        // 底部分割线
+        with(dividerBottomComponent) {
+            setBackgroundColor(color)
+            view.layoutParams.height = size.toInt()
+            view.visibility = if (visible[1]) View.VISIBLE else View.INVISIBLE
+        }
+        // 按钮容器
+        with(binding.dlgBottom) {
+            setDividerDrawable(GradientDrawable().also {
+                it.setColor(color)
+                it.setSize(size.toInt(), Int.MAX_VALUE)
+            })
+            setShowDivider(
+                if (visible[2]) FlexboxLayout.SHOW_DIVIDER_MIDDLE
+                else FlexboxLayout.SHOW_DIVIDER_NONE
+            )
+        }
     }
 
     companion object {
@@ -265,5 +408,4 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         @Suppress("UPPER_BOUND_VIOLATED_WARNING")
         fun builder(activity: Activity) = GetAlterDialog<GetAlterDialog<*>>(activity)
     }
-
 }

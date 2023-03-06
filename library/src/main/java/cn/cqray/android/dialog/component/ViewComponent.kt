@@ -9,7 +9,6 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.RoundDrawable
@@ -75,38 +74,12 @@ open class ViewComponent<V : View>(
         // 宽度变化监听
         widthLD.observe(lifecycleOwner) {
             view.layoutParams = params.also { p -> p.width = it }
-            view.parent.requestLayout()
+            view.parent?.requestLayout()
         }
         // 高度变化监听
         heightLD.observe(lifecycleOwner) {
             view.layoutParams = params.also { p -> p.height = it }
-            view.parent.requestLayout()
-        }
-        // 监听显示隐藏状态变化
-        visibilityLD.observe(lifecycleOwner) { view.visibility = it }
-        // 监听背景变化
-        backgroundLD.observe(lifecycleOwner) { changeBackground(it) }
-    }
-
-    /**
-     * 订阅[LiveData]
-     */
-    private fun observeLD() {
-        // 控件内部间隔变化监听
-        paddingLD.observe(lifecycleOwner) { view.setPadding(it[0], it[1], it[2], it[3]) }
-        // 控件外部间隔变化监听
-        marginLD.observe(lifecycleOwner) {
-            view.layoutParams = params.also { p -> p.setMargins(it[0], it[1], it[2], it[3]) }
-        }
-        // 宽度变化监听
-        widthLD.observe(lifecycleOwner) {
-            view.layoutParams = params.also { p -> p.width = it }
-            view.parent.requestLayout()
-        }
-        // 高度变化监听
-        heightLD.observe(lifecycleOwner) {
-            view.layoutParams = params.also { p -> p.height = it }
-            view.parent.requestLayout()
+            view.parent?.requestLayout()
         }
         // 监听显示隐藏状态变化
         visibilityLD.observe(lifecycleOwner) { view.visibility = it }

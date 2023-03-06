@@ -8,10 +8,11 @@
     <TextView
         android:id="@+id/dlg_title"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/line"
+        android:layout_height="54dp"
         android:textColor="@color/text"
-        android:textSize="@dimen/h3"
-        android:textStyle="bold" />
+        android:textSize="@dimen/h2"
+        android:textStyle="bold"
+        android:gravity="center"/>
 
     <View
         android:id="@+id/dlg_divider_top"
@@ -27,14 +28,6 @@
 
     </FrameLayout>
 
-<!--    <TextView-->
-<!--        android:id="@+id/dlg_text"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:padding="@dimen/content"-->
-<!--        android:textColor="@color/text"-->
-<!--        android:textSize="@dimen/body" />-->
-
     <View
         android:id="@+id/dlg_divider_bottom"
         android:layout_width="match_parent"
@@ -45,6 +38,7 @@
         android:id="@+id/dlg_bottom"
         android:layout_width="match_parent"
         android:layout_height="@dimen/line"
+        app:showDivider="middle"
         app:justifyContent="space_around" />
 
 </LinearLayout>
