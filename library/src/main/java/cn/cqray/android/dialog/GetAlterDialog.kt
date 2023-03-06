@@ -34,20 +34,20 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     protected val binding by lazy { AndroidAlterDialogLayoutBinding.inflate(activity.layoutInflater) }
 
     /** 标题组件 **/
-    val titleComponent by lazy { TextViewComponent(this, { binding.dlgTitle }) }
+    val titleComponent by lazy { TextViewComponent(this) { binding.dlgTitle } }
 
     /** 内容组件 **/
     val contentComponent by lazy {
         val context = binding.root.context
         val id = R.layout.android_alter_dialog_content
-        TextViewComponent(this, { View.inflate(context, id, null) as TextView })
+        TextViewComponent(this) { View.inflate(context, id, null) as TextView }
     }
 
     /** 分割线组件 **/
-    val dividerTopComponent by lazy { ViewComponent(this, { binding.dlgDividerTop }) }
+    val dividerTopComponent by lazy { ViewComponent(this) { binding.dlgDividerTop } }
 
     /** 分割线组件 **/
-    val dividerBottomComponent by lazy { ViewComponent(this, { binding.dlgDividerBottom }) }
+    val dividerBottomComponent by lazy { ViewComponent(this) { binding.dlgDividerBottom } }
 
     /** 按钮组件集合 **/
     private val buttonComponents = mutableListOf<TextViewComponent>()
@@ -376,7 +376,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     private fun changeDividerProperties() {
         val context = dividerTopComponent.view.context
         val color = dividerColorLD.value ?: ContextCompat.getColor(context, R.color.divider)
-        val size = dividerSizeLD.value ?: Resources.getSystem().displayMetrics.density * 0.75 + 0.5
+        val size = dividerSizeLD.value ?: (Resources.getSystem().displayMetrics.density * 0.75 + 0.5)
         val visible = dividerVisibleLD.value!!
         // 顶部分割线
         with(dividerTopComponent) {
