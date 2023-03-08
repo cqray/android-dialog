@@ -7,7 +7,6 @@ import android.view.View
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import cn.cqray.android.dialog.amin.DialogAnimator
-import cn.cqray.java.tool.SizeUnit
 
 /**
  * 对话框相关功能提供器
@@ -127,7 +126,7 @@ interface GetDialogProvider<T : GetDialogProvider<T>> {
      * @param unit 值单位[SizeUnit]
      */
     @JvmDefault
-    fun offset(offsetX: Float, offsetY: Float, unit: SizeUnit) = also {
+    fun offset(offsetX: Float, offsetY: Float, unit: Int) = also {
         dialogDelegate.setOffset(offsetX, offsetY, unit)
     } as T
 

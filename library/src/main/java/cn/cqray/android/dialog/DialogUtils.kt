@@ -17,7 +17,6 @@ import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import butterknife.ButterKnife
 import butterknife.Unbinder
-import cn.cqray.java.tool.SizeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Suppress("Unchecked_cast")
@@ -82,7 +81,7 @@ internal object DialogUtils {
     /**
      * 获取相应的尺寸
      * @param value 值
-     * @param unit 值单位[SizeUnit]
+     * @param unit 值单位
      */
     @JvmStatic
     fun applyDimension(value: Float, unit: Int): Float {
@@ -98,24 +97,24 @@ internal object DialogUtils {
         return 0F
     }
 
-    /**
-     * 获取相应的尺寸
-     * @param value 值
-     * @param unit 值单位[SizeUnit]
-     */
-    @JvmStatic
-    fun applyDimension(value: Float, unit: SizeUnit): Float {
-        val metrics = Resources.getSystem().displayMetrics
-        when (unit.type) {
-            TypedValue.COMPLEX_UNIT_PX -> return value
-            TypedValue.COMPLEX_UNIT_DIP -> return value * metrics.density
-            TypedValue.COMPLEX_UNIT_SP -> return value * metrics.scaledDensity
-            TypedValue.COMPLEX_UNIT_PT -> return value * metrics.xdpi * (1.0f / 72)
-            TypedValue.COMPLEX_UNIT_IN -> return value * metrics.xdpi
-            TypedValue.COMPLEX_UNIT_MM -> return value * metrics.xdpi * (1.0f / 25.4f)
-        }
-        return 0F
-    }
+//    /**
+//     * 获取相应的尺寸
+//     * @param value 值
+//     * @param unit 值单位[SizeUnit]
+//     */
+//    @JvmStatic
+//    fun applyDimension(value: Float, unit: SizeUnit): Float {
+//        val metrics = Resources.getSystem().displayMetrics
+//        when (unit.type) {
+//            TypedValue.COMPLEX_UNIT_PX -> return value
+//            TypedValue.COMPLEX_UNIT_DIP -> return value * metrics.density
+//            TypedValue.COMPLEX_UNIT_SP -> return value * metrics.scaledDensity
+//            TypedValue.COMPLEX_UNIT_PT -> return value * metrics.xdpi * (1.0f / 72)
+//            TypedValue.COMPLEX_UNIT_IN -> return value * metrics.xdpi
+//            TypedValue.COMPLEX_UNIT_MM -> return value * metrics.xdpi * (1.0f / 25.4f)
+//        }
+//        return 0F
+//    }
 
     /**
      * 获取APP可用屏幕宽度

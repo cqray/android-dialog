@@ -10,6 +10,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
@@ -24,7 +25,6 @@ import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
-import cn.cqray.java.tool.SizeUnit
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class DialogDelegate(val activity: Activity, val provider: GetDialogProvider<*>) {
@@ -269,7 +269,7 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
      * @param offsetX X轴偏移
      * @param offsetY Y轴偏移
      */
-    fun setOffset(offsetX: Float, offsetY: Float) = setOffset(offsetX, offsetY, SizeUnit.DIP)
+    fun setOffset(offsetX: Float, offsetY: Float) = setOffset(offsetX, offsetY, TypedValue.COMPLEX_UNIT_DIP)
 
     /**
      * 设置偏移
@@ -278,10 +278,10 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
      * @param unit 值单位
      */
     @Synchronized
-    fun setOffset(offsetX: Float, offsetY: Float, unit: SizeUnit) = also {
+    fun setOffset(offsetX: Float, offsetY: Float, unit: Int) = also {
         val offsets = offsetLD.value!!
-        offsets[0] = DialogUtils.applyDimension(offsetX, unit.type).toInt()
-        offsets[1] = DialogUtils.applyDimension(offsetY, unit.type).toInt()
+        offsets[0] = DialogUtils.applyDimension(offsetX, unit).toInt()
+        offsets[1] = DialogUtils.applyDimension(offsetY, unit).toInt()
         offsetLD.setValue(offsets)
     }
 

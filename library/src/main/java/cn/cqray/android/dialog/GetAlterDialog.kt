@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,6 @@ import androidx.viewbinding.ViewBinding
 import cn.cqray.android.dialog.component.TextViewComponent
 import cn.cqray.android.dialog.component.ViewComponent
 import cn.cqray.android.dialog.databinding.AndroidAlterDialogLayoutBinding
-import cn.cqray.java.tool.SizeUnit
 import com.google.android.flexbox.FlexboxLayout
 
 /**
@@ -136,7 +136,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun titleHeight(height: Float) = also { titleComponent.setHeight(height) } as T
 
-    fun titleHeight(height: Float, unit: SizeUnit) = also { titleComponent.setHeight(height, unit) } as T
+    fun titleHeight(height: Float, unit: Int) = also { titleComponent.setHeight(height, unit) } as T
 
     fun titleVisible(visible: Boolean) = also {
         titleComponent.setVisible(visible)
@@ -153,7 +153,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun titleTextSize(size: Float) = also { titleComponent.setTextSize(size) } as T
 
-    fun titleTextSize(size: Float, unit: SizeUnit) = also { titleComponent.setTextSize(size, unit) } as T
+    fun titleTextSize(size: Float, unit: Int) = also { titleComponent.setTextSize(size, unit) } as T
 
     fun titleTextBold(bold: Boolean) = also { titleComponent.setTextBold(bold) } as T
 
@@ -163,7 +163,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun contentHeight(height: Float) = also { contentComponent.setHeight(height) } as T
 
-    fun contentHeight(height: Float, unit: SizeUnit) = also { contentComponent.setHeight(height, unit) } as T
+    fun contentHeight(height: Float, unit: Int) = also { contentComponent.setHeight(height, unit) } as T
 
     fun contentText(content: CharSequence?) = also { contentComponent.setText(content) } as T
 
@@ -173,7 +173,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun contentTextSize(size: Float) = also { contentComponent.setTextSize(size) } as T
 
-    fun contentTextSize(size: Float, unit: SizeUnit) = also { contentComponent.setTextSize(size, unit) } as T
+    fun contentTextSize(size: Float, unit: Int) = also { contentComponent.setTextSize(size, unit) } as T
 
     fun contentTextBold(bold: Boolean) = also { contentComponent.setTextBold(bold) } as T
 
@@ -183,7 +183,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun contentPadding(padding: Float) = also { contentComponent.setPadding(padding) } as T
 
-    fun contentPadding(padding: Float, unit: SizeUnit) = also { contentComponent.setPadding(padding, unit) } as T
+    fun contentPadding(padding: Float, unit: Int) = also { contentComponent.setPadding(padding, unit) } as T
 
     fun buttonTexts(vararg texts: CharSequence) = also {
         synchronized(buttonTexts) {
@@ -203,15 +203,15 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun buttonTextSizes(vararg sizes: Float) = buttonTextSizes(sizes.toTypedArray())
 
-    fun buttonTextSizes(sizes: Array<Float>) = buttonTextSizes(sizes, SizeUnit.SP)
+    fun buttonTextSizes(sizes: Array<Float>) = buttonTextSizes(sizes, TypedValue.COMPLEX_UNIT_SP)
 
-    fun buttonTextSizes(sizes: Array<Float>, unit: SizeUnit) = also {
+    fun buttonTextSizes(sizes: Array<Float>, unit: Int) = also {
         synchronized(buttonTextSizes) {
             buttonTextSizes.clear()
             buttonTextSizes.addAll(mutableListOf<Float>().also { list ->
                 for (size in sizes) {
                     // 转换尺寸
-                    list.add(DialogUtils.applyDimension(size, unit.type))
+                    list.add(DialogUtils.applyDimension(size, unit))
                 }
             })
             buttonLD.notifyChanged()
@@ -337,8 +337,8 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
             // 文字大小
             with(buttonTextSizes) {
                 val textSize = activity.resources.getDimension(R.dimen.h3)
-                if (i < size) component.setTextSize(getOrNull(i) ?: textSize, SizeUnit.PX)
-                else component.setTextSize(getOrNull(size - 1) ?: textSize, SizeUnit.PX)
+                if (i < size) component.setTextSize(getOrNull(i) ?: textSize, TypedValue.COMPLEX_UNIT_PX)
+                else component.setTextSize(getOrNull(size - 1) ?: textSize, TypedValue.COMPLEX_UNIT_PX)
             }
             // 文字样式
             with(buttonTextTypefaces) {

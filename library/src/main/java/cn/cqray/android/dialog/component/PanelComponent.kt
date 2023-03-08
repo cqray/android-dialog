@@ -1,11 +1,11 @@
 package cn.cqray.android.dialog.component
 
 import android.graphics.Color
+import android.util.TypedValue.*
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.dialog.DialogLiveData
 import cn.cqray.android.dialog.DialogUtils
-import cn.cqray.java.tool.SizeUnit
 import kotlin.math.max
 import kotlin.math.min
 
@@ -43,8 +43,8 @@ class PanelComponent(
         setBackgroundColor(Color.WHITE)
         // 订阅面板大小监听
         sizeLD.observe(lifecycleOwner) {
-            super.setWidth(it[0], SizeUnit.PX)
-            super.setHeight(it[1], SizeUnit.PX)
+            super.setWidth(it[0], COMPLEX_UNIT_PX)
+            super.setHeight(it[1], COMPLEX_UNIT_PX)
         }
         // 订阅面板大小变更监听
         sizeChangeLD.observe(lifecycleOwner) { changeSizes() }
@@ -53,7 +53,7 @@ class PanelComponent(
     }
 
     @Synchronized
-    override fun setWidth(width: Float, unit: SizeUnit) {
+    override fun setWidth(width: Float, unit: Int) {
         sizes[0] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
         sizes[1] = null
         sizeChangeLD.notifyChanged()
@@ -67,19 +67,19 @@ class PanelComponent(
     }
 
     @Synchronized
-    fun setWidthMin(width: Float, unit: SizeUnit) {
+    fun setWidthMin(width: Float, unit: Int) {
         sizes[2] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
-    fun setWidthMax(width: Float, unit: SizeUnit) {
+    fun setWidthMax(width: Float, unit: Int) {
         sizes[3] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
-    override fun setHeight(height: Float, unit: SizeUnit) {
+    override fun setHeight(height: Float, unit: Int) {
         sizes[4] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
         sizes[5] = null
         sizeChangeLD.notifyChanged()
@@ -93,13 +93,13 @@ class PanelComponent(
     }
 
     @Synchronized
-    fun setHeightMin(height: Float, unit: SizeUnit) {
+    fun setHeightMin(height: Float, unit: Int) {
         sizes[6] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
-    fun setHeightMax(height: Float, unit: SizeUnit) {
+    fun setHeightMax(height: Float, unit: Int) {
         sizes[7] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
