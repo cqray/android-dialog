@@ -12,8 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import cn.cqray.android.anim.listener.ViewAnimatorListener
-import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.R
+import cn.cqray.android.dialog.internal.LiveData
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import java.util.concurrent.TimeUnit
@@ -43,7 +42,7 @@ class TipComponent(
     private val animators = arrayOf(BounceIn(), BounceOut())
 
     /** 提示位置信息  */
-    private val layoutGravity = DialogLiveData(Gravity.CENTER)
+    private val layoutGravity = LiveData(Gravity.CENTER)
 
     init {
 //        val resources = Utils.getApp().resources
@@ -61,11 +60,11 @@ class TipComponent(
         setBackgroundColor(Color.parseColor("#484848"))
 //        setLayoutGravity(Gravity.CENTER)
         setTextColor(Color.WHITE)
-        setTextSize(R.dimen.body)
+//        setTextSize(R.dimen.body)
         setGravity(Gravity.CENTER)
         setHeight(-2F)
         setWidth(-2F)
-        setGone(true)
+//        setGone(true)
         setBackgroundRadius(4F)
         setLayoutGravity(Gravity.CENTER)
 

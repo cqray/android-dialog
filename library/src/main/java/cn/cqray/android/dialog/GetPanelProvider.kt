@@ -144,56 +144,26 @@ interface GetPanelProvider<T : GetPanelProvider<T>> {
     fun setPadding(padding: Float, unit: Int) = also { panelComponent.setPadding(padding, unit) } as T
 
     /**
-     * 设置内部左右间隔，默认单位DIP
-     * @param padding 间隔值
-     */
-    @JvmDefault
-    fun setPaddingLR(padding: Float) = also { panelComponent.setPaddingLR(padding) } as T
-
-    /**
-     * 设置内部左右间隔
-     * @param padding 间隔值
-     * @param unit 值单位[TypedValue]
-     */
-    @JvmDefault
-    fun setPaddingLR(padding: Float, unit: Int) = also { panelComponent.setPaddingLR(padding, unit) } as T
-
-    /**
-     * 设置内部上下间隔，默认单位DIP
-     * @param padding 间隔值
-     */
-    @JvmDefault
-    fun setPaddingTB(padding: Float) = also { panelComponent.setPaddingTB(padding) } as T
-
-    /**
-     * 设置内部部上下间隔
-     * @param padding 间隔值
-     * @param unit 值单位[TypedValue]
-     */
-    @JvmDefault
-    fun setPaddingTB(padding: Float, unit: Int) = also { panelComponent.setPaddingTB(padding, unit) } as T
-
-    /**
      * 设置内部部间隔，默认单位DIP
-     * @param l 左间隔值
+     * @param s 左间隔值
      * @param t 上间隔值
-     * @param r 右间隔值
+     * @param e 右间隔值
      * @param b 下间隔值
      */
     @JvmDefault
-    fun setPadding(l: Float, t: Float, r: Float, b: Float) = also { panelComponent.setPadding(l, t, r, b) } as T
+    fun setPadding(s: Float, t: Float, e: Float, b: Float) = also { panelComponent.setPadding(s, t, e, b) } as T
 
     /**
      * 设置内部部间隔
-     * @param l 左间隔值
+     * @param s 左间隔值
      * @param t 上间隔值
-     * @param r 右间隔值
+     * @param e 右间隔值
      * @param b 下间隔值
      * @param unit 值单位[TypedValue]
      */
     @JvmDefault
-    fun setPadding(l: Float, t: Float, r: Float, b: Float, unit: Int) = also {
-        panelComponent.setPadding(l, t, r, b, unit)
+    fun setPadding(s: Float, t: Float, e: Float, b: Float, unit: Int) = also {
+        panelComponent.setPadding(s, t, e, b, unit)
     } as T
 
     /**
@@ -212,56 +182,26 @@ interface GetPanelProvider<T : GetPanelProvider<T>> {
     fun margin(margin: Float, unit: Int) = also { panelComponent.setMargin(margin, unit) } as T
 
     /**
-     * 设置外部左右间隔，默认单位DIP
-     * @param margin 间隔值
-     */
-    @JvmDefault
-    fun marginLR(margin: Float) = also { panelComponent.setMarginLR(margin) } as T
-
-    /**
-     * 设置外部左右间隔
-     * @param margin 间隔值
-     * @param unit 值单位[TypedValue]
-     */
-    @JvmDefault
-    fun marginLR(margin: Float, unit: Int) = also { panelComponent.setMarginLR(margin, unit) } as T
-
-    /**
-     * 设置外部上下间隔，默认单位DIP
-     * @param margin 间隔值
-     */
-    @JvmDefault
-    fun marginTB(margin: Float) = also { panelComponent.setMarginTB(margin) } as T
-
-    /**
-     * 设置外部上下间隔
-     * @param margin 间隔值
-     * @param unit 值单位[TypedValue]
-     */
-    @JvmDefault
-    fun marginTB(margin: Float, unit: Int) = also { panelComponent.setMarginTB(margin, unit) } as T
-
-    /**
      * 设置外部间隔，默认单位DIP
-     * @param l 左间隔值
+     * @param s 左间隔值
      * @param t 上间隔值
-     * @param r 右间隔值
+     * @param e 右间隔值
      * @param b 下间隔值
      */
     @JvmDefault
-    fun margin(l: Float, t: Float, r: Float, b: Float) = also { panelComponent.setMargin(l, t, r, b) } as T
+    fun margin(s: Float, t: Float, e: Float, b: Float) = also { panelComponent.setMargin(s, t, e, b) } as T
 
     /**
      * 设置外部间隔
-     * @param l 左间隔值
+     * @param s 左间隔值
      * @param t 上间隔值
-     * @param r 右间隔值
+     * @param e 右间隔值
      * @param b 下间隔值
      * @param unit 值单位[TypedValue]
      */
     @JvmDefault
-    fun margin(l: Float, t: Float, r: Float, b: Float, unit: Int) = also {
-        panelComponent.setMargin(l, t, r, b, unit)
+    fun margin(s: Float, t: Float, e: Float, b: Float, unit: Int) = also {
+        panelComponent.setMargin(s, t, e, b, unit)
     } as T
 
     /**

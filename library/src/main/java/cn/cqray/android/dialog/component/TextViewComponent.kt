@@ -1,16 +1,14 @@
 package cn.cqray.android.dialog.component
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.annotation.ColorInt
-import androidx.annotation.DimenRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.LifecycleOwner
-import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.DialogUtils
+import cn.cqray.android.dialog.internal.LiveData
+import cn.cqray.android.dialog.internal.Utils
 
 open class TextViewComponent(
     lifecycleOwner: LifecycleOwner,
@@ -20,25 +18,23 @@ open class TextViewComponent(
     viewGet,
 ) {
     /** 文本  */
-    private val text = DialogLiveData<Any?>()
+    private val textLD = LiveData<Any?>()
 
     /** 文本颜色  */
-    private val textColor = DialogLiveData<ColorStateList>()
+    private val textColorLD = LiveData<ColorStateList>()
 
     /** 文本大小  */
-    private val textSize = DialogLiveData<Any>()
+    private val textSizeLD = LiveData<Any>()
 
     /** 文本加粗  */
-    private val textStyle = DialogLiveData<Int>()
-
-    private val textTypeface = DialogLiveData<Any?>()
+    private val textStyleLD = LiveData<Int>()
 
     /** 文本位置  */
-    private val gravity = DialogLiveData<Int>()
+    private val gravityLD = LiveData<Int>()
 
     init {
         // 文本变化监听
-        text.observe(lifecycleOwner) {
+        textLD.observe(lifecycleOwner) {
             when (it) {
                 null -> view.text = null
                 is Int -> view.setText(it)
@@ -46,9 +42,9 @@ open class TextViewComponent(
             }
         }
         // 文本颜色变化监听
-        textColor.observe(lifecycleOwner) { view.setTextColor(it) }
+        textColorLD.observe(lifecycleOwner) { view.setTextColor(it) }
         // 文本大小变化监听
-        textSize.observe(lifecycleOwner) {
+        textSizeLD.observe(lifecycleOwner) {
             val size = when (it) {
                 is Int -> view.resources.getDimension(it)
                 else -> it as Float
@@ -56,38 +52,24 @@ open class TextViewComponent(
             view.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
         }
         // 文本样式变化监听
-        textTypeface.observe(lifecycleOwner) {
-            when(it) {
-                is Int -> view.typeface = Typeface.defaultFromStyle(it)
-                is Typeface -> view.typeface = it
-                else -> view.typeface = null
-            }
-        }
+        textStyleLD.observe(lifecycleOwner) { view.typeface = Typeface.defaultFromStyle(it) }
         // 文本位置变化监听
-        gravity.observe(lifecycleOwner) { view.gravity = it }
+        gravityLD.observe(lifecycleOwner) { view.gravity = it }
     }
 
-    fun setText(@StringRes id: Int) = text.setValue(id)
+    fun setText(@StringRes id: Int) = textLD.setValue(id)
 
-    fun setText(text: CharSequence?) = this.text.setValue(text)
+    fun setText(text: CharSequence?) = textLD.setValue(text)
 
-    fun setTextColor(@ColorInt color: Int) = textColor.setValue(ColorStateList.valueOf(color))
+    fun setTextColor(@ColorInt color: Int) = textColorLD.setValue(ColorStateList.valueOf(color))
 
-    fun setTextColor(color: String) = setTextColor(Color.parseColor(color))
-
-    fun setTextColor(colorStateList: ColorStateList) = textColor.setValue(colorStateList)
-
-    fun setTextSize(@DimenRes id: Int) = textSize.setValue(id)
+    fun setTextColor(colors: ColorStateList) = textColorLD.setValue(colors)
 
     fun setTextSize(size: Float) = setTextSize(size, TypedValue.COMPLEX_UNIT_SP)
 
-    fun setTextSize(size: Float, unit: Int) = textSize.setValue(DialogUtils.applyDimension(size, unit))
+    fun setTextSize(size: Float, unit: Int) = textSizeLD.setValue(Utils.applyDimension(size, unit))
 
-    fun setTextBold(bold: Boolean) = textStyle.setValue(if (bold) Typeface.BOLD else Typeface.NORMAL)
+    fun setTextStyle(textStyle: Int) = textStyleLD.setValue(textStyle)
 
-    fun setTextTypeface(typeface: Int) = textTypeface.setValue(typeface)
-
-    fun setTextTypeface(typeface: Typeface?) = textTypeface.setValue(typeface)
-
-    fun setGravity(gravity: Int) = this.gravity.setValue(gravity)
+    fun setGravity(gravity: Int) = gravityLD.setValue(gravity)
 }

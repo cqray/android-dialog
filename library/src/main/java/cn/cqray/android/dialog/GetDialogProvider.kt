@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.util.TypedValue
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
 import cn.cqray.android.dialog.amin.DialogAnimator
@@ -123,7 +124,7 @@ interface GetDialogProvider<T : GetDialogProvider<T>> {
      * 对话框偏移量
      * @param offsetX 横向偏移量
      * @param offsetY 纵向向偏移量
-     * @param unit 值单位[SizeUnit]
+     * @param unit 值单位[TypedValue]
      */
     @JvmDefault
     fun offset(offsetX: Float, offsetY: Float, unit: Int) = also {

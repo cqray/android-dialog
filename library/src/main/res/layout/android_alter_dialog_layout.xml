@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/dlg_title"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
+        android:layout_height="@dimen/line"
         android:textColor="@color/text"
         android:textSize="@dimen/h2"
         android:textStyle="bold"

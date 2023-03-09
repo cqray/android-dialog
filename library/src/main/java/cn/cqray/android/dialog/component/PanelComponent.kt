@@ -4,8 +4,8 @@ import android.graphics.Color
 import android.util.TypedValue.*
 import android.widget.FrameLayout
 import androidx.lifecycle.LifecycleOwner
-import cn.cqray.android.dialog.DialogLiveData
-import cn.cqray.android.dialog.DialogUtils
+import cn.cqray.android.dialog.internal.LiveData
+import cn.cqray.android.dialog.internal.Utils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,10 +29,10 @@ class PanelComponent(
     private val sizes = arrayOfNulls<Float?>(8)
 
     /** 对话框位置 **/
-    private val sizeLD = DialogLiveData<FloatArray>()
+    private val sizeLD = LiveData<FloatArray>()
 
     /** 对话框大小**/
-    private val sizeChangeLD = DialogLiveData<Unit>()
+    private val sizeChangeLD = LiveData<Unit>()
 
 //    val tipComponent = TipComponent(lifecycleOwner) { viewGet().findViewById(R.id.dlg_tip) }
 
@@ -54,7 +54,7 @@ class PanelComponent(
 
     @Synchronized
     override fun setWidth(width: Float, unit: Int) {
-        sizes[0] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
+        sizes[0] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizes[1] = null
         sizeChangeLD.notifyChanged()
     }
@@ -68,19 +68,19 @@ class PanelComponent(
 
     @Synchronized
     fun setWidthMin(width: Float, unit: Int) {
-        sizes[2] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
+        sizes[2] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     fun setWidthMax(width: Float, unit: Int) {
-        sizes[3] = if (width <= 0) null else DialogUtils.applyDimension(width, unit)
+        sizes[3] = if (width <= 0) null else Utils.applyDimension(width, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     override fun setHeight(height: Float, unit: Int) {
-        sizes[4] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
+        sizes[4] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizes[5] = null
         sizeChangeLD.notifyChanged()
     }
@@ -94,13 +94,13 @@ class PanelComponent(
 
     @Synchronized
     fun setHeightMin(height: Float, unit: Int) {
-        sizes[6] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
+        sizes[6] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
 
     @Synchronized
     fun setHeightMax(height: Float, unit: Int) {
-        sizes[7] = if (height <= 0) null else DialogUtils.applyDimension(height, unit)
+        sizes[7] = if (height <= 0) null else Utils.applyDimension(height, unit)
         sizeChangeLD.notifyChanged()
     }
 
@@ -109,8 +109,8 @@ class PanelComponent(
      */
     private fun changeSizes() {
         // 对话框宽高（满屏）
-        val dialogWidth = DialogUtils.getAppScreenWidth(view.context)
-        val dialogHeight = DialogUtils.getAppScreenHeight(view.context)
+        val dialogWidth = Utils.getAppScreenWidth(view.context)
+        val dialogHeight = Utils.getAppScreenHeight(view.context)
         // 计算新的尺寸信息
         val size = FloatArray(2)
         // 宽度计算

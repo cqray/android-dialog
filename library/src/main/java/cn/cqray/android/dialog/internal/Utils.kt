@@ -1,4 +1,4 @@
-package cn.cqray.android.dialog
+package cn.cqray.android.dialog.internal
 
 import android.app.Activity
 import android.app.Dialog
@@ -17,10 +17,11 @@ import androidx.core.view.ViewCompat
 import androidx.lifecycle.Lifecycle
 import butterknife.ButterKnife
 import butterknife.Unbinder
+import cn.cqray.android.dialog.GetDialog
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Suppress("Unchecked_cast")
-internal object DialogUtils {
+internal object Utils {
 
     private val logTag = GetDialog::class.java.simpleName
 
@@ -100,7 +101,7 @@ internal object DialogUtils {
 //    /**
 //     * 获取相应的尺寸
 //     * @param value 值
-//     * @param unit 值单位[SizeUnit]
+//     * @param unit 值单位[TypedValue]
 //     */
 //    @JvmStatic
 //    fun applyDimension(value: Float, unit: SizeUnit): Float {

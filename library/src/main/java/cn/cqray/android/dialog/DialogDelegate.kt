@@ -16,7 +16,6 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.LiveData
 import androidx.viewbinding.ViewBinding
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
@@ -25,8 +24,15 @@ import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
 import cn.cqray.android.dialog.amin.DialogAnimator
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
+import cn.cqray.android.dialog.internal.Utils
 
-@Suppress("MemberVisibilityCanBePrivate")
+/**
+ * 对话框委托实现
+ * @author Cqray
+ */
+@Suppress(
+    "MemberVisibilityCanBePrivate"
+)
 open class DialogDelegate(val activity: Activity, val provider: GetDialogProvider<*>) {
 
     /** ButterKnife绑定实例  */
@@ -48,13 +54,13 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     private val animators = arrayOf(BounceIn(), BounceOut())
 
     /** Fragment视图 **/
-    private val contentLD = DialogLiveData<Any>()
+    private val contentLD = cn.cqray.android.dialog.internal.LiveData<Any>()
 
     /** 对话框位置 **/
-    private val gravityLD = DialogLiveData(Gravity.CENTER)
+    private val gravityLD = cn.cqray.android.dialog.internal.LiveData(Gravity.CENTER)
 
     /** 对话框偏移 **/
-    private val offsetLD = DialogLiveData(intArrayOf(0, 0))
+    private val offsetLD = cn.cqray.android.dialog.internal.LiveData(intArrayOf(0, 0))
 
     /** 对话框生命周期管理注册器 **/
     private val lifecycleRegistry by lazy { LifecycleRegistry(lifecycleOwner) }
@@ -111,7 +117,7 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
                 is View -> layout.addView(it)
             }
             // 兼容 ButterKnife
-            unBinder = DialogUtils.bindButterKnife(dialog, layout.getChildAt(1))
+            unBinder = Utils.bindButterKnife(dialog, layout.getChildAt(1))
         }
         // 监听面板位置变化
         gravityLD.observe(lifecycleOwner) { int ->
@@ -143,7 +149,7 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         // 释放ButterKnife
-        DialogUtils.unbindButterKnife(unBinder)
+        Utils.unbindButterKnife(unBinder)
     }
 
     /**
@@ -196,8 +202,8 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
         dialog.setCanceledOnTouchOutside(false)
         dialog.setCancelable(false)
         dialog.window?.let {
-            val width = DialogUtils.getAppScreenWidth(activity)
-            val height = DialogUtils.getAppScreenHeight(activity)
+            val width = Utils.getAppScreenWidth(activity)
+            val height = Utils.getAppScreenHeight(activity)
             it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
             it.setDimAmount(dimAmount[0])
             it.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -216,17 +222,17 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     /**
      * 显示对话框
      */
-    fun show() = DialogUtils.runOnUiThread(activity) { onCreateDialog().show() }
+    fun show() = Utils.runOnUiThread(activity) { onCreateDialog().show() }
 
     /**
      * 销毁对话框，有动画
      */
-    fun dismiss() = DialogUtils.runOnUiThread(activity) { doDimAnimator(doPanelAnimator(false), false) }
+    fun dismiss() = Utils.runOnUiThread(activity) { doDimAnimator(doPanelAnimator(false), false) }
 
     /**
      * 快速销毁对话框，无动画
      */
-    fun quickDismiss() = DialogUtils.runOnUiThread(activity) { dialog.dismiss() }
+    fun quickDismiss() = Utils.runOnUiThread(activity) { dialog.dismiss() }
 
     fun setContentView(view: View) = contentLD.setValue(view)
 
@@ -280,8 +286,8 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     @Synchronized
     fun setOffset(offsetX: Float, offsetY: Float, unit: Int) = also {
         val offsets = offsetLD.value!!
-        offsets[0] = DialogUtils.applyDimension(offsetX, unit).toInt()
-        offsets[1] = DialogUtils.applyDimension(offsetY, unit).toInt()
+        offsets[0] = Utils.applyDimension(offsetX, unit).toInt()
+        offsets[1] = Utils.applyDimension(offsetY, unit).toInt()
         offsetLD.setValue(offsets)
     }
 
@@ -358,6 +364,6 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
             }
         }
         // 主线程运行
-        DialogUtils.runOnUiThread(activity) {setDimAccount(native)}
+        Utils.runOnUiThread(activity) {setDimAccount(native)}
     }
 }

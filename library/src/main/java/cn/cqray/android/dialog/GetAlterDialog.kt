@@ -1,6 +1,7 @@
 package cn.cqray.android.dialog
 
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
@@ -18,6 +19,8 @@ import androidx.viewbinding.ViewBinding
 import cn.cqray.android.dialog.component.TextViewComponent
 import cn.cqray.android.dialog.component.ViewComponent
 import cn.cqray.android.dialog.databinding.AndroidAlterDialogLayoutBinding
+import cn.cqray.android.dialog.internal.LiveData
+import cn.cqray.android.dialog.internal.Utils
 import com.google.android.flexbox.FlexboxLayout
 
 /**
@@ -56,13 +59,13 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     private val buttonTexts = mutableListOf<CharSequence>()
 
     /** 按钮文本颜色 **/
-    private val buttonTextColors = mutableListOf<Int?>()
+    private val buttonTextColors = mutableListOf<Any>()
 
     /** 按钮文本大小 **/
     private val buttonTextSizes = mutableListOf<Float?>()
 
     /** 按钮文本字体样式 **/
-    private val buttonTextTypefaces = mutableListOf<Any?>()
+    private val buttonTextStyles = mutableListOf<Int?>()
 
     /** 按钮背景 **/
     private val buttonBackgrounds = mutableListOf<Any?>()
@@ -71,25 +74,23 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     private val buttonListeners = mutableListOf<View.OnClickListener?>()
 
     /** 按钮视图变化 **/
-    private val buttonLD = DialogLiveData<Any>()
+    private val buttonLD = LiveData<Any>()
 
     /** 内容视图布局 **/
-    private val contentViewLD = DialogLiveData<Any>()
+    private val contentViewLD = LiveData<Any>()
 
     /** 分割线颜色 **/
-    private val dividerColorLD = DialogLiveData<Int?>(null)
+    private val dividerColorLD = LiveData<Int?>(null)
 
     /** 分割线大小 **/
-    private val dividerSizeLD = DialogLiveData<Float?>()
+    private val dividerSizeLD = LiveData<Float?>()
 
     /** 分割线是否显示 **/
-    private val dividerVisibleLD = DialogLiveData(arrayOf(true, true, true))
+    private val dividerVisibleLD = LiveData(arrayOf(true, true, true))
 
     init {
         buttonTexts("取消", "确认")
-        buttonTextTypefaces(Typeface.BOLD_ITALIC)
         this.topDividerVisible(false)
-        this.bottomDividerVisible(false)
         this.widthScale(0.8F)
         this.widthMax(300F)
     }
@@ -139,7 +140,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
     fun titleHeight(height: Float, unit: Int) = also { titleComponent.setHeight(height, unit) } as T
 
     fun titleVisible(visible: Boolean) = also {
-        titleComponent.setVisible(visible)
+        titleComponent.setVisibility(if (visible) View.VISIBLE else View.GONE)
         if (!visible) topDividerVisible(false)
     } as T
 
@@ -151,15 +152,13 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun titleTextColor(color: Int) = also { titleComponent.setTextColor(color) } as T
 
+    fun titleTextColor(colors: ColorStateList) = also { titleComponent.setTextColor(colors) } as T
+
     fun titleTextSize(size: Float) = also { titleComponent.setTextSize(size) } as T
 
     fun titleTextSize(size: Float, unit: Int) = also { titleComponent.setTextSize(size, unit) } as T
 
-    fun titleTextBold(bold: Boolean) = also { titleComponent.setTextBold(bold) } as T
-
-    fun titleTextTypeface(typeface: Int) = also { titleComponent.setTextTypeface(typeface) } as T
-
-    fun titleTextTypeface(typeface: Typeface) = also { titleComponent.setTextTypeface(typeface) } as T
+    fun titleTextStyle(textStyle: Int) = also { titleComponent.setTextStyle(textStyle) } as T
 
     fun contentHeight(height: Float) = also { contentComponent.setHeight(height) } as T
 
@@ -175,11 +174,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
 
     fun contentTextSize(size: Float, unit: Int) = also { contentComponent.setTextSize(size, unit) } as T
 
-    fun contentTextBold(bold: Boolean) = also { contentComponent.setTextBold(bold) } as T
-
-    fun contentTextTypeface(typeface: Int) = also { contentComponent.setTextTypeface(typeface) } as T
-
-    fun contentTextTypeface(typeface: Typeface) = also { contentComponent.setTextTypeface(typeface) } as T
+    fun contentTextStyle(textStyle: Int) = also { contentComponent.setTextStyle(textStyle) } as T
 
     fun contentPadding(padding: Float) = also { contentComponent.setPadding(padding) } as T
 
@@ -201,6 +196,14 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
         }
     } as T
 
+    fun buttonTextColors(vararg colors: ColorStateList) = also {
+        synchronized(buttonTextColors) {
+            buttonTextColors.clear()
+            buttonTextColors.addAll(colors.toMutableList())
+            buttonLD.notifyChanged()
+        }
+    } as T
+
     fun buttonTextSizes(vararg sizes: Float) = buttonTextSizes(sizes.toTypedArray())
 
     fun buttonTextSizes(sizes: Array<Float>) = buttonTextSizes(sizes, TypedValue.COMPLEX_UNIT_SP)
@@ -211,36 +214,17 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
             buttonTextSizes.addAll(mutableListOf<Float>().also { list ->
                 for (size in sizes) {
                     // 转换尺寸
-                    list.add(DialogUtils.applyDimension(size, unit))
+                    list.add(Utils.applyDimension(size, unit))
                 }
             })
             buttonLD.notifyChanged()
         }
     } as T
 
-    fun buttonTextBolds(vararg bold: Boolean?) = also {
-        synchronized(buttonTextTypefaces) {
-            val array = arrayOfNulls<Int?>(bold.size)
-            bold.forEachIndexed { index, item ->
-                val typeface = if (item == true) Typeface.BOLD else Typeface.NORMAL
-                array[index] = typeface
-            }
-            buttonTextTypefaces(*array)
-        }
-    }
-
-    fun buttonTextTypefaces(vararg typefaces: Int?) = also {
-        synchronized(buttonTextTypefaces) {
-            buttonTextTypefaces.clear()
-            buttonTextTypefaces.addAll(typefaces.toMutableList())
-            buttonLD.notifyChanged()
-        }
-    } as T
-
-    fun buttonTextTypefaces(vararg typefaces: Typeface?) = also {
-        synchronized(buttonTextTypefaces) {
-            buttonTextTypefaces.clear()
-            buttonTextTypefaces.addAll(typefaces.toMutableList())
+    fun buttonTextStyles(vararg textStyles: Int?) = also {
+        synchronized(buttonTextStyles) {
+            buttonTextStyles.clear()
+            buttonTextStyles.addAll(textStyles.toMutableList())
             buttonLD.notifyChanged()
         }
     } as T
@@ -329,10 +313,23 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
             }
             // 文字颜色
             with(buttonTextColors) {
-                val id = if (i > 0) R.color.text else R.color.tint
-                val textColor = ContextCompat.getColor(activity, id)
-                if (i < size) component.setTextColor(getOrNull(i) ?: textColor)
-                else component.setTextColor(getOrNull(size - 1) ?: textColor)
+                // 获取默认的两种颜色ID，并取值
+                val defId = when {
+                    buttonTexts.size == 1 -> R.color.colorPrimary
+                    i > 0 -> R.color.text
+                    else -> R.color.tint
+                }
+                val defColor = ContextCompat.getColor(activity, defId)
+                // 获取用户设置的按钮颜色
+                val btnColor =
+                    if (i < size) getOrNull(i)
+                    else getOrNull(size - 1)
+                // 设置对应的颜色
+                when (btnColor) {
+                    is ColorStateList -> component.setTextColor(btnColor)
+                    is Int -> component.setTextColor(btnColor)
+                    null -> component.setTextColor(defColor)
+                }
             }
             // 文字大小
             with(buttonTextSizes) {
@@ -341,15 +338,11 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
                 else component.setTextSize(getOrNull(size - 1) ?: textSize, TypedValue.COMPLEX_UNIT_PX)
             }
             // 文字样式
-            with(buttonTextTypefaces) {
-                val typeface =
+            with(buttonTextStyles) {
+                val textStyle =
                     if (i < size) getOrNull(i)
                     else getOrNull(size - 1)
-                when (typeface) {
-                    is Int -> component.setTextTypeface(typeface)
-                    is Typeface -> component.setTextTypeface(typeface)
-                    else -> component.setTextTypeface(null)
-                }
+                component.setTextStyle(textStyle ?: Typeface.NORMAL)
             }
             // 设置背景
             with(buttonBackgrounds) {
@@ -359,7 +352,7 @@ open class GetAlterDialog<T : GetAlterDialog<T>>(activity: Activity) : GetDialog
                 when (background) {
                     is Int -> component.setBackgroundResource(background)
                     is Drawable -> component.setBackground(background)
-                    else -> DialogUtils.setRippleBackground(component.view)
+                    else -> Utils.setRippleBackground(component.view)
                 }
             }
             // 点击事件
