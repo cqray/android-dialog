@@ -22,8 +22,9 @@ import androidx.annotation.LayoutRes
 import cn.cqray.android.anim.listener.ViewAnimatorListener
 import cn.cqray.android.dialog.amin.BounceIn
 import cn.cqray.android.dialog.amin.BounceOut
-import cn.cqray.android.dialog.amin.DialogAnimator
+import cn.cqray.android.dialog.amin.GetAnimator
 import cn.cqray.android.dialog.databinding.AndroidDlgLayoutBaseBinding
+import cn.cqray.android.dialog.internal.LiveData
 import cn.cqray.android.dialog.internal.Utils
 
 /**
@@ -33,7 +34,7 @@ import cn.cqray.android.dialog.internal.Utils
 @Suppress(
     "MemberVisibilityCanBePrivate"
 )
-open class DialogDelegate(val activity: Activity, val provider: GetDialogProvider<*>) {
+open class GetDialogDelegate(val activity: Activity, val provider: GetDialogProvider<*>) {
 
     /** ButterKnife绑定实例  */
     private var unBinder: Any? = null
@@ -54,13 +55,13 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     private val animators = arrayOf(BounceIn(), BounceOut())
 
     /** Fragment视图 **/
-    private val contentLD = cn.cqray.android.dialog.internal.LiveData<Any>()
+    private val contentLD = LiveData<Any>()
 
     /** 对话框位置 **/
-    private val gravityLD = cn.cqray.android.dialog.internal.LiveData(Gravity.CENTER)
+    private val gravityLD = LiveData(Gravity.CENTER)
 
     /** 对话框偏移 **/
-    private val offsetLD = cn.cqray.android.dialog.internal.LiveData(intArrayOf(0, 0))
+    private val offsetLD = LiveData(intArrayOf(0, 0))
 
     /** 对话框生命周期管理注册器 **/
     private val lifecycleRegistry by lazy { LifecycleRegistry(lifecycleOwner) }
@@ -103,7 +104,7 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     }
 
     /**
-     * 初始化[LiveData]数据
+     * 初始化数据
      */
     private fun initLDs() {
         // 视图变化监听
@@ -175,7 +176,7 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
             && !provider.onBackPressed()
         ) {
             // 消除对话框
-            this@DialogDelegate.dismiss()
+            this@GetDialogDelegate.dismiss()
         }
     }
 
@@ -185,18 +186,18 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
     private fun onCreateDialog(): Dialog {
         // 创建对话框
         val dialog = object : Dialog(activity) {
-            override fun onAttachedToWindow() = this@DialogDelegate.onAttachedToWindow()
+            override fun onAttachedToWindow() = this@GetDialogDelegate.onAttachedToWindow()
 
-            override fun onCreate(savedInstanceState: Bundle?) = this@DialogDelegate.onCreate(savedInstanceState)
+            override fun onCreate(savedInstanceState: Bundle?) = this@GetDialogDelegate.onCreate(savedInstanceState)
 
-            override fun onDetachedFromWindow() = this@DialogDelegate.onDetachedFromWindow()
+            override fun onDetachedFromWindow() = this@GetDialogDelegate.onDetachedFromWindow()
 
             override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-                return if (this@DialogDelegate.dispatchTouchEvent(ev)) true
+                return if (this@GetDialogDelegate.dispatchTouchEvent(ev)) true
                 else super.dispatchTouchEvent(ev)
             }
 
-            override fun onBackPressed() = this@DialogDelegate.onBackPressed()
+            override fun onBackPressed() = this@GetDialogDelegate.onBackPressed()
         }
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCanceledOnTouchOutside(false)
@@ -242,9 +243,9 @@ open class DialogDelegate(val activity: Activity, val provider: GetDialogProvide
 
     fun setCancelableOutsize(cancelable: Boolean) = cancelable.let { this.cancelable[1] = it }
 
-    fun setShowAnimator(animator: DialogAnimator) = also { animators[0] = animator }
+    fun setShowAnimator(animator: GetAnimator) = also { animators[0] = animator }
 
-    fun setDismissAnimator(animator: DialogAnimator) = also { animators[1] = animator }
+    fun setDismissAnimator(animator: GetAnimator) = also { animators[1] = animator }
 
     /**
      * 设置原生遮罩透明度

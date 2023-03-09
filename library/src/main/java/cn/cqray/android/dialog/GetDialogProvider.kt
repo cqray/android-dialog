@@ -7,7 +7,8 @@ import android.view.View
 import android.util.TypedValue
 import androidx.annotation.FloatRange
 import androidx.annotation.LayoutRes
-import cn.cqray.android.dialog.amin.DialogAnimator
+import cn.cqray.android.anim.ViewAnimator
+import cn.cqray.android.dialog.amin.GetAnimator
 
 /**
  * 对话框相关功能提供器
@@ -23,7 +24,7 @@ import cn.cqray.android.dialog.amin.DialogAnimator
 interface GetDialogProvider<T : GetDialogProvider<T>> {
 
     /** 对话框委托实例 **/
-    val dialogDelegate: DialogDelegate
+    val dialogDelegate: GetDialogDelegate
 
     /**
      * 显示对画框
@@ -96,14 +97,40 @@ interface GetDialogProvider<T : GetDialogProvider<T>> {
      * @param animator 动画
      */
     @JvmDefault
-    fun showAnimator(animator: DialogAnimator) = also { dialogDelegate.setShowAnimator(animator) } as T
+    fun showAnimator(animator: GetAnimator) = also { dialogDelegate.setShowAnimator(animator) } as T
+
+    /**
+     * 自定义显示动画
+     * @param handle 动画处理器
+     */
+    fun showAnimator(handle: Function1<ViewAnimator, Unit>) = also {
+        val animator = object : GetAnimator() {
+            override fun onAnimatorPrepared(animator: ViewAnimator) {
+                handle.invoke(animator)
+            }
+        }
+        dialogDelegate.setShowAnimator(animator)
+    }
 
     /**
      * 消失动画
      * @param animator 动画
      */
     @JvmDefault
-    fun dismissAnimator(animator: DialogAnimator) = also { dialogDelegate.setDismissAnimator(animator) } as T
+    fun dismissAnimator(animator: GetAnimator) = also { dialogDelegate.setDismissAnimator(animator) } as T
+
+    /**
+     * 自定义消失动画
+     * @param handle 动画处理器
+     */
+    fun dismissAnimator(handle: Function1<ViewAnimator, Unit>) = also {
+        val animator = object : GetAnimator() {
+            override fun onAnimatorPrepared(animator: ViewAnimator) {
+                handle.invoke(animator)
+            }
+        }
+        dialogDelegate.setDismissAnimator(animator)
+    }
 
     /**
      * 对话框位置

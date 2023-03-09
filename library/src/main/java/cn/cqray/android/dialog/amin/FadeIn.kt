@@ -6,7 +6,7 @@ import cn.cqray.android.anim.ViewAnimator
  * 淡入
  * @author Cqray
  */
-class FadeIn : DialogAnimator() {
+class FadeIn : GetAnimator() {
     override fun onAnimatorPrepared(animator: ViewAnimator) {
         animator.fadeIn()
     }

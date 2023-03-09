@@ -6,7 +6,7 @@ import cn.cqray.android.anim.ViewAnimator
  * 缩放进入
  * @author Cqray
  */
-class ZoomIn : DialogAnimator() {
+class ZoomIn : GetAnimator() {
     override fun onAnimatorPrepared(animator: ViewAnimator) {
         animator.zoomIn()
     }

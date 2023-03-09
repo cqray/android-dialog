@@ -15,7 +15,7 @@ open class GetDialog<T : GetDialog<T>>(val activity: Activity) :
     GetPanelProvider<GetDialog<T>> {
 
     /** 对话框委托 **/
-    override val dialogDelegate: DialogDelegate by lazy { DialogDelegate(activity, this) }
+    override val dialogDelegate: GetDialogDelegate by lazy { GetDialogDelegate(activity, this) }
 
     /** 面板组件 **/
     override val panelComponent by lazy { PanelComponent(this) { dialogDelegate.binding.dlgPanel } }
@@ -34,6 +34,10 @@ open class GetDialog<T : GetDialog<T>>(val activity: Activity) :
 
         @JvmStatic
         @Suppress("UPPER_BOUND_VIOLATED_WARNING")
-        fun builder(activity: Activity) = GetDialog<GetDialog<*>>(activity)
+        fun builder2(activity: Activity) = GetDialog<GetDialog<*>>(activity)
+
+
+        @JvmStatic
+        fun builder(activity: Activity) = GetDialogBuilder(activity)
     }
 }

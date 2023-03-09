@@ -6,7 +6,7 @@ import cn.cqray.android.anim.ViewAnimator
  * 弹出
  * @author Cqray
  */
-class BounceOut : DialogAnimator() {
+class BounceOut : GetAnimator() {
     override fun onAnimatorPrepared(animator: ViewAnimator) {
         animator.bounceOut()
     }

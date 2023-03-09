@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference
  * 动画框动画
  * @author Cqray
  */
-abstract class DialogAnimator {
+abstract class GetAnimator {
     /** 目标视图 **/
     private val atomicView = AtomicReference<View>()
 

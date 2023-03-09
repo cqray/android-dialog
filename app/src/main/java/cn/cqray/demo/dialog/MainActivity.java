@@ -8,6 +8,7 @@ import android.view.View;
 
 import cn.cqray.android.dialog.BottomAlterDialog;
 import cn.cqray.android.dialog.GetAlterDialog;
+import cn.cqray.android.dialog.GetDialog;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int [] location = new int[2];
+                int[] location = new int[2];
                 v.getLocationOnScreen(location);
 
 //                Te.show(MainActivity.this);
@@ -38,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
 //                        .setContentView(R.layout.activity_main)
 //                        .show();
 
-                GetAlterDialog.builder(MainActivity.this)
+                GetDialog.builder(MainActivity.this)
+                        .asBottomAlter()
                         //.setContentView(R.layout.activity_main)
                         .titleText("提示")
                         .contentText("这是内容")
