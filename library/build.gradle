@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 30
@@ -21,7 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             android.libraryVariants.all { variant ->
-                variant.outputs.all {outputFileName = "android-dialog.aar"}
+                variant.outputs.all { outputFileName = "android-dialog.aar" }
             }
         }
     }
@@ -66,11 +67,10 @@ dependencies {
     compileOnly 'com.jakewharton:butterknife:10.2.3'
 }
 
-
 afterEvaluate {
-    
+
     generateReleaseBuildConfig.enabled = false
-    generateDebugBuildConfig.enabled =false
+    generateDebugBuildConfig.enabled = false
 
     publishing {
         publications {
